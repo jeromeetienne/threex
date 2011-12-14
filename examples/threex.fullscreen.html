@@ -1,0 +1,26 @@
+<html>
+<body>
+	<!-- DOM declaration -->
+	<span class="available">fullscreen available ? <span class="value"></span></span>
+	<span class="activated">fullscreen activated ? <span class="value"></span></span>
+	<button class="button request">request fullscreen</button>
+	<button class="button cancel">request fullscreen</button>
+
+	<script src="../threex.fullscreen.js"></script>
+
+	<script>
+		document.querySelector(".available .value").innerHTML	= THREEx.FullScreen.available() ? "yes" : "no";
+		document.querySelector(".activated .value").innerHTML	= THREEx.FullScreen.activated() ? "yes" : "no";
+		
+		document.querySelector(".button.request").addEventListener('click', function(){
+			THREEx.FullScreen.request();
+			document.querySelector(".activated .value").innerHTML	= THREEx.FullScreen.activated() ? "yes" : "no";
+		}, false);
+
+		document.querySelector(".button.cancel").addEventListener('click', function(){
+			THREEx.FullScreen.cancel();
+			document.querySelector(".activated .value").innerHTML	= THREEx.FullScreen.activated() ? "yes" : "no";
+		}, false);
+	</script>
+</body>
+</html>
