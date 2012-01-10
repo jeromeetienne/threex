@@ -5,8 +5,9 @@ THREEx.DeviceOrientationState	= function()
 {
 	// to store the current state
 	this._state	= { x: 0, y: 0, z: 0 };
-
-	this._$callback	= function(event){ this._onDeviceOrientation(event); }.bind(this);
+	
+	var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	this._$callback	= __bind(function(event){ this._onDeviceOrientation(event); }, this);
 	
 	// bind events
 	// - spec http://dev.w3.org/geo/api/spec-source-orientation.html

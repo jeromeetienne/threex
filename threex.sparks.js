@@ -16,6 +16,7 @@ THREEx.Sparks	= function(opts)
 	this._texture	= opts.texture	|| this._buildDefaultTexture();
 	var counter	= opts.counter	|| console.assert(false);
 	
+	// TODO replace this by objectpool.js
 	var vertexIndexPool = {
 		__pools: [],
 		// Get a new Vector
@@ -81,8 +82,14 @@ THREEx.Sparks	= function(opts)
 		var vertexIdx	= vertexIndexPool.get();
 		var target	= {
 			vertexIdx	: vertexIdx,
-			size		: function(value){ valuesSize[vertexIdx] = value;	},
-			color		: function(){ return valuesColor[vertexIdx];		}
+			size		: function(value){
+				if( value !== undefined )	valuesSize[vertexIdx] = value;
+				return valuesSize[vertexIdx];
+			},
+			color		: function(value){
+				if( value !== undefined )	valuesColor[vertexIdx]	= value;
+				return valuesColor[vertexIdx];
+			}
 		};
 		return target;
 	};

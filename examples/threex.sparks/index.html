@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+	<head>
+		<title>learningthree.js boiler plate for three.js</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+			
+		<script src="vendor/three.js/Three.js"></script>
+		<script src="vendor/three.js/Detector.js"></script>
+		<!-- see details at http://paulirish.com/2011/requestanimationframe-for-smart-animating/ -->
+		<script src="vendor/three.js/RequestAnimationFrame.js"></script>
+		<!-- https://github.com/mrdoob/stats.js -->
+		<script src="vendor/three.js/Stats.js"></script>
+
+		<script src="vendor/DragPanControls.js"></script>
+	
+		<script src="./vendor/sparks.js/Sparks.js"></script>
+		<script src="./vendor/sparks.js/examples/js/Tween.js"></script>
+		
+		<script src="../../threex.sparks.js"></script>
+
+		<link  href="css/main.css" rel="stylesheet"/>
+	</head>
+<body>
+	<!-- three.js container -->
+    	<div id="container"></div>
+	<!-- info on screen display -->
+	<div id="info">
+		<a href="http://learningthreejs.com/blog/2011/12/20/boilerplate-for-three-js/" target="_blank">LearningThree.js</a>
+		Example of threex.sparks
+		<br/>
+		<a href="https://github.com/mrdoob/three.js/" target="_blank">three.js</a>,
+		<a href="https://github.com/jeromeetienne/threex/" target="_blank">threex</a> and
+		<a href="https://github.com/zz85/sparks.js/" target="_blank">sparks.js</a>
+	</div> 
+
+	<script type="text/javascript">
+		var stats, scene, renderer;
+		var camera, cameraControl;
+
+		if( !init() )	animate();
+
+		// init the scene
+		function init(){
+
+			if( Detector.webgl ){
+				renderer = new THREE.WebGLRenderer({
+					antialias		: true,	// to get smoother output
+					preserveDrawingBuffer	: true	// to allow screenshot
+				});
+				renderer.setClearColorHex( 0x222222, 1 );
+			}else{
+				Detector.addGetWebGLMessage();
+				return true;
+			}
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.getElementById('container').appendChild(renderer.domElement);
+
+			// add Stats.js - https://github.com/mrdoob/stats.js
+			stats = new Stats();
+			stats.domElement.style.position	= 'absolute';
+			stats.domElement.style.bottom	= '0px';
+			document.body.appendChild( stats.domElement );
+
+			// create a scene
+			scene = new THREE.Scene();
+
+			// put a camera in the scene
+			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 10000 );
+			camera.position.set(0, 3, 5);
+			scene.add(camera);
+
+			// create a camera contol
+			cameraControls	= new THREE.DragPanControls(camera)
+			cameraControls.target	= new THREE.Vector3(0,0.5,0);
+
+			// here you add your objects
+			// - you will most likely replace this part by your own
+			var geometry	= new THREE.CylinderGeometry( 0.5, 0.001, 1.5 );
+			var material	= new THREE.MeshNormalMaterial();
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.y	= -1;
+			scene.add( mesh );
+
+			threexSparks	= initParticles();
+			
+			// add the particles to the scene
+			scene.add(threexSparks.container());
+		}
+
+		function initParticles(){
+			var sparks	= new THREEx.Sparks({
+				maxParticles	: 50,
+				counter		: new SPARKS.SteadyCounter(30)
+			});
+			
+			// setup the emitter
+			var emitter	= sparks.emitter();
+			
+			var originalColor	= new THREE.Color().setRGB(0.5,0.3,0);
+
+			var initColorSize	= function(){
+				this.initialize = function( emitter, particle ){
+					particle.target.color().copy( originalColor );
+					particle.target.size(20);
+				};
+			};
+			var actionLinearColor	= function(colorSrc, colorDst, deltaSeconds){
+				var colorInc	= new THREE.Color();
+				colorInc.r	= (colorDst.r - colorSrc.r) / deltaSeconds;
+				colorInc.g	= (colorDst.g - colorSrc.g) / deltaSeconds;
+				colorInc.b	= (colorDst.b - colorSrc.b) / deltaSeconds;
+				this.update	= function( emitter, particle, time ){
+					var color	= particle.target.color();
+					color.r		+= colorInc.r * time;
+					color.g		+= colorInc.g * time;
+					color.b		+= colorInc.b * time;
+				};
+			};
+			
+			var actionLinearSize	= function(sizeSrc, sizeDst, deltaSeconds){
+				var sizeInc	= ( sizeDst - sizeSrc ) / deltaSeconds;
+				this.update	= function( emitter, particle, time ){
+					var size	= particle.target.size();
+					size	+= sizeInc * time;
+					particle.target.size( size );
+				};
+			};
+			
+			emitter.addInitializer(new initColorSize());
+			emitter.addInitializer(new SPARKS.Position( new SPARKS.PointZone( new THREE.Vector3(0,0,0) ) ) );
+			emitter.addInitializer(new SPARKS.Lifetime(0.8, 1));
+			emitter.addInitializer(new SPARKS.Velocity(new SPARKS.PointZone(new THREE.Vector3(0,3,0))));
+			
+			emitter.addAction(new SPARKS.Age());
+			emitter.addAction(new SPARKS.Move());
+			emitter.addAction(new actionLinearColor(originalColor, new THREE.Color().setRGB(0.1,0.3,0.6), 1));
+			emitter.addAction(new actionLinearSize(20, 0, 1));
+			emitter.addAction(new SPARKS.RandomDrift(10,0,10));
+						
+			// start the emitter
+			sparks.emitter().start();
+			
+			return sparks;
+		}
+
+		// animation loop
+		function animate() {
+
+			// loop on request animation loop
+			// - it has to be at the begining of the function
+			// - see details at http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+			requestAnimationFrame( animate );
+
+			// do the render
+			render();
+
+			// update stats
+			stats.update();
+		}
+
+		// render the scene
+		function render(){
+
+			// update camera controls
+			cameraControls.update();
+
+	threexSparks	&& threexSparks.update();
+
+	// FIXME this should be INSIDE webgl renderer... bug
+	renderer.context.depthMask( true );
+
+			// actually render the scene
+			renderer.render( scene, camera );
+		}
+	</script>
+</body>
+</html>
