@@ -19,6 +19,7 @@
 		<script src="./vendor/sparks.js/examples/js/Tween.js"></script>
 		
 		<script src="../../threex.sparks.js"></script>
+		<script src="../../threex.sparksPlugins.js"></script>
 
 		<link  href="css/main.css" rel="stylesheet"/>
 	</head>
@@ -92,56 +93,53 @@
 		function initParticles(){
 			var sparks	= new THREEx.Sparks({
 				maxParticles	: 50,
-				counter		: new SPARKS.SteadyCounter(30)
+				counter		: new SPARKS.SteadyCounter(30),
+				//texture		: THREE.ImageUtils.loadTexture("./images/tremulous/damage/blood.jpg"),
+				//texture		: THREE.ImageUtils.loadTexture("./images/tremulous/lcannon/primary_4.jpg"),
+				//texture		: THREE.ImageUtils.loadTexture("./images/tremulous/marks/burn_mrk.jpg"),
+				texture		: THREE.ImageUtils.loadTexture("./images/tremulous/blaster/orange_particle.jpg"),
 			});
 			
+//THREEx.Sparks.registerInitializer('color', function(){	
+//})
+
+
+// TODO do the same for actions
+// TODO make it such as the arguments arent known
+sparks.initializer	= {
+	color	: function(value){
+		sparks.emitter().addInitializer(new THREEx.SparksPlugins.InitColor(value));
+		return sparks.initializer;
+	},
+	size	: function(value){
+		sparks.emitter().addInitializer(new THREEx.SparksPlugins.InitSize(value));
+		return sparks.initializer;
+	},
+	lifeTime: function(minValue, maxValue){
+		sparks.emitter().addInitializer(new SPARKS.Lifetime(minValue, maxValue));
+		return sparks.initializer;
+	}
+};
+
 			// setup the emitter
 			var emitter	= sparks.emitter();
 			
 			var originalColor	= new THREE.Color().setRGB(0.5,0.3,0);
 
-			var initColorSize	= function(){
-				this.initialize = function( emitter, particle ){
-					particle.target.color().copy( originalColor );
-					particle.target.size(20);
-				};
-			};
-			var actionLinearColor	= function(colorSrc, colorDst, deltaSeconds){
-				var colorInc	= new THREE.Color();
-				colorInc.r	= (colorDst.r - colorSrc.r) / deltaSeconds;
-				colorInc.g	= (colorDst.g - colorSrc.g) / deltaSeconds;
-				colorInc.b	= (colorDst.b - colorSrc.b) / deltaSeconds;
-				this.update	= function( emitter, particle, time ){
-					var color	= particle.target.color();
-					color.r		+= colorInc.r * time;
-					color.g		+= colorInc.g * time;
-					color.b		+= colorInc.b * time;
-				};
-			};
+			sparks.initializer.color(originalColor).size(30).lifeTime(0.8, 1);
 			
-			var actionLinearSize	= function(sizeSrc, sizeDst, deltaSeconds){
-				var sizeInc	= ( sizeDst - sizeSrc ) / deltaSeconds;
-				this.update	= function( emitter, particle, time ){
-					var size	= particle.target.size();
-					size	+= sizeInc * time;
-					particle.target.size( size );
-				};
-			};
-			
-			emitter.addInitializer(new initColorSize());
 			emitter.addInitializer(new SPARKS.Position( new SPARKS.PointZone( new THREE.Vector3(0,0,0) ) ) );
-			emitter.addInitializer(new SPARKS.Lifetime(0.8, 1));
-			emitter.addInitializer(new SPARKS.Velocity(new SPARKS.PointZone(new THREE.Vector3(0,3,0))));
+			emitter.addInitializer(new SPARKS.Velocity(new SPARKS.PointZone(new THREE.Vector3(0,3,0))));		
 			
 			emitter.addAction(new SPARKS.Age());
 			emitter.addAction(new SPARKS.Move());
-			emitter.addAction(new actionLinearColor(originalColor, new THREE.Color().setRGB(0.1,0.3,0.6), 1));
-			emitter.addAction(new actionLinearSize(20, 0, 1));
-			emitter.addAction(new SPARKS.RandomDrift(10,0,10));
-						
+			emitter.addAction(new THREEx.SparksPlugins.ActionLinearColor(originalColor, new THREE.Color().setRGB(0,0,0.6), 1));
+			emitter.addAction(new THREEx.SparksPlugins.ActionLinearSize(30, 0, 1));
+			emitter.addAction(new SPARKS.RandomDrift(15,0,15));
+
 			// start the emitter
 			sparks.emitter().start();
-			
+
 			return sparks;
 		}
 
