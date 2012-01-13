@@ -19,6 +19,7 @@
 		<script src="vendor/threex.dragpancontrols.js"></script>
 
 		<script src="./threex.mouseevents.js"></script>
+		<script src="./threex.mouseevents.object3d.js"></script>
 
 		<link  href="css/main.css" rel="stylesheet"/>
 	</head>
@@ -108,27 +109,35 @@
 			mesh	= new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
-			mouseevents	= new THREEx.MouseEvents();
-			mouseevents.bind(mesh, 'click', function(object3d){
-				//console.log("event click")
-				object3d.material.color.setHex(Math.random() * 0xffffff)
-			});
-			mouseevents.bind(mesh, 'enter', function(object3d){
-				//console.log("event enter")
-				object3d.material.color.setHex(0x0088ff)
-			});
-			mouseevents.bind(mesh, 'leave', function(object3d){
-				//console.log("event leave")
-				object3d.material.color.setHex(0xffAA88)
-			});
-			mouseevents.bind(mesh, 'down', function(object3d){
-				//console.log("event down")
-				object3d.material.color.setHex(0xFF0000)
-			});
-			mouseevents.bind(mesh, 'up', function(object3d){
-				//console.log("event up")
-				object3d.material.color.setHex(0x0000ff)
-			});
+			if( false ){
+				mouseevents	= new THREEx.MouseEvents();
+				mouseevents.bind(mesh, 'click', function(object3d){
+					//console.log("event click")
+					object3d.material.color.setHex(Math.random() * 0xffffff)
+				});
+				mouseevents.bind(mesh, 'enter', function(object3d){
+					//console.log("event enter")
+					object3d.material.color.setHex(0x0088ff)
+				});
+				mouseevents.bind(mesh, 'leave', function(object3d){
+					//console.log("event leave")
+					object3d.material.color.setHex(0xffAA88)
+				});
+				mouseevents.bind(mesh, 'down', function(object3d){
+					//console.log("event down")
+					object3d.material.color.setHex(0xFF0000)
+				});
+				mouseevents.bind(mesh, 'up', function(object3d){
+					//console.log("event up")
+					object3d.material.color.setHex(0x0000ff)
+				});				
+			}
+			
+			if( true ){
+				mesh.on('click', function(object3d){
+					object3d.scale.multiplyScalar( 1.05 );
+				});	
+			}
 		}
 
 		// animation loop
