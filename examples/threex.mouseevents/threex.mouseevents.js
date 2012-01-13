@@ -5,7 +5,7 @@
 //   * bubling and all ?
 // * how to handle draging
 // * rename it because it isnt only mouse ?
-// * TODO debug touch event they dont work
+// * TODO debug touch event they dont work 
 
 // 
 // # Code

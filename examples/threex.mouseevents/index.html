@@ -87,7 +87,7 @@
 			scene.add(camera);
 
 			// create a camera contol
-			//cameraControls	= new THREEx.DragPanControls(camera)
+			cameraControls	= new THREEx.DragPanControls(camera)
 
 			// transparently support window resize
 			THREEx.WindowResize.bind(renderer, camera);
@@ -150,7 +150,7 @@
 		function render() {
 
 			// update camera controls
-			//cameraControls.update();
+			cameraControls.update();
 			
 			// actually render the scene
 			renderer.render( scene, camera );
