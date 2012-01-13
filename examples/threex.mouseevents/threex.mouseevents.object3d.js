@@ -16,7 +16,7 @@
 //
 // ```mesh.off('click', function(object3d){ ... })```
 //
-// # alternative API close to DOM events
+// # alternative API with name closer to DOM events
 //
 // ```mesh.addEventListener('click', function(object3d){ ... })```
 // ```mesh.removeEventListener('click', function(object3d){ ... })```
