@@ -60,7 +60,7 @@ THREEx.Sparks	= function(opts)
 		valuesSize[v]	= 99;
 		valuesColor[v]	= new THREE.Color( 0x000000 );
 	}
-	
+
 	var material	= new THREE.ShaderMaterial( {
 		uniforms	: this._uniforms,
 		attributes	: this._attributes,
@@ -69,12 +69,13 @@ THREEx.Sparks	= function(opts)
 
 		blending	: THREE.AdditiveBlending,
 		depthWrite	: false,
+		//depthTest	: false,
 		transparent	: true
 	});
 
 	this._group	= new THREE.ParticleSystem( particles, material );
-	//this._group.dynamic		= true;
-	//this._group.sortParticles	= true;	// TODO is this needed ?	
+	this._group.dynamic		= true;
+	this._group.sortParticles	= true;	// TODO is this needed ?	
 
 	//// EMITTER STUFF
 

@@ -87,7 +87,7 @@
 			scene.add(camera);
 
 			// create a camera contol
-			cameraControls	= new THREEx.DragPanControls(camera)
+			//cameraControls	= new THREEx.DragPanControls(camera)
 
 			// transparently support window resize
 			THREEx.WindowResize.bind(renderer, camera);
@@ -102,7 +102,7 @@
 
 			// here you add your objects
 			// - you will most likely replace this part by your own
-			var geometry	= new THREE.TorusGeometry( 1, 0.42 );
+			var geometry	= new THREE.CubeGeometry( 2, 2, 2 );
 			var material	= new THREE.MeshLambertMaterial( { color: 0xffAA88 } )
 			//var material	= new THREE.MeshNormalMaterial();
 			mesh	= new THREE.Mesh( geometry, material );
@@ -110,13 +110,24 @@
 
 			mouseevents	= new THREEx.MouseEvents();
 			mouseevents.bind(mesh, 'click', function(object3d){
+				//console.log("event click")
 				object3d.material.color.setHex(Math.random() * 0xffffff)
 			});
-			mouseevents.bind(mesh, 'mouseenter', function(object3d){
-				object3d.material.color.setHex(0xff0000)
+			mouseevents.bind(mesh, 'enter', function(object3d){
+				//console.log("event enter")
+				object3d.material.color.setHex(0x0088ff)
 			});
-			mouseevents.bind(mesh, 'mouseleave', function(object3d){
-				object3d.material.color.setHex(0x00ff00)
+			mouseevents.bind(mesh, 'leave', function(object3d){
+				//console.log("event leave")
+				object3d.material.color.setHex(0xffAA88)
+			});
+			mouseevents.bind(mesh, 'down', function(object3d){
+				//console.log("event down")
+				object3d.material.color.setHex(0xFF0000)
+			});
+			mouseevents.bind(mesh, 'up', function(object3d){
+				//console.log("event up")
+				object3d.material.color.setHex(0x0000ff)
 			});
 		}
 

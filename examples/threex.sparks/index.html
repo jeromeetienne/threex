@@ -81,11 +81,12 @@
 			var geometry	= new THREE.CylinderGeometry( 0.5, 0.001, 1.5 );
 			var material	= new THREE.MeshNormalMaterial();
 			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.y	= -1;
+			mesh.position.x	= 0.8;
+			mesh.rotation.z	= Math.PI/2;
 			scene.add( mesh );
 
 			threexSparks	= initParticles();
-			
+			threexSparks.container().rotation.z	= Math.PI/2;
 			// add the particles to the scene
 			scene.add(threexSparks.container());
 		}
@@ -93,7 +94,7 @@
 		function initParticles(){
 			var sparks	= new THREEx.Sparks({
 				maxParticles	: 50,
-				counter		: new SPARKS.SteadyCounter(30),
+				counter		: new SPARKS.SteadyCounter(20),
 				//texture		: THREE.ImageUtils.loadTexture("./images/tremulous/damage/blood.jpg"),
 				//texture		: THREE.ImageUtils.loadTexture("./images/tremulous/lcannon/primary_4.jpg"),
 				//texture		: THREE.ImageUtils.loadTexture("./images/tremulous/marks/burn_mrk.jpg"),
@@ -120,20 +121,20 @@ sparks.initializer	= {
 
 			// setup the emitter
 			var emitter	= sparks.emitter();
-			
+
 			var originalColor	= new THREE.Color().setRGB(0.5,0.3,0);
 			var originalSize	= 20;
 
-			sparks.initializer.color(originalColor).size(originalSize).lifeTime(0.8, 1);
+			sparks.initializer.color(originalColor).size(originalSize).lifeTime(0.4, 1);
 			
 			emitter.addInitializer(new SPARKS.Position( new SPARKS.PointZone( new THREE.Vector3(0,0,0) ) ) );
-			emitter.addInitializer(new SPARKS.Velocity(new SPARKS.PointZone(new THREE.Vector3(0,1.5,0))));		
+			emitter.addInitializer(new SPARKS.Velocity(new SPARKS.PointZone(new THREE.Vector3(0,3,0))));		
 			
 			emitter.addAction(new SPARKS.Age());
 			emitter.addAction(new SPARKS.Move());
 			emitter.addAction(new THREEx.SparksPlugins.ActionLinearColor(originalColor, new THREE.Color().setRGB(0,0,0.6), 1));
-			emitter.addAction(new THREEx.SparksPlugins.ActionLinearSize(originalSize, 0, 1));
-			emitter.addAction(new SPARKS.RandomDrift(15,0,15));
+			emitter.addAction(new THREEx.SparksPlugins.ActionLinearSize(originalSize, originalSize/4, 1));
+			emitter.addAction(new SPARKS.RandomDrift(5,0,5));
 
 			// start the emitter
 			sparks.emitter().start();
