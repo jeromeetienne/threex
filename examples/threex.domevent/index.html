@@ -138,7 +138,7 @@
 					.start();
 			});
 			meshes['sphere1'].on('click', function(object3d){
-				if( object3d.rotation.x === 0 ){
+				if( object3d.rotation.x < Math.PI/4 ){
 					var rotation	= {x: Math.PI/2};
 					var color	= {r: 1, g: 0.5, b: 0};
 				}else{
