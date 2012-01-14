@@ -172,6 +172,7 @@
 					.start();
 				new TWEEN.Tween(object3d.material.color)
 					.to({r: 0.5, g: 0.75, b: 0.25}, 600)
+					.delay(400)
 					.easing(TWEEN.Easing.Quartic.EaseOut)
 					.start();
 				new TWEEN.Tween(object3d.rotation)
@@ -185,9 +186,10 @@
 			var meshes	= {};
 			var dx		= 4;
 			var dy		= 2;
-			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
+			var material	= new THREE.MeshLambertMaterial( { color: 0xFF8800 } );
 			var mesh	= new THREE.Mesh( geometry, material );
 			mesh.position.set(0,dy,0);
+			mesh.rotation.x	= +1*Math.PI/2;
 			mesh.rotation.y	= -1*Math.PI/2;
 			scene.add( mesh );
 			meshes['sphere1']	= mesh;
