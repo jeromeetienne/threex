@@ -1,11 +1,34 @@
 // This THREEx helper makes it easy to handle the mouse events in your 3D scene
-// * TODO handle the
+//
 // * handle click, mouseenter, mouseleave, mousedown, mouseup
 // * handle hierachie of object3D ?
 //   * bubling and all ?
 // * how to handle draging
-// * rename it because it isnt only mouse ?
-// * TODO debug touch event they dont work 
+// * TODO debug touch event they dont work
+// * supported event got the usual dom events name
+//   ```click```,
+//   ```mouseenter```, ```mouseleave```, 
+//   ```mousedown```, ```mouseup```
+
+// # Lets get started
+// First you include it in your page
+//
+// ```<script src='threex.domevent.js'></script>```
+//
+// # Instanciate it
+// you instanciate the object
+//
+// ```var domEvent = new THREEx.DomEvent();```
+// 
+// # how to bind an event
+// then you may bind an event
+//
+// ```domEvent.bind(mesh, 'click', function(object3d){ object3d.scale.x *= 2; });```
+//
+// # how to unbind an event
+// if you want to remove a bind, just do
+//
+// ```domEvent.unbind(mesh, 'click', callback);```
 
 // 
 // # Code
@@ -15,13 +38,15 @@
 /** @namespace */
 var THREEx		= THREEx 		|| {};
 
-THREEx.MouseEvents	= function(domElement)
+// # Constructor
+THREEx.DomEvent	= function(domElement)
 {
 	this._domElement= domElement || document;
 	this._projector	= new THREE.Projector();
 	
 	this._selected	= null;
 
+	// Bind dom event for mouse and touch
 	var _this	= this;
 	this._$onClick		= function(){ _this._onClick.apply(_this, arguments);		};
 	this._$onMouseMove	= function(){ _this._onMouseMove.apply(_this, arguments);	};
@@ -39,8 +64,10 @@ THREEx.MouseEvents	= function(domElement)
 	this._domElement.addEventListener( 'touchend'	, this._$onTouchEnd	, false );
 }
 
-THREEx.MouseEvents.prototype.destroy	= function()
+// # Destructor
+THREEx.DomEvent.prototype.destroy	= function()
 {
+	// unBind dom event for mouse and touch
 	this._domElement.removeEventListener( 'click'		, this._$onClick	, false );
 	this._domElement.removeEventListener( 'mousemove'	, this._$onMouseMove	, false );
 	this._domElement.removeEventListener( 'mousedown'	, this._$onMouseDown	, false );
@@ -50,28 +77,30 @@ THREEx.MouseEvents.prototype.destroy	= function()
 	this._domElement.removeEventListener( 'touchend'	, this._$onTouchEnd	, false );
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-//										//
-//////////////////////////////////////////////////////////////////////////////////
+/********************************************************************************/
+/*		domevent context						*/
+/********************************************************************************/
 
-THREEx.MouseEvents.prototype._objectCtxInit	= function(object3d){
+// handle domevent context in object3d instance
+
+THREEx.DomEvent.prototype._objectCtxInit	= function(object3d){
 	object3d._3xMouseEvent = {};
 }
-THREEx.MouseEvents.prototype._objectCtxDeinit	= function(object3d){
+THREEx.DomEvent.prototype._objectCtxDeinit	= function(object3d){
 	delete object3d._3xMouseEvent;
 }
-THREEx.MouseEvents.prototype._objectCtxIsInit	= function(object3d){
+THREEx.DomEvent.prototype._objectCtxIsInit	= function(object3d){
 	return object3d._3xMouseEvent ? true : false;
 }
-THREEx.MouseEvents.prototype._objectCtxGet	= function(object3d){
+THREEx.DomEvent.prototype._objectCtxGet	= function(object3d){
 	return object3d._3xMouseEvent;
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-//										//
-//////////////////////////////////////////////////////////////////////////////////
+/********************************************************************************/
+/*										*/
+/********************************************************************************/
 
-THREEx.MouseEvents.prototype.bind	= function(object3d, eventName, callback)
+THREEx.DomEvent.prototype.bind	= function(object3d, eventName, callback)
 {
 	if( !this._objectCtxIsInit(object3d) )	this._objectCtxInit(object3d);
 	var objectCtx	= this._objectCtxGet(object3d);
@@ -82,19 +111,20 @@ THREEx.MouseEvents.prototype.bind	= function(object3d, eventName, callback)
 	});
 }
 
-THREEx.MouseEvents.prototype._bound	= function(eventName, object3d)
+THREEx.DomEvent.prototype._bound	= function(eventName, object3d)
 {
 	var objectCtx	= this._objectCtxGet(object3d);
 	if( !objectCtx )	return false;
 	return objectCtx[eventName+'Handlers'] ? true : false;
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-//										//
-//////////////////////////////////////////////////////////////////////////////////
+/********************************************************************************/
+/*		onMove								*/
+/********************************************************************************/
 
+// # handle mousemove kind of events
 
-THREEx.MouseEvents.prototype._onMove	= function(mouseX, mouseY)
+THREEx.DomEvent.prototype._onMove	= function(mouseX, mouseY)
 {
 	var vector	= new THREE.Vector3( mouseX, mouseY, 1 );
 	this._projector.unprojectVector( vector, camera );
@@ -140,11 +170,13 @@ THREEx.MouseEvents.prototype._onMove	= function(mouseX, mouseY)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////
-//										//
-//////////////////////////////////////////////////////////////////////////////////
+/********************************************************************************/
+/*		onEvent								*/
+/********************************************************************************/
 
-THREEx.MouseEvents.prototype._onEvent	= function(eventName, mouseX, mouseY)
+// # handle click kind of events
+
+THREEx.DomEvent.prototype._onEvent	= function(eventName, mouseX, mouseY)
 {
 	var vector	= new THREE.Vector3( mouseX, mouseY, 1 );
 	this._projector.unprojectVector( vector, camera );
@@ -170,42 +202,45 @@ THREEx.MouseEvents.prototype._onEvent	= function(eventName, mouseX, mouseY)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-//		handle mouse events						//
-//////////////////////////////////////////////////////////////////////////////////
+/********************************************************************************/
+/*		handle mouse events						*/
+/********************************************************************************/
+// # handle mouse events
 
-THREEx.MouseEvents.prototype._onMouseDown	= function(event){ return this._onMouseEvent('down'	, event);	}
-THREEx.MouseEvents.prototype._onMouseUp		= function(event){ return this._onMouseEvent('up'	, event);	}
+THREEx.DomEvent.prototype._onMouseDown	= function(event){ return this._onMouseEvent('down'	, event);	}
+THREEx.DomEvent.prototype._onMouseUp		= function(event){ return this._onMouseEvent('up'	, event);	}
 
 
-THREEx.MouseEvents.prototype._onMouseEvent	= function(eventName, domEvent)
+THREEx.DomEvent.prototype._onMouseEvent	= function(eventName, domEvent)
 {
 	var mouseX	= +(domEvent.clientX / window.innerWidth ) * 2 - 1;
 	var mouseY	= -(domEvent.clientY / window.innerHeight) * 2 + 1;
 	return this._onEvent(eventName, mouseX, mouseY);
 }
 
-THREEx.MouseEvents.prototype._onMouseMove	= function(event)
+THREEx.DomEvent.prototype._onMouseMove	= function(event)
 {
 	var mouseX	= +(event.clientX / window.innerWidth ) * 2 - 1;
 	var mouseY	= -(event.clientY / window.innerHeight) * 2 + 1;
 	return this._onMove(mouseX, mouseY);
 }
 
-THREEx.MouseEvents.prototype._onClick		= function(event)
+THREEx.DomEvent.prototype._onClick		= function(event)
 {
 	// TODO handle touch ?
 	return this._onMouseEvent('click'	, event);
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-//		Handle touch events						//
-//////////////////////////////////////////////////////////////////////////////////
+/********************************************************************************/
+/*		handle touch events						*/
+/********************************************************************************/
+// # handle touch events
 
-THREEx.MouseEvents.prototype._onTouchStart	= function(event){ return this._onTouchEvent('down'	, event);	}
-THREEx.MouseEvents.prototype._onTouchEnd		= function(event){ return this._onTouchEvent('up'	, event);	}
 
-THREEx.MouseEvents.prototype._onTouchMove	= function(event)
+THREEx.DomEvent.prototype._onTouchStart	= function(event){ return this._onTouchEvent('down'	, event);	}
+THREEx.DomEvent.prototype._onTouchEnd		= function(event){ return this._onTouchEvent('up'	, event);	}
+
+THREEx.DomEvent.prototype._onTouchMove	= function(event)
 {
 	if( event.touches.length != 1 )	return undefined;
 
@@ -216,7 +251,7 @@ THREEx.MouseEvents.prototype._onTouchMove	= function(event)
 	return this._onMove('move', mouseX, mouseY);
 }
 
-THREEx.MouseEvents.prototype._onTouchEvent	= function(eventName, domEvent)
+THREEx.DomEvent.prototype._onTouchEvent	= function(eventName, domEvent)
 {
 	if( event.touches.length != 1 )	return undefined;
 

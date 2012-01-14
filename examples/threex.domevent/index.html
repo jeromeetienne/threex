@@ -20,8 +20,8 @@
 		<script src="vendor/threex/THREEx.WindowResize.js"></script>
 		<script src="vendor/threex.dragpancontrols.js"></script>
 
-		<script src="./threex.domevent.js"></script>
-		<script src="./threex.domevent.object3d.js"></script>
+		<script src="../../threex.domevent.js"></script>
+		<script src="../../threex.domevent.object3d.js"></script>
 
 		<link  href="css/main.css" rel="stylesheet"/>
 	</head>
@@ -41,7 +41,7 @@
 	</div> 
 
 	<script type="text/javascript">
-		var stats, scene, renderer, mouseevents;
+		var stats, scene, renderer, domEvent;
 		var camera, cameraControl;
 		var mouse = { x: 0, y: 0 };
 
@@ -137,24 +137,24 @@
 			meshes['sphere4']	= mesh;
 
 			if( false ){
-				mouseevents	= new THREEx.MouseEvents();
-				mouseevents.bind(mesh, 'click', function(object3d){
+				domEvent	= new THREEx.DomEvent();
+				domEvent.bind(mesh, 'click', function(object3d){
 					//console.log("event click")
 					object3d.material.color.setHex(Math.random() * 0xffffff)
 				});
-				mouseevents.bind(mesh, 'enter', function(object3d){
+				domEvent.bind(mesh, 'enter', function(object3d){
 					//console.log("event enter")
 					object3d.material.color.setHex(0x0088ff)
 				});
-				mouseevents.bind(mesh, 'leave', function(object3d){
+				domEvent.bind(mesh, 'leave', function(object3d){
 					//console.log("event leave")
 					object3d.material.color.setHex(0xffAA88)
 				});
-				mouseevents.bind(mesh, 'down', function(object3d){
+				domEvent.bind(mesh, 'down', function(object3d){
 					//console.log("event down")
 					object3d.material.color.setHex(0xFF0000)
 				});
-				mouseevents.bind(mesh, 'up', function(object3d){
+				domEvent.bind(mesh, 'up', function(object3d){
 					//console.log("event up")
 					object3d.material.color.setHex(0x0000ff)
 				});				
@@ -164,11 +164,11 @@
 				meshes['sphere2'].on('down', function(object3d){
 					var scale	= 1.2;
 					new TWEEN.Tween(object3d.scale)
-						.to({x: scale, y: scale, z: scale}, 300)
+						.to({x: scale, y: scale, z: scale}, 100)
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 					new TWEEN.Tween(object3d.material.color)
-						.to({r: 1, g: 0.5, b: 0}, 300)
+						.to({r: 1, g: 0.5, b: 0}, 100)
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 				}).on('up', function(object3d){
@@ -190,15 +190,15 @@
 						var scale	= {x:1, y:1, z:1};
 						var color	= {r: 1, g: 0.625, b: 0.5};
 					}
-					new TWEEN.Tween(object3d.scale).to(scale, 500)
+					new TWEEN.Tween(object3d.scale).to(scale, 200)
 						.easing(TWEEN.Easing.Quartic.EaseIn).start();
-					new TWEEN.Tween(object3d.material.color).to(color, 500)
+					new TWEEN.Tween(object3d.material.color).to(color, 200)
 						.easing(TWEEN.Easing.Quartic.EaseIn).start();
 				});	
 
 				meshes['sphere3'].on('enter', function(object3d){
 					new TWEEN.Tween(object3d.scale)
-						.to({x: 1.5, y: 1.5, z: 1.5}, 300)
+						.to({x: 1.5, y: 1.5, z: 1.5}, 200)
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 					new TWEEN.Tween(object3d.material.color)
@@ -206,7 +206,7 @@
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 					new TWEEN.Tween(object3d.rotation)
-						.to({x: 0.5*Math.PI, y: 2*Math.PI}, 1000)
+						.to({y: 2*Math.PI}, 1000)
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 				}).on('leave', function(object3d){
@@ -219,7 +219,7 @@
 						.easing(TWEEN.Easing.Quartic.EaseOut)
 						.start();
 					new TWEEN.Tween(object3d.rotation)
-						.to({x: 0, y: 0}, 1000)
+						.to({y: 0}, 1000)
 						.easing(TWEEN.Easing.Quartic.EaseOut)
 						.start();
 				});
@@ -233,7 +233,10 @@
 
 		// animation loop
 		function animate() {
+			
+			// upate tween
 			TWEEN.update();
+
 			// loop on request animation loop
 			// - it has to be at the begining of the function
 			// - see details at http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
