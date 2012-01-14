@@ -32,8 +32,12 @@
 	<div id="info">
 		<div class="top">
 			<a href="http://learningthreejs.com/blog/2011/12/20/boilerplate-for-three-js/" target="_blank">LearningThree.js</a>
-			boiler plate for
+			demo for threex.domEvent.js
 			<a href="https://github.com/mrdoob/three.js/" target="_blank">three.js</a>
+			<br/>
+			-
+			<br/>
+			<strong>Instructions: </strong> click on top - hover on right - press and hold on left
 		</div>
 		<div class="bottom" id="inlineDoc" >
 			- <i>p</i> for screenshot
@@ -111,30 +115,23 @@
 			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
 			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
 			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.set(2,1,0);
+			mesh.position.set(0,0.8,0);
 			scene.add( mesh );
 			meshes['sphere1']	= mesh;
 
 			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
 			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
 			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.set(-2,1,0);
+			mesh.position.set(-1.2,-0.8,0);
 			scene.add( mesh );
 			meshes['sphere2']	= mesh;
 
 			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
-			var material	= new THREE.MeshLambertMaterial( { color: 0xffAA88 } );
+			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
 			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.set(-2,-1,0);
+			mesh.position.set(1.2,-0.8,0);
 			scene.add( mesh );
 			meshes['sphere3']	= mesh;
-
-			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
-			var material	= new THREE.MeshLambertMaterial( { color: 0xffAA88 } );
-			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.set(2,-1,0);
-			scene.add( mesh );
-			meshes['sphere4']	= mesh;
 
 			if( false ){
 				domEvent	= new THREEx.DomEvent();
@@ -162,7 +159,7 @@
 			
 			if( true ){
 				meshes['sphere2'].on('down', function(object3d){
-					var scale	= 1.2;
+					var scale	= 1.4;
 					new TWEEN.Tween(object3d.scale)
 						.to({x: scale, y: scale, z: scale}, 100)
 						.easing(TWEEN.Easing.Quartic.EaseIn)
@@ -172,7 +169,7 @@
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 				}).on('up', function(object3d){
-					var scale	= 1/1.2;
+					var scale	= 1;
 					new TWEEN.Tween(object3d.scale)
 						.to({x: scale, y: scale, z: scale}, 300)
 						.easing(TWEEN.Easing.Quartic.EaseIn)
@@ -185,10 +182,10 @@
 				meshes['sphere1'].on('click', function(object3d){
 					if( object3d.scale.x === 1 ){
 						var scale	= {x:1.2, y:1.2, z:1.2};
-						var color	= {r: 0, g: 0.5, b: 1};
+						var color	= {r: 1, g: 0.5, b: 0};
 					}else{
 						var scale	= {x:1, y:1, z:1};
-						var color	= {r: 1, g: 0.625, b: 0.5};
+						var color	= {r: 0.5, g: 0.75, b: 0.25};
 					}
 					new TWEEN.Tween(object3d.scale).to(scale, 200)
 						.easing(TWEEN.Easing.Quartic.EaseIn).start();
@@ -202,7 +199,7 @@
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 					new TWEEN.Tween(object3d.material.color)
-						.to({r: 0, g: 0.5, b: 1}, 600)
+						.to({r: 1, g: 0.5, b: 0}, 600)
 						.easing(TWEEN.Easing.Quartic.EaseIn)
 						.start();
 					new TWEEN.Tween(object3d.rotation)
@@ -223,11 +220,6 @@
 						.easing(TWEEN.Easing.Quartic.EaseOut)
 						.start();
 				});
-				//meshes['sphere3'].on('enter', function(object3d){
-				//	object3d.material.color.setHex(0x0088ff)
-				//}).on('leave', function(object3d){
-				//	object3d.material.color.setHex(0xffAA88)
-				//});
 			}
 		}
 
