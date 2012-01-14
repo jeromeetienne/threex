@@ -90,7 +90,7 @@
 
 			// put a camera in the scene
 			camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 10000 );
-			camera.position.set(0, 1, 15);
+			camera.position.set(0, 0, 5);
 			scene.add(camera);
 
 			// create a camera contol
@@ -109,103 +109,126 @@
 
 			// here you add your objects
 			// - you will most likely replace this part by your own
-			new THREE.JSONLoader().load('teapot.js', function(geometry){
-				var meshes	= buildMeshes(geometry);
-				bindEvents(meshes);
-			})
-		}
 
-		function bindEvents(meshes){
-			meshes['sphere2'].on('down', function(object3d){
-				var scale	= 1.4;
-				new TWEEN.Tween(object3d.scale)
-					.to({x: scale, y: scale, z: scale}, 100)
-					.easing(TWEEN.Easing.Quartic.EaseIn)
-					.start();
-				new TWEEN.Tween(object3d.material.color)
-					.to({r: 1, g: 0.5, b: 0}, 100)
-					.easing(TWEEN.Easing.Quartic.EaseIn)
-					.start();
-			}).on('up', function(object3d){
-				var scale	= 1;
-				new TWEEN.Tween(object3d.scale)
-					.to({x: scale, y: scale, z: scale}, 300)
-					.easing(TWEEN.Easing.Quartic.EaseIn)
-					.start();
-				new TWEEN.Tween(object3d.material.color)
-					.to({r: 0.5, g: 0.75, b: 0.25}, 300)
-					.easing(TWEEN.Easing.Quartic.EaseIn)
-					.start();
-			});
-			meshes['sphere1'].on('click', function(object3d){
-				if( object3d.rotation.x === 0 ){
-					var rotation	= {x: Math.PI/2};
-					var color	= {r: 1, g: 0.5, b: 0};
-				}else{
-					var rotation	= {x:0};
-					var color	= {r: 0.5, g: 0.75, b: 0.25};
-				}
-				new TWEEN.Tween(object3d.rotation).to(rotation, 800)
-					.easing(TWEEN.Easing.Bounce.EaseOut).start();
-				new TWEEN.Tween(object3d.material.color).to(color, 300)
-					.easing(TWEEN.Easing.Quartic.EaseIn).start();
-			});	
-
-			meshes['sphere3'].on('enter', function(object3d){
-				new TWEEN.Tween(object3d.scale)
-					.to({x: 1.5, y: 1.5, z: 1.5}, 200)
-					.easing(TWEEN.Easing.Quartic.EaseIn)
-					.start();
-				new TWEEN.Tween(object3d.material.color)
-					.to({r: 1, g: 0.5, b: 0}, 600)
-					.delay(400)
-					.easing(TWEEN.Easing.Quartic.EaseIn)
-					.start();
-				new TWEEN.Tween(object3d.rotation)
-					.to({y: 3*Math.PI}, 1000)
-					.easing(TWEEN.Easing.Quartic.EaseIn)
-					.start();
-			}).on('leave', function(object3d){
-				new TWEEN.Tween(object3d.scale)
-					.to({x: 1, y: 1, z: 1}, 300)
-					.easing(TWEEN.Easing.Quartic.EaseOut)
-					.start();
-				new TWEEN.Tween(object3d.material.color)
-					.to({r: 0.5, g: 0.75, b: 0.25}, 600)
-					.easing(TWEEN.Easing.Quartic.EaseOut)
-					.start();
-				new TWEEN.Tween(object3d.rotation)
-					.to({y: Math.PI}, 1000)
-					.easing(TWEEN.Easing.Quartic.EaseOut)
-					.start();
-			});
-		}
-		
-		function buildMeshes(geometry){
-			var meshes	= {};
-			var dx		= 4;
-			var dy		= 2;
+		new THREE.JSONLoader().load('teapot.js', function(geometry){
 			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
 			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.set(0,dy,0);
-			mesh.rotation.y	= -1*Math.PI/2;
+			mesh.position.set(0,0,0);
+			scene.add( mesh );
+		})
+			
+			var meshes	= {};
+			
+			var geometry	= new THREE.SphereGeometry( 0.5, 10, 8 );
+			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.set(0,0.8,0);
 			scene.add( mesh );
 			meshes['sphere1']	= mesh;
 
+			var geometry	= new THREE.SphereGeometry( 0.5, 10, 8 );
 			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
 			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.set(-dx,-dy,0);
+			mesh.position.set(-1.2,-0.8,0);
 			scene.add( mesh );
 			meshes['sphere2']	= mesh;
 
+			var geometry	= new THREE.SphereGeometry( 0.5, 10, 8 );
 			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
 			var mesh	= new THREE.Mesh( geometry, material );
-			mesh.position.set(dx,-dy,0);
-			mesh.rotation.y	= Math.PI;
+			mesh.position.set(1.2,-0.8,0);
 			scene.add( mesh );
 			meshes['sphere3']	= mesh;
 
-			return meshes;	
+			if( false ){
+				domEvent	= new THREEx.DomEvent();
+				domEvent.bind(mesh, 'click', function(object3d){
+					//console.log("event click")
+					object3d.material.color.setHex(Math.random() * 0xffffff)
+				});
+				domEvent.bind(mesh, 'enter', function(object3d){
+					//console.log("event enter")
+					object3d.material.color.setHex(0x0088ff)
+				});
+				domEvent.bind(mesh, 'leave', function(object3d){
+					//console.log("event leave")
+					object3d.material.color.setHex(0xffAA88)
+				});
+				domEvent.bind(mesh, 'down', function(object3d){
+					//console.log("event down")
+					object3d.material.color.setHex(0xFF0000)
+				});
+				domEvent.bind(mesh, 'up', function(object3d){
+					//console.log("event up")
+					object3d.material.color.setHex(0x0000ff)
+				});				
+			}
+			
+			if( true ){
+				meshes['sphere2'].on('down', function(object3d){
+					var scale	= 1.4;
+					new TWEEN.Tween(object3d.scale)
+						.to({x: scale, y: scale, z: scale}, 100)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 1, g: 0.5, b: 0}, 100)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+				}).on('up', function(object3d){
+					var scale	= 1;
+					new TWEEN.Tween(object3d.scale)
+						.to({x: scale, y: scale, z: scale}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 0.5, g: 0.75, b: 0.25}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+				});
+				meshes['sphere1'].on('click', function(object3d){
+					if( object3d.scale.x === 1 ){
+						var scale	= {x:1.5, y:1.5, z:1.5};
+						var color	= {r: 1, g: 0.5, b: 0};
+					}else{
+						var scale	= {x:1, y:1, z:1};
+						var color	= {r: 0.5, g: 0.75, b: 0.25};
+					}
+					new TWEEN.Tween(object3d.scale).to(scale, 800)
+						.easing(TWEEN.Easing.Bounce.EaseOut).start();
+					new TWEEN.Tween(object3d.material.color).to(color, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn).start();
+				});	
+
+				meshes['sphere3'].on('enter', function(object3d){
+					new TWEEN.Tween(object3d.scale)
+						.to({x: 1.5, y: 1.5, z: 1.5}, 200)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 1, g: 0.5, b: 0}, 600)
+						.delay(400)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.rotation)
+						.to({y: 3*Math.PI}, 1000)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+				}).on('leave', function(object3d){
+					new TWEEN.Tween(object3d.scale)
+						.to({x: 1, y: 1, z: 1}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseOut)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 0.5, g: 0.75, b: 0.25}, 600)
+						.easing(TWEEN.Easing.Quartic.EaseOut)
+						.start();
+					new TWEEN.Tween(object3d.rotation)
+						.to({y: 0}, 1000)
+						.easing(TWEEN.Easing.Quartic.EaseOut)
+						.start();
+				});
+			}
 		}
 
 		// animation loop
