@@ -13,13 +13,15 @@
 		<!-- https://github.com/mrdoob/stats.js -->
 		<script src="vendor/three.js/Stats.js"></script>
 
+		<script src="vendor/tween.js/Tween.js"></script>
+
 		<script src="vendor/threex/THREEx.screenshot.js"></script>
 		<script src="vendor/threex/THREEx.FullScreen.js"></script>
 		<script src="vendor/threex/THREEx.WindowResize.js"></script>
 		<script src="vendor/threex.dragpancontrols.js"></script>
 
-		<script src="./threex.mouseevents.js"></script>
-		<script src="./threex.mouseevents.object3d.js"></script>
+		<script src="./threex.domevent.js"></script>
+		<script src="./threex.domevent.object3d.js"></script>
 
 		<link  href="css/main.css" rel="stylesheet"/>
 	</head>
@@ -103,11 +105,36 @@
 
 			// here you add your objects
 			// - you will most likely replace this part by your own
-			var geometry	= new THREE.CubeGeometry( 2, 2, 2 );
-			var material	= new THREE.MeshLambertMaterial( { color: 0xffAA88 } )
-			//var material	= new THREE.MeshNormalMaterial();
-			mesh	= new THREE.Mesh( geometry, material );
+			
+			var meshes	= {};
+			
+			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
+			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.set(2,1,0);
 			scene.add( mesh );
+			meshes['sphere1']	= mesh;
+
+			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
+			var material	= new THREE.MeshLambertMaterial( { color: 0x88CC44 } );
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.set(-2,1,0);
+			scene.add( mesh );
+			meshes['sphere2']	= mesh;
+
+			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
+			var material	= new THREE.MeshLambertMaterial( { color: 0xffAA88 } );
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.set(-2,-1,0);
+			scene.add( mesh );
+			meshes['sphere3']	= mesh;
+
+			var geometry	= new THREE.SphereGeometry( 0.5, 0.5, 0.5 );
+			var material	= new THREE.MeshLambertMaterial( { color: 0xffAA88 } );
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.set(2,-1,0);
+			scene.add( mesh );
+			meshes['sphere4']	= mesh;
 
 			if( false ){
 				mouseevents	= new THREEx.MouseEvents();
@@ -134,15 +161,79 @@
 			}
 			
 			if( true ){
-				mesh.on('click', function(object3d){
-					object3d.scale.multiplyScalar( 1.05 );
+				meshes['sphere2'].on('down', function(object3d){
+					var scale	= 1.2;
+					new TWEEN.Tween(object3d.scale)
+						.to({x: scale, y: scale, z: scale}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 1, g: 0.5, b: 0}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+				}).on('up', function(object3d){
+					var scale	= 1/1.2;
+					new TWEEN.Tween(object3d.scale)
+						.to({x: scale, y: scale, z: scale}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 0.5, g: 0.75, b: 0.25}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+				});
+				meshes['sphere1'].on('click', function(object3d){
+					if( object3d.scale.x === 1 ){
+						var scale	= {x:1.2, y:1.2, z:1.2};
+						var color	= {r: 0, g: 0.5, b: 1};
+					}else{
+						var scale	= {x:1, y:1, z:1};
+						var color	= {r: 1, g: 0.625, b: 0.5};
+					}
+					new TWEEN.Tween(object3d.scale).to(scale, 500)
+						.easing(TWEEN.Easing.Quartic.EaseIn).start();
+					new TWEEN.Tween(object3d.material.color).to(color, 500)
+						.easing(TWEEN.Easing.Quartic.EaseIn).start();
 				});	
+
+				meshes['sphere3'].on('enter', function(object3d){
+					new TWEEN.Tween(object3d.scale)
+						.to({x: 1.5, y: 1.5, z: 1.5}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 0, g: 0.5, b: 1}, 600)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+					new TWEEN.Tween(object3d.rotation)
+						.to({x: 0.5*Math.PI, y: 2*Math.PI}, 1000)
+						.easing(TWEEN.Easing.Quartic.EaseIn)
+						.start();
+				}).on('leave', function(object3d){
+					new TWEEN.Tween(object3d.scale)
+						.to({x: 1, y: 1, z: 1}, 300)
+						.easing(TWEEN.Easing.Quartic.EaseOut)
+						.start();
+					new TWEEN.Tween(object3d.material.color)
+						.to({r: 0.5, g: 0.75, b: 0.25}, 600)
+						.easing(TWEEN.Easing.Quartic.EaseOut)
+						.start();
+					new TWEEN.Tween(object3d.rotation)
+						.to({x: 0, y: 0}, 1000)
+						.easing(TWEEN.Easing.Quartic.EaseOut)
+						.start();
+				});
+				//meshes['sphere3'].on('enter', function(object3d){
+				//	object3d.material.color.setHex(0x0088ff)
+				//}).on('leave', function(object3d){
+				//	object3d.material.color.setHex(0xffAA88)
+				//});
 			}
 		}
 
 		// animation loop
 		function animate() {
-
+			TWEEN.update();
 			// loop on request animation loop
 			// - it has to be at the begining of the function
 			// - see details at http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
@@ -159,7 +250,7 @@
 		function render() {
 
 			// update camera controls
-			cameraControls.update();
+			//cameraControls.update();
 			
 			// actually render the scene
 			renderer.render( scene, camera );
