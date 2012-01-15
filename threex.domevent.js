@@ -9,27 +9,47 @@
 //   ```click```,
 //   ```mouseenter```, ```mouseleave```, 
 //   ```mousedown```, ```mouseup```
-
 // # Lets get started
 // First you include it in your page
 //
 // ```<script src='threex.domevent.js'></script>```
 //
-// # Instanciate it
-// you instanciate the object
+// # use the object oriented api
+//
+// You bind an event like this
+//
+// ```mesh.on('click', function(object3d){ ... })```
+//
+// To unbind an event, just do
+//
+// ```mesh.off('click', function(object3d){ ... })```
+//
+// As an alternative, there is another naming closer DOM events.
+// Pick the one you like, they are doing the same thing
+//
+// ```mesh.addEventListener('click', function(object3d){ ... })```
+// ```mesh.removeEventListener('click', function(object3d){ ... })```
+//
+// # use the standalone api
+//
+// The object-oriented api modifies THREE.Object3D class.
+// It is a global class, so it may be legitimatly considered unclean by some people.
+// If this bother you, simply do ```THREEx.DomEvent.noConflict()``` and use the
+// standalone API. In fact, the object oriented API is just a thin wrapper
+// on top of the standalone API.
+//
+// First, you instanciate the object
 //
 // ```var domEvent = new THREEx.DomEvent();```
 // 
-// # how to bind an event
-// then you may bind an event
+// Then you bind an event like this
 //
 // ```domEvent.bind(mesh, 'click', function(object3d){ object3d.scale.x *= 2; });```
 //
-// # how to unbind an event
-// if you want to remove a bind, just do
+// To unbind an event, just do
 //
 // ```domEvent.unbind(mesh, 'click', callback);```
-
+//
 // 
 // # Code
 
@@ -280,4 +300,40 @@ THREEx.DomEvent.prototype._onTouchEvent	= function(eventName, domEvent)
 	var mouseX	= +(event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
 	var mouseY	= -(event.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
 	return this._onEvent(eventName, mouseX, mouseY);	
+}
+
+/********************************************************************************/
+// # Patch THREE.Object3D
+/********************************************************************************/
+
+// handle noConflit.
+THREEx.DomEvent.noConflict	= function(){
+	THREEx.DomEvent.noConflict.symbols.forEach(function(symbol){
+		THREE.Object3D.prototype[symbol]	= THREEx.DomEvent.noConflict.previous[symbol]
+	})
+}
+// Backup previous values to restore them later if needed.
+THREEx.DomEvent.noConflict.symbols	= ['on', 'off', 'addEventListener', 'removeEventListener'];
+THREEx.DomEvent.noConflict.previous	= {};
+THREEx.DomEvent.noConflict.symbols.forEach(function(symbol){
+	THREEx.DomEvent.noConflict.previous[symbol]	= THREE.Object3D.prototype[symbol]
+})
+
+// begin the actual patching of THREE.Object3D
+
+// create the global instance of THREEx.DomEvent
+THREE.Object3D._threexDomEvent	= new THREEx.DomEvent();
+
+// # wrap mouseevents.bind()
+THREE.Object3D.prototype.on	=
+THREE.Object3D.prototype.addEventListener = function(eventName, callback){
+	THREE.Object3D._threexDomEvent.bind(this, eventName, callback);
+	return this;
+}
+
+// # wrap mouseevents.unbind()
+THREE.Object3D.prototype.off	=
+THREE.Object3D.prototype.removeEventListener	= function(eventName, callback){
+	// TODO to code
+	return this;
 }
