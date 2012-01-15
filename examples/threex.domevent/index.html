@@ -116,7 +116,7 @@
 		}
 
 		function bindEvents(meshes){
-			meshes['sphere2'].on('down', function(object3d){
+			meshes['sphere2'].on('mousedown', function(object3d){
 				var scale	= 1.4;
 				new TWEEN.Tween(object3d.scale)
 					.to({x: scale, y: scale, z: scale}, 100)
@@ -126,7 +126,7 @@
 					.to({r: 1, g: 0.5, b: 0}, 100)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
-			}).on('up', function(object3d){
+			}).on('mouseup', function(object3d){
 				var scale	= 1;
 				new TWEEN.Tween(object3d.scale)
 					.to({x: scale, y: scale, z: scale}, 300)
@@ -151,7 +151,7 @@
 					.easing(TWEEN.Easing.Quartic.EaseIn).start();
 			});	
 
-			meshes['sphere3'].on('enter', function(object3d){
+			meshes['sphere3'].on('mouseover', function(object3d){
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1.5, y: 1.5, z: 1.5}, 200)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
@@ -165,7 +165,7 @@
 					.to({y: 3*Math.PI}, 1000)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
-			}).on('leave', function(object3d){
+			}).on('mouseout', function(object3d){
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1, y: 1, z: 1}, 300)
 					.easing(TWEEN.Easing.Quartic.EaseOut)
