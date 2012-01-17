@@ -135,7 +135,7 @@
 					.to({r: 0.5, g: 0.75, b: 0.25}, 300)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
-			});
+			}); 
 			meshes['sphere1'].on('click', function(object3d){
 				new Audio("sounds/dong.wav").play()
 				if( object3d.rotation.x < Math.PI/4 ){
