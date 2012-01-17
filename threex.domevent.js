@@ -9,7 +9,7 @@
 // # use the object oriented api
 //
 // You bind an event like this
-//
+// 
 // ```mesh.on('click', function(object3d){ ... })```
 //
 // To unbind an event, just do
