@@ -1,15 +1,7 @@
 // This THREEx helper makes it easy to handle the mouse events in your 3D scene
 //
-// * handle click, mouseenter, mouseleave, mousedown, mouseup
-// * handle hierachie of object3D ?
-//   * bubling and all ?
-// * how to handle draging
-// * TODO debug touch event they dont work
-// * supported event got the usual dom events name
-//   ```click```,
-//   ```mouseenter```, ```mouseleave```, 
-//   ```mousedown```, ```mouseup```
 // # Lets get started
+//
 // First you include it in your page
 //
 // ```<script src='threex.domevent.js'></script>```
@@ -29,6 +21,14 @@
 //
 // ```mesh.addEventListener('click', function(object3d){ ... })```
 // ```mesh.removeEventListener('click', function(object3d){ ... })```
+//
+// # Supported Events
+//
+// Always in a effort to stay close to usual pratices, the events name are the same as in DOM.
+// The semantic is the same too.
+// Currently, the available events are
+// [click, dblclick, mouseup, mousedown](http://www.quirksmode.org/dom/events/click.html),
+// [mouseover and mouse out](http://www.quirksmode.org/dom/events/mouseover.html).
 //
 // # use the standalone api
 //

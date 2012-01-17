@@ -106,7 +106,7 @@
 
 			// here you add your objects
 			// - you will most likely replace this part by your own
-			new THREE.JSONLoader().load('teapot.js', function(geometry){
+			new THREE.JSONLoader().load('models/teapot.js', function(geometry){
 				var meshes	= buildMeshes(geometry);
 				bindEvents(meshes);
 			})
@@ -114,6 +114,7 @@
 
 		function bindEvents(meshes){
 			meshes['sphere2'].on('mousedown', function(object3d){
+				new Audio("sounds/bing.wav").play()
 				var scale	= 1.4;
 				new TWEEN.Tween(object3d.scale)
 					.to({x: scale, y: scale, z: scale}, 100)
@@ -124,6 +125,7 @@
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
 			}).on('mouseup', function(object3d){
+				new Audio("sounds/boom.wav").play()
 				var scale	= 1;
 				new TWEEN.Tween(object3d.scale)
 					.to({x: scale, y: scale, z: scale}, 300)
@@ -135,6 +137,7 @@
 					.start();
 			});
 			meshes['sphere1'].on('click', function(object3d){
+				new Audio("sounds/dong.wav").play()
 				if( object3d.rotation.x < Math.PI/4 ){
 					var rotation	= {x: Math.PI/2};
 					var color	= {r: 1, g: 0.5, b: 0};
@@ -149,6 +152,7 @@
 			});	
 
 			meshes['sphere3'].on('mouseover', function(object3d){
+				new Audio("sounds/bing.wav").play()
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1.5, y: 1.5, z: 1.5}, 200)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
@@ -163,6 +167,7 @@
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
 			}).on('mouseout', function(object3d){
+				new Audio("sounds/boom.wav").play()
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1, y: 1, z: 1}, 300)
 					.easing(TWEEN.Easing.Quartic.EaseOut)
