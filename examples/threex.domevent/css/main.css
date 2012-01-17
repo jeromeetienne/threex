@@ -8,13 +8,6 @@ body {
 	font-family	: arial;
 	font-size	: 100%;
 }
-#info .top {
-	position	: absolute;
-	top		: 0px;
-	width		: 100%;
-	padding		: 5px;
-	text-align	: center;
-}
 #info a {
 	color		: #66F;
 	text-decoration	: none;
@@ -22,9 +15,24 @@ body {
 #info a:hover {
 	text-decoration	: underline;
 }
+
+#info {
+	padding		: 5px;
+}
+#info .top {
+	position	: absolute;
+	top		: 0px;
+}
+#info .middle {
+	width		: 100%;
+	text-align	: center;
+}
 #info .bottom {
 	position	: absolute;
 	bottom		: 0px;
-	right		: 5px;
 	padding		: 5px;
+}
+#info .right {
+	position	: absolute;
+	right		: 5px;
 }
