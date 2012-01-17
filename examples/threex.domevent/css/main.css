@@ -36,3 +36,10 @@ body {
 	position	: absolute;
 	right		: 5px;
 }
+
+#codeSample {
+	font-size	: 300%;
+}
+@media all and (max-width: 640px) {
+	#codeSample { font-size: 150%; }
+}
