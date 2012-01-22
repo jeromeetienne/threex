@@ -4,19 +4,22 @@
 		<title>learningthree.js boiler plate for three.js</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-
-		<script src="vendor/three.js/Three.js">		</script>
-		<script src="vendor/three.js/Detector.js">	</script>
+		
+			
+		<script src="vendor/three.js/Three.js"></script>
+		<script src="vendor/three.js/Detector.js"></script>
 		<!-- https://github.com/mrdoob/stats.js -->
-		<script src="vendor/three.js/Stats.js">		</script>
+		<script src="vendor/three.js/Stats.js"></script>
 
-		<script src="../../THREEx.screenshot.js">	</script>
-		<script src="../../threex.fullscreen.js">	</script>
-		<script src="../../threex.windowresize.js">	</script>
-		<script src="vendor/threex.dragpancontrols.js">	</script>
+		<script src="vendor/threex/THREEx.screenshot.js"></script>
+		<script src="vendor/threex/THREEx.FullScreen.js"></script>
+		<script src="vendor/threex/THREEx.WindowResize.js"></script>
+		<script src="vendor/threex.dragpancontrols.js"></script>
 
-		<script src="../../threex.preloader.js"></script>
+		<script src="THREE.plugins.js"></script>
+		<script>THREE.Plugins.mixin(THREE.Geometry);</script>
+
+		<script src="three.geometry.toolbox.js"></script>
 
 		<link  href="css/main.css" rel="stylesheet"/>
 	</head>
@@ -51,9 +54,12 @@
 					preserveDrawingBuffer	: true	// to allow screenshot
 				});
 				renderer.setClearColorHex( 0xBBBBBB, 1 );
+			// uncomment if webgl is required
+			//}else{
+			//	Detector.addGetWebGLMessage();
+			//	return true;
 			}else{
-				Detector.addGetWebGLMessage();
-				return true;
+				renderer	= new THREE.CanvasRenderer();
 			}
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.getElementById('container').appendChild(renderer.domElement);
@@ -87,28 +93,16 @@
 
 			// here you add your objects
 			// - you will most likely replace this part by your own
-			var light	= new THREE.AmbientLight( 0xffffff );
-			scene.add( light );
-			
-			var light	= new THREE.DirectionalLight( 0xffffff );
-			light.position.set( 1, 1, 1 ).normalize();
-			scene.add( light );
+			geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15 );
 
+//geometry.scale(2).translate(5,0,0).center().normalize();
+console.log("width", geometry.size() )
+//geometry.rotate(new THREE.Vector3(Math.PI/3,0,0));
+//geometry.rotate(Math.PI/3,0,0);
 
-			var preload	= new THREEx.Preloader();
-			preload.texture('images/moon_1024.jpg', 'moon')
-			preload.bind('complete', function(){
-				var geometry	= new THREE.CubeGeometry( 1, 1, 1 );
-				var material	= new THREE.MeshPhongMaterial({
-					ambient	: 0x400040,
-					color	: 0xff00ff,
-					shading	: THREE.SmoothShading,
-					map	: preload.cache().get('moon')
-				});
-				var mesh	= new THREE.Mesh( geometry, material );
-				scene.add( mesh );				
-			});
-			preload.start();
+			var material	= new THREE.MeshNormalMaterial();
+			var mesh	= new THREE.Mesh( geometry, material );
+			scene.add( mesh );
 		}
 
 		// animation loop
