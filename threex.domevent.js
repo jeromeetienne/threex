@@ -141,9 +141,7 @@ THREEx.DomEvent.prototype.bind	= function(object3d, eventName, callback)
 	var objectCtx	= this._objectCtxGet(object3d);	
 	if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
-	objectCtx[eventName+'Handlers'].push({
-		callback	: callback
-	});
+	objectCtx[eventName+'Handlers'].push(callback);
 }
 
 THREEx.DomEvent.prototype._bound	= function(eventName, object3d)
@@ -151,6 +149,20 @@ THREEx.DomEvent.prototype._bound	= function(eventName, object3d)
 	var objectCtx	= this._objectCtxGet(object3d);
 	if( !objectCtx )	return false;
 	return objectCtx[eventName+'Handlers'] ? true : false;
+}
+
+THREEx.DomEvent.prototype.unbind	= function(object3d, eventName, callback)
+{
+	console.assert( THREEx.DomEvent.eventNames.indexOf(eventName) !== -1, "not available events:"+eventName );
+
+	if( !this._objectCtxIsInit(object3d) )	this._objectCtxInit(object3d);
+
+	var objectCtx	= this._objectCtxGet(object3d);
+	if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
+
+	var index	= objectCtx[eventName+'Handlers'].indexOf(callback);
+console.log("unbind", object3d, eventName, callback, index)
+	if( index !== -1 )	objectCtx[eventName+'Handlers'].splice(index, 1); 
 }
 
 /********************************************************************************/
@@ -190,17 +202,16 @@ THREEx.DomEvent.prototype._onMove	= function(mouseX, mouseY)
 		if( oldSelected && this._bound('mouseout', oldSelected) ){
 			outHandlers	= this._objectCtxGet(oldSelected).mouseoutHandlers.slice(0); 
 		}
-
 		this._selected	= null;
 	}
 
 	// notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
 	overHandlers && overHandlers.forEach(function(handler){
-		handler.callback(newSelected);
+		handler(newSelected);
 	})
 	// notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
 	outHandlers && outHandlers.forEach(function(handler){
-		handler.callback(oldSelected);
+		handler(oldSelected);
 	})
 }
 
@@ -232,7 +243,7 @@ THREEx.DomEvent.prototype._onEvent	= function(eventName, mouseX, mouseY)
 
 		var handlers	= objectCtx[eventName+'Handlers'];
 		handlers && handlers.length && handlers.forEach(function(handler){
-			handler.callback(object3d, intersect);
+			handler(object3d, intersect);
 		})
 	}
 }
@@ -334,6 +345,6 @@ THREE.Object3D.prototype.addEventListener = function(eventName, callback){
 // # wrap mouseevents.unbind()
 THREE.Object3D.prototype.off	=
 THREE.Object3D.prototype.removeEventListener	= function(eventName, callback){
-	// TODO to code
+	THREE.Object3D._threexDomEvent.unbind(this, eventName, callback);
 	return this;
 }
