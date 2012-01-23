@@ -161,7 +161,6 @@ THREEx.DomEvent.prototype.unbind	= function(object3d, eventName, callback)
 	if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
 	var index	= objectCtx[eventName+'Handlers'].indexOf(callback);
-console.log("unbind", object3d, eventName, callback, index)
 	if( index !== -1 )	objectCtx[eventName+'Handlers'].splice(index, 1); 
 }
 
@@ -228,24 +227,25 @@ THREEx.DomEvent.prototype._onEvent	= function(eventName, mouseX, mouseY)
 	this._projector.unprojectVector( vector, camera );
 
 	var ray		= new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-	var intersects = ray.intersectScene( scene );
-
+	var intersects	= ray.intersectScene( scene );
 	// FIXME to test only the bound objects is likely faster to run
 	// - handle the list
 	// var intersects = ray.intersectObjects( [mesh] );
 
-	for(var i = 0; i < intersects.length; i++){
-		var intersect	= intersects[i];
-		var object3d	= intersect.object;
-		var objectCtx	= this._objectCtxGet(object3d);
+	// if there are no intersections, return now
+	if( intersects.length === 0 )	return;
 
-		if( !objectCtx )	continue;
+	// init some vairables
+	var intersect	= intersects[0];
+	var object3d	= intersect.object;
+	var objectCtx	= this._objectCtxGet(object3d);
+	if( !objectCtx )	return;
 
-		var handlers	= objectCtx[eventName+'Handlers'];
-		handlers && handlers.length && handlers.forEach(function(handler){
-			handler(object3d, intersect);
-		})
-	}
+	// notify all handlers
+	var handlers	= objectCtx[eventName+'Handlers'];
+	handlers && handlers.length && handlers.forEach(function(handler){
+		handler(object3d, intersect);
+	})
 }
 
 /********************************************************************************/
