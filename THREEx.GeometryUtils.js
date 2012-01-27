@@ -45,6 +45,10 @@ THREEx.GeometryUtils	= THREEx.GeometryUtils	|| {};
 // - chained API
 // - possibility a matrix to reduce computation ?
 
+//////////////////////////////////////////////////////////////////////////////////
+//										//
+//////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Change the scale of a geometry
  * 
@@ -66,19 +70,37 @@ THREEx.GeometryUtils.scale	= function(geometry, scale)
 	return this;
 }
 
-THREEx.GeometryUtils.translate	= function(geometry, delta)
+THREEx.GeometryUtils.size	= function(geometry)
 {
-	// change all geometry.vertices
-	for(var i = 0; i < geometry.vertices.length; i++) {
-		var vertex	= geometry.vertices[i];
-		vertex.position.addSelf(delta); 
-	}
+	// compute bounding box - TODO is that needed ?
+	geometry.computeBoundingBox();
+	// compute middle
+	var size= new THREE.Vector3()
+	size.x	= geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+	size.y	= geometry.boundingBox.max.y - geometry.boundingBox.min.y;
+	size.z	= geometry.boundingBox.max.z - geometry.boundingBox.min.z;
 
-	// mark the vertices as dirty
-	geometry.__dirtyVertices = true;
-	// return this, to get chained API	
-	return this;
+	// return the just computed middle
+	return size;	
 }
+
+THREEx.GeometryUtils.normalize	= function(geometry)
+{
+	var size	= THREEx.GeometryUtils.size(geometry);
+	var scale;
+	if( size.x >= size.y && size.x >= size.z ){
+		scale	= 1/size.x;
+	}else if( size.y >= size.x && size.y >= size.z ){
+		scale	= 1/size.y;
+	}else{
+		scale	= 1/size.z;
+	}
+	return THREEx.GeometryUtils.scale(geometry, new THREE.Vector3(scale, scale, scale));
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//										//
+//////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Compute the "middlePoint" aka the point at the middle of the boundingBox
@@ -93,12 +115,48 @@ THREEx.GeometryUtils.middlePoint	= function(geometry)
 
 	// compute middle
 	var middle	= new THREE.Vector3()
-	middle.x	= ( geometry.boundingBox.x[ 1 ] + geometry.boundingBox.x[ 0 ] ) / 2;
-	middle.y	= ( geometry.boundingBox.y[ 1 ] + geometry.boundingBox.y[ 0 ] ) / 2;
-	middle.z	= ( geometry.boundingBox.z[ 1 ] + geometry.boundingBox.z[ 0 ] ) / 2;
+	middle.x	= ( geometry.boundingBox.max.x + geometry.boundingBox.min.x ) / 2;
+	middle.y	= ( geometry.boundingBox.max.y + geometry.boundingBox.min.y ) / 2;
+	middle.z	= ( geometry.boundingBox.max.z + geometry.boundingBox.min.z ) / 2;
 
 	// return the just computed middle
 	return middle;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//										//
+//////////////////////////////////////////////////////////////////////////////////
+
+
+THREEx.GeometryUtils.translate	= function(geometry, delta)
+{
+	// change all geometry.vertices
+	for(var i = 0; i < geometry.vertices.length; i++) {
+		var vertex	= geometry.vertices[i];
+		vertex.position.addSelf(delta); 
+	}
+
+	// mark the vertices as dirty
+	geometry.__dirtyVertices = true;
+	// return this, to get chained API	
+	return this;
+}
+
+THREEx.GeometryUtils.rotate	= function(geometry, angles, order)
+{
+	order	= order	|| 'XYZ';
+
+	// compute bounding box - TODO is that needed ?
+	geometry.computeBoundingBox();
+	
+	var matrix	= new THREE.Matrix4();
+	matrix.setRotationFromEuler(angles, order);
+	geometry.applyMatrix( matrix );
+
+	// mark the vertices as dirty
+	geometry.__dirtyVertices = true;
+	// return this, to get chained API	
+	return this;
 }
 
 /**
@@ -114,6 +172,11 @@ THREEx.GeometryUtils.center	= function(geometry, noX, noY, noZ)
 
 	return this.translate(geometry, delta)
 }
+
+//////////////////////////////////////////////////////////////////////////////////
+//										//
+//////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * Initial version of attachement

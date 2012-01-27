@@ -1,14 +1,3 @@
-//var geometry	= new THREE.Geometry();
-//
-//geometry.center();
-//geometry.width();
-//geometry.height();
-//geometry.depth();
-//
-//geometry.scale();
-//geometry.translate();
-//geometry.rotate();
-
 /**
  * Scale the geometry
 */
@@ -29,6 +18,7 @@ THREE.Geometry.register('scale', function(scale){
 	}
 
 	// mark the vertices as dirty
+	geometry.dynamic	= true;
 	geometry.__dirtyVertices = true;
 
 	// return this, to get chained API	
@@ -54,6 +44,7 @@ THREE.Geometry.register('translate', function(delta){
 	}
 
 	// mark the vertices as dirty
+	geometry.dynamic	= true;
 	geometry.__dirtyVertices = true;
 
 	// return this, to get chained API	
@@ -99,12 +90,13 @@ THREE.Geometry.register('center', function(noX, noY, noZ){
  * @returns {THREE.Vector3} point for this geometry
 */
 THREE.Geometry.register('rotate', function(angles, order){
+	var geometry	= this;
 	// handle parameters
 	if( typeof angles === "number" && arguments.length >= 3 ){
 		angles	= new THREE.Vector3(arguments[0], arguments[1], arguments[2]);
 		order	= arguments[3];
 	}
-	console.assert(angles instanceof THREE.Vector3, "Geometry.scale parameter error");
+	console.assert(angles instanceof THREE.Vector3, "Geometry.rotate parameter error");
 
 	order	= order	|| 'XYZ';
 
@@ -116,7 +108,10 @@ THREE.Geometry.register('rotate', function(angles, order){
 	this.applyMatrix( matrix );
 
 	// mark the vertices as dirty
-	this.__dirtyVertices = true;
+	geometry.dynamic	= true;
+	this.__dirtyVertices	= true;
+
+	return this;
 });
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +119,7 @@ THREE.Geometry.register('rotate', function(angles, order){
 //////////////////////////////////////////////////////////////////////////////////
 
 THREE.Geometry.register('size', function(){
+	var geometry	= this;
 	// compute bounding box - TODO is that needed ?
 	this.computeBoundingBox();
 	// compute middle
