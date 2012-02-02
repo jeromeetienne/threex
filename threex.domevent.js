@@ -1,5 +1,14 @@
 // This THREEx helper makes it easy to handle the mouse events in your 3D scene
 //
+// * CHANGES NEEDED
+//   * handle drag/drop
+//   * notify events not object3D - like DOM
+//     * so single object with property
+//   * DONE bubling implement bubling/capturing
+//   * DONE implement event.stopPropagation()
+//   * DONE implement event.type = "click" and co
+//   * DONE implement event.target
+//
 // # Lets get started
 //
 // First you include it in your page
@@ -59,12 +68,13 @@
 var THREEx		= THREEx 		|| {};
 
 // # Constructor
-THREEx.DomEvent	= function(domElement)
+THREEx.DomEvent	= function(camera, domElement)
 {
+	this._camera	= camera || null;
 	this._domElement= domElement || document;
 	this._projector	= new THREE.Projector();
-	
 	this._selected	= null;
+	this._boundObjs	= [];
 
 	// Bind dom event for mouse and touch
 	var _this	= this;
@@ -116,39 +126,46 @@ THREEx.DomEvent.eventNames	= [
 // handle domevent context in object3d instance
 
 THREEx.DomEvent.prototype._objectCtxInit	= function(object3d){
-	object3d._3xMouseEvent = {};
+	object3d._3xDomEvent = {};
 }
 THREEx.DomEvent.prototype._objectCtxDeinit	= function(object3d){
-	delete object3d._3xMouseEvent;
+	delete object3d._3xDomEvent;
 }
 THREEx.DomEvent.prototype._objectCtxIsInit	= function(object3d){
-	return object3d._3xMouseEvent ? true : false;
+	return object3d._3xDomEvent ? true : false;
 }
 THREEx.DomEvent.prototype._objectCtxGet	= function(object3d){
-	return object3d._3xMouseEvent;
+	return object3d._3xDomEvent;
 }
 
 /********************************************************************************/
 /*										*/
 /********************************************************************************/
 
-THREEx.DomEvent.prototype.bind	= function(object3d, eventName, callback)
+/**
+ * Getter/Setter for camera
+*/
+THREEx.DomEvent.prototype.camera	= function(value)
+{
+	if( value )	this._camera	= value;
+	return this._camera;
+}
+
+THREEx.DomEvent.prototype.bind	= function(object3d, eventName, callback, useCapture)
 {
 	console.assert( THREEx.DomEvent.eventNames.indexOf(eventName) !== -1, "not available events:"+eventName );
 
 	if( !this._objectCtxIsInit(object3d) )	this._objectCtxInit(object3d);
-
 	var objectCtx	= this._objectCtxGet(object3d);	
 	if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
-	objectCtx[eventName+'Handlers'].push(callback);
-}
-
-THREEx.DomEvent.prototype._bound	= function(eventName, object3d)
-{
-	var objectCtx	= this._objectCtxGet(object3d);
-	if( !objectCtx )	return false;
-	return objectCtx[eventName+'Handlers'] ? true : false;
+	objectCtx[eventName+'Handlers'].push({
+		callback	: callback,
+		useCapture	: useCapture
+	});
+	
+	// add this object in this._boundObjs
+	this._boundObjs.push(object3d);
 }
 
 THREEx.DomEvent.prototype.unbind	= function(object3d, eventName, callback)
@@ -160,8 +177,25 @@ THREEx.DomEvent.prototype.unbind	= function(object3d, eventName, callback)
 	var objectCtx	= this._objectCtxGet(object3d);
 	if( !objectCtx[eventName+'Handlers'] )	objectCtx[eventName+'Handlers']	= [];
 
-	var index	= objectCtx[eventName+'Handlers'].indexOf(callback);
-	if( index !== -1 )	objectCtx[eventName+'Handlers'].splice(index, 1); 
+	var handlers	= objectCtx[eventName+'Handlers'];
+	for(var i = 0; i < handlers.length; i++){
+		var handler	= handlers[i];
+		if( callback != handler.callback )	continue;
+		if( useCapture != handler.useCapture )	continue;
+		handlers.splice(i, 1)
+		break;
+	}
+	// from this object from this._boundObjs
+	var index	= this._boundObjs.indexOf(object3d);
+	console.assert( index !== -1 );
+	this._boundObjs.splice(index, 1);
+}
+
+THREEx.DomEvent.prototype._bound	= function(eventName, object3d)
+{
+	var objectCtx	= this._objectCtxGet(object3d);
+	if( !objectCtx )	return false;
+	return objectCtx[eventName+'Handlers'] ? true : false;
 }
 
 /********************************************************************************/
@@ -170,13 +204,13 @@ THREEx.DomEvent.prototype.unbind	= function(object3d, eventName, callback)
 
 // # handle mousemove kind of events
 
-THREEx.DomEvent.prototype._onMove	= function(mouseX, mouseY)
+THREEx.DomEvent.prototype._onMove	= function(mouseX, mouseY, origDomEvent)
 {
 	var vector	= new THREE.Vector3( mouseX, mouseY, 1 );
-	this._projector.unprojectVector( vector, camera );
+	this._projector.unprojectVector( vector, this._camera );
 
-	var ray		= new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-	var intersects = ray.intersectScene( scene );
+	var ray		= new THREE.Ray( this._camera.position, vector.subSelf( this._camera.position ).normalize() );
+	var intersects = ray.intersectObjects( this._boundObjs );
 	
 	var oldSelected	= this._selected;
 
@@ -185,33 +219,23 @@ THREEx.DomEvent.prototype._onMove	= function(mouseX, mouseY)
 		var newSelected	= intersect.object;
 		this._selected	= newSelected;
 	
-		var overHandlers, outHandlers;
+		var notifyOver, notifyOut;
 		if( oldSelected != newSelected ){
 			// if newSelected bound mouseenter, notify it
-			if( this._bound('mouseover', newSelected) ){
-				overHandlers	= this._objectCtxGet(newSelected).mouseoverHandlers.slice(0); 
-			}
+			notifyOver	= this._bound('mouseover', newSelected);
 			// if there is a oldSelect and oldSelected bound mouseleave, notify it
-			if( oldSelected && this._bound('mouseout', oldSelected) ){
-				outHandlers	= this._objectCtxGet(oldSelected).mouseoutHandlers.slice(0); 
-			}
+			notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
 		}
 	}else{
 		// if there is a oldSelect and oldSelected bound mouseleave, notify it
-		if( oldSelected && this._bound('mouseout', oldSelected) ){
-			outHandlers	= this._objectCtxGet(oldSelected).mouseoutHandlers.slice(0); 
-		}
+		notifyOut	= oldSelected && this._bound('mouseout', oldSelected);
 		this._selected	= null;
 	}
 
 	// notify mouseEnter - done at the end with a copy of the list to allow callback to remove handlers
-	overHandlers && overHandlers.forEach(function(handler){
-		handler(newSelected);
-	})
+	notifyOver && this._notify('mouseover', newSelected, origDomEvent);
 	// notify mouseLeave - done at the end with a copy of the list to allow callback to remove handlers
-	outHandlers && outHandlers.forEach(function(handler){
-		handler(oldSelected);
-	})
+	notifyOut  && this._notify('mouseout', oldSelected, origDomEvent);
 }
 
 
@@ -221,16 +245,14 @@ THREEx.DomEvent.prototype._onMove	= function(mouseX, mouseY)
 
 // # handle click kind of events
 
-THREEx.DomEvent.prototype._onEvent	= function(eventName, mouseX, mouseY)
+THREEx.DomEvent.prototype._onEvent	= function(eventName, mouseX, mouseY, origDomEvent)
 {
 	var vector	= new THREE.Vector3( mouseX, mouseY, 1 );
-	this._projector.unprojectVector( vector, camera );
+	this._projector.unprojectVector( vector, this._camera );
 
-	var ray		= new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-	var intersects	= ray.intersectScene( scene );
-	// FIXME to test only the bound objects is likely faster to run
-	// - handle the list
-	// var intersects = ray.intersectObjects( [mesh] );
+	vector.subSelf( this._camera.position ).normalize()
+	var ray		= new THREE.Ray( this._camera.position, vector );
+	var intersects	= ray.intersectObjects( this._boundObjs );
 
 	// if there are no intersections, return now
 	if( intersects.length === 0 )	return;
@@ -241,11 +263,40 @@ THREEx.DomEvent.prototype._onEvent	= function(eventName, mouseX, mouseY)
 	var objectCtx	= this._objectCtxGet(object3d);
 	if( !objectCtx )	return;
 
+	// notify handlers
+	this._notify(eventName, object3d, origDomEvent);
+}
+
+THREEx.DomEvent.prototype._notify	= function(eventName, object3d, origDomEvent)
+{
+	var objectCtx	= this._objectCtxGet(object3d);
+	var handlers	= objectCtx ? objectCtx[eventName+'Handlers'] : null;
+
+	// do bubbling
+	if( !objectCtx || !handlers || handlers.length === 0 ){
+		object3d.parent && this._notify(eventName, object3d.parent);
+		return;
+	}
+	
 	// notify all handlers
 	var handlers	= objectCtx[eventName+'Handlers'];
-	handlers && handlers.length && handlers.forEach(function(handler){
-		handler(object3d, intersect);
-	})
+	for(var i = 0; i < handlers.length; i++){
+		var handler	= handlers[i];
+		var toPropagate	= true;
+		handler.callback({
+			type		: eventName,
+			target		: object3d,
+			origDomEvent	: origDomEvent,
+			stopPropagation	: function(){
+				toPropagate	= false;
+			}
+		});
+		if( !toPropagate )	continue;
+		// do bubbling
+		if( handler.useCapture === false ){
+			object3d.parent && this._notify(eventName, object3d.parent);
+		}
+	}
 }
 
 /********************************************************************************/
@@ -261,14 +312,14 @@ THREEx.DomEvent.prototype._onMouseEvent	= function(eventName, domEvent)
 {
 	var mouseX	= +(domEvent.clientX / window.innerWidth ) * 2 - 1;
 	var mouseY	= -(domEvent.clientY / window.innerHeight) * 2 + 1;
-	return this._onEvent(eventName, mouseX, mouseY);
+	return this._onEvent(eventName, mouseX, mouseY, domEvent);
 }
 
-THREEx.DomEvent.prototype._onMouseMove	= function(event)
+THREEx.DomEvent.prototype._onMouseMove	= function(domEvent)
 {
-	var mouseX	= +(event.clientX / window.innerWidth ) * 2 - 1;
-	var mouseY	= -(event.clientY / window.innerHeight) * 2 + 1;
-	return this._onMove(mouseX, mouseY);
+	var mouseX	= +(domEvent.clientX / window.innerWidth ) * 2 - 1;
+	var mouseY	= -(domEvent.clientY / window.innerHeight) * 2 + 1;
+	return this._onMove(mouseX, mouseY, domEvent);
 }
 
 THREEx.DomEvent.prototype._onClick		= function(event)
@@ -291,60 +342,25 @@ THREEx.DomEvent.prototype._onDblClick		= function(event)
 THREEx.DomEvent.prototype._onTouchStart	= function(event){ return this._onTouchEvent('mousedown', event);	}
 THREEx.DomEvent.prototype._onTouchEnd	= function(event){ return this._onTouchEvent('mouseup'	, event);	}
 
-THREEx.DomEvent.prototype._onTouchMove	= function(event)
+THREEx.DomEvent.prototype._onTouchMove	= function(domEvent)
 {
-	if( event.touches.length != 1 )	return undefined;
+	if( domEvent.touches.length != 1 )	return undefined;
 
-	event.preventDefault();
+	domEvent.preventDefault();
 
-	var mouseX	= +(event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-	var mouseY	= -(event.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
-	return this._onMove('mousemove', mouseX, mouseY);
+	var mouseX	= +(domEvent.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
+	var mouseY	= -(domEvent.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
+	return this._onMove('mousemove', mouseX, mouseY, domEvent);
 }
 
 THREEx.DomEvent.prototype._onTouchEvent	= function(eventName, domEvent)
 {
-	if( event.touches.length != 1 )	return undefined;
+	if( domEvent.touches.length != 1 )	return undefined;
 
-	event.preventDefault();
+	domEvent.preventDefault();
 
-	var mouseX	= +(event.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-	var mouseY	= -(event.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
-	return this._onEvent(eventName, mouseX, mouseY);	
+	var mouseX	= +(domEvent.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
+	var mouseY	= -(domEvent.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
+	return this._onEvent(eventName, mouseX, mouseY, domEvent);	
 }
 
-/********************************************************************************/
-// # Patch THREE.Object3D
-/********************************************************************************/
-
-// handle noConflit.
-THREEx.DomEvent.noConflict	= function(){
-	THREEx.DomEvent.noConflict.symbols.forEach(function(symbol){
-		THREE.Object3D.prototype[symbol]	= THREEx.DomEvent.noConflict.previous[symbol]
-	})
-}
-// Backup previous values to restore them later if needed.
-THREEx.DomEvent.noConflict.symbols	= ['on', 'off', 'addEventListener', 'removeEventListener'];
-THREEx.DomEvent.noConflict.previous	= {};
-THREEx.DomEvent.noConflict.symbols.forEach(function(symbol){
-	THREEx.DomEvent.noConflict.previous[symbol]	= THREE.Object3D.prototype[symbol]
-})
-
-// begin the actual patching of THREE.Object3D
-
-// create the global instance of THREEx.DomEvent
-THREE.Object3D._threexDomEvent	= new THREEx.DomEvent();
-
-// # wrap mouseevents.bind()
-THREE.Object3D.prototype.on	=
-THREE.Object3D.prototype.addEventListener = function(eventName, callback){
-	THREE.Object3D._threexDomEvent.bind(this, eventName, callback);
-	return this;
-}
-
-// # wrap mouseevents.unbind()
-THREE.Object3D.prototype.off	=
-THREE.Object3D.prototype.removeEventListener	= function(eventName, callback){
-	THREE.Object3D._threexDomEvent.unbind(this, eventName, callback);
-	return this;
-}

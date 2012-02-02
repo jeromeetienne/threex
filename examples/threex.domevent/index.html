@@ -21,6 +21,7 @@
 		<script src="vendor/threex.dragpancontrols.js"></script>
 
 		<script src="../../threex.domevent.js"></script>
+		<script src="../../threex.domevent.object3d.js"></script>
 
 		<link  href="css/main.css" rel="stylesheet"/>
 	</head>
@@ -62,12 +63,9 @@
 					preserveDrawingBuffer	: true	// to allow screenshot
 				});
 				renderer.setClearColorHex( 0xBBBBBB, 1 );
-			// uncomment if webgl is required
-			//}else{
-			//	Detector.addGetWebGLMessage();
-			//	return true;
 			}else{
-				renderer	= new THREE.CanvasRenderer();
+				Detector.addGetWebGLMessage();
+				return true;
 			}
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.getElementById('container').appendChild(renderer.domElement);
@@ -109,14 +107,18 @@
 
 			// here you add your objects
 			// - you will most likely replace this part by your own
+
+			THREE.Object3D._threexDomEvent.camera(camera);
+			
 			new THREE.JSONLoader().load('models/teapot.js', function(geometry){
 				var meshes	= buildMeshes(geometry);
 				bindEvents(meshes);
-			})
+			});
 		}
 		
 		function bindEvents(meshes){
-			meshes['sphere2'].on('mousedown', function(object3d){
+			meshes['sphere2'].on('mousedown', function(event){
+				var object3d	= event.target;
 				var scale	= 1.4;
 				new TWEEN.Tween(object3d.scale)
 					.to({x: scale, y: scale, z: scale}, 100)
@@ -126,7 +128,8 @@
 					.to({r: 1, g: 0.5, b: 0}, 100)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
-			}).on('mouseup', function(object3d){
+			}).on('mouseup', function(event){
+				var object3d	= event.target;
 				var scale	= 1;
 				new TWEEN.Tween(object3d.scale)
 					.to({x: scale, y: scale, z: scale}, 300)
@@ -137,7 +140,8 @@
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
 			});
-			meshes['sphere1'].on('click', function(object3d){
+			meshes['sphere1'].on('click', function(event){
+				var object3d	= event.target;
 				if( object3d.rotation.x < Math.PI/4 ){
 					var rotation	= {x: Math.PI/2};
 					var color	= {r: 1, g: 0.5, b: 0};
@@ -151,7 +155,9 @@
 					.easing(TWEEN.Easing.Quartic.EaseIn).start();
 			});	
 
-			meshes['sphere3'].on('mouseover', function(object3d){
+			meshes['sphere3'].on('mouseover', function(event){
+				var object3d	= event.target;
+console.log("event", event);
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1.5, y: 1.5, z: 1.5}, 200)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
@@ -165,7 +171,9 @@
 					.to({y: 3*Math.PI}, 1000)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
 					.start();
-			}).on('mouseout', function(object3d){
+			}).on('mouseout', function(event){
+				var object3d	= event.target;
+console.log("event", event);
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1, y: 1, z: 1}, 300)
 					.easing(TWEEN.Easing.Quartic.EaseOut)
