@@ -157,7 +157,6 @@
 
 			meshes['sphere3'].on('mouseover', function(event){
 				var object3d	= event.target;
-console.log("event", event);
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1.5, y: 1.5, z: 1.5}, 200)
 					.easing(TWEEN.Easing.Quartic.EaseIn)
@@ -173,7 +172,6 @@ console.log("event", event);
 					.start();
 			}).on('mouseout', function(event){
 				var object3d	= event.target;
-console.log("event", event);
 				new TWEEN.Tween(object3d.scale)
 					.to({x: 1, y: 1, z: 1}, 300)
 					.easing(TWEEN.Easing.Quartic.EaseOut)
