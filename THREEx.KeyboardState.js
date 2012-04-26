@@ -39,7 +39,7 @@ THREEx.KeyboardState	= function()
 	// to store the current state
 	this.keyCodes	= {};
 	this.modifiers	= {};
-	
+
 	// create callback to bind/unbind keyboard events
 	var self	= this;
 	this._onKeyDown	= function(event){ self._onKeyChange(event, true); };
@@ -48,7 +48,7 @@ THREEx.KeyboardState	= function()
 	// bind keyEvents
 	document.addEventListener("keydown", this._onKeyDown, false);
 	document.addEventListener("keyup", this._onKeyUp, false);
-}
+};
 
 /**
  * To stop listening of the keyboard events
@@ -58,7 +58,7 @@ THREEx.KeyboardState.prototype.destroy	= function()
 	// unbind keyEvents
 	document.removeEventListener("keydown", this._onKeyDown, false);
 	document.removeEventListener("keyup", this._onKeyUp, false);
-}
+};
 
 THREEx.KeyboardState.MODIFIERS	= ['shift', 'ctrl', 'alt', 'meta'];
 THREEx.KeyboardState.ALIAS	= {
@@ -69,7 +69,9 @@ THREEx.KeyboardState.ALIAS	= {
 	'space'		: 32,
 	'pageup'	: 33,
 	'pagedown'	: 34,
-	'tab'		: 9
+	'enter'		: 13,
+	'tab'		: 9,
+	'escape'	: 27
 };
 
 /**
@@ -89,7 +91,7 @@ THREEx.KeyboardState.prototype._onKeyChange	= function(event, pressed)
 	this.modifiers['ctrl']	= event.ctrlKey;
 	this.modifiers['alt']	= event.altKey;
 	this.modifiers['meta']	= event.metaKey;
-}
+};
 
 /**
  * query keyboard state to know if a key is pressed of not
@@ -108,9 +110,9 @@ THREEx.KeyboardState.prototype.pressed	= function(keyDesc)
 		}else if( Object.keys(THREEx.KeyboardState.ALIAS).indexOf( key ) != -1 ){
 			pressed	= this.keyCodes[ THREEx.KeyboardState.ALIAS[key] ];
 		}else {
-			pressed	= this.keyCodes[key.toUpperCase().charCodeAt(0)]
+			pressed	= this.keyCodes[key.toUpperCase().charCodeAt(0)];
 		}
 		if( !pressed)	return false;
 	};
 	return true;
-}
+};
