@@ -1,8 +1,9 @@
 {
-  "name": "threex.loop",
-  "version": "0.0.0-4",
-  "description": "rendering loop for three.js",
-  "main": "THREEx.Loop.js",
+  "name": "threex.context",
+  "version": "0.0.0-1",
+  "description": "a notion of context for three.js",
+  "main": "three
+  x.context.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

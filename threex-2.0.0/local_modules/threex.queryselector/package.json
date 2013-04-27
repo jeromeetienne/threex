@@ -1,8 +1,8 @@
 {
-  "name": "threex.context",
+  "name": "threex.queryselector",
   "version": "0.0.0-1",
-  "description": "a notion of context for three.js",
-  "main": "THREEx.Context.js",
+  "description": "css like selection for THREE.Object3D",
+  "main": "threex.queryselector.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

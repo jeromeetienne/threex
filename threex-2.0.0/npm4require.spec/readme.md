@@ -1,15 +1,14 @@
 # npm4require.js
 ## A Workflow For Managing Web Package With Npm.js And Require.js
 
-npm4require doesnt include codes, or tools for command lines.
-It is only a workflow. 
+npm4require doesnt include codes, no libraries or cmdline tools.
+It is just a workflow. 
 
 It is made to handle modules on the web.
 It use 2 wellknown tools :
 [npm.js](https://npmjs.org/) handles modules storing and versioning.
 [require.js](http://requirejs.org) handles loading modules in the browser.
-It is a very vendor.js way to handle package.
-
+It is a very vendor.js way to handle packages.
 
 ## Module installation
 
@@ -36,26 +35,9 @@ require(['node_modules/threex.loop/package.require'], function(){
 })
 ```
 
-## Module Folder Description
+## how to write a module ?
 
-There is only 2 files required
+* publish a npm package for it, then add a ```package.require.js``` and you are done.
 
-### package.json
-* this file MUST exists
-* for npm
-
-### package.require.js
-* this is a file in javascript, it contains the code to load the module with require.js
-  * so it is a require.js related function
-  * see require.js docs for how to do it
-  * or simply look at other modules
-* this file MUST exist
-* for example, the ```package.require.js``` to load a single javascript file ```index.js``` 
-
-```
-define( [ './index.js',
-	], function(){
-});
-```
 
 

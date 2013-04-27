@@ -1,5 +1,5 @@
 define( [ '../threex.loop/package.require'
-	, './THREEx.Context'
+	, './threex.context'
 	], function(){
 	console.log('module threex.context loaded')
 });

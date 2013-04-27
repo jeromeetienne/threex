@@ -1,0 +1,12 @@
+{
+  "name": "threex.creators",
+  "version": "0.0.0",
+  "description": "ERROR: No README.md file found!",
+  "main": "THREEx.Creators.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "jerome.etienne@gmail.com",
+  "license": "MIT"
+}

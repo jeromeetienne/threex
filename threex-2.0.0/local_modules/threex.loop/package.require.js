@@ -1,0 +1,3 @@
+define( [ './threex.loop',
+	], function(){
+});

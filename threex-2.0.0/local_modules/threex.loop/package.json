@@ -1,8 +1,8 @@
 {
-  "name": "threex.queryselector",
-  "version": "0.0.0-1",
-  "description": "css like selection for THREE.Object3D",
-  "main": "THREEx.QuerySelector.js",
+  "name": "threex.loop",
+  "version": "0.0.0-4",
+  "description": "rendering loop for three.js",
+  "main": "threex.loop.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

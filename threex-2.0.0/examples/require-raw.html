@@ -15,11 +15,19 @@
 <script src="../vendor/three.js/build/three.min.js"></script>
 <script src="../vendor/require.js/require.js"></script>
 <script>
-require([ '../node_modules/threex.context/package.require'
+require([ '../local_modules/threex.context/package.require',
+	, '../local_modules/threex.windowresize/package.require'
+	, '../local_modules/threex.mesh/package.require'
+	, '../local_modules/threex.creators/package.require'
 	], function(){
 	console.log('dependancy loaded')
 
 	var ctx		= new THREEx.Context().start()
+
+	THREEx.WindowResize(ctx.renderer, ctx.camera)
+
+	var mesh1	= THREEx.createTorusMesh().addTo(ctx)
+	mesh1.position.set(1,0,0)
 
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
 	var material	= new THREE.MeshNormalMaterial();
