@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - cube</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="../vendor/three.js/build/three.min.js"></script>
+		<script src="../vendor/creatorpattern.js/creatorpattern.js"></script>
+		<script src="../src/THREEx.Loop.js"></script>
+		<script src="../src/THREEx.Context.js"></script>
+		<script src="../src/THREEx.Creators.js"></script>
+		<script src="../src/THREEx.Mesh.js"></script>
+		<script src="../src/THREEx.QuerySelector.js"></script>
+		<script>
+			var ctx		= THREEx.Context.create().start()
+
+			var mesh	= THREEx.createCubeMesh().addTo(ctx)
+			mesh.translateX( -1 );
+
+			var mesh	= THREEx.createCubeMesh().addTo(ctx)
+			mesh.translateX( +1 );
+			mesh.addClass('fooClass').domId('bonjour')
+			
+			console.log(ctx.querySelector('.fooClass', ctx.scene))
+			
+			ctx.hook(function(delta, now){
+				mesh.rotation.x += 0.1 * delta*Math.PI*2;
+				mesh.rotation.y += 0.2 * delta*Math.PI*2;
+			})			
+		</script>
+
+	</body>
+</html>
