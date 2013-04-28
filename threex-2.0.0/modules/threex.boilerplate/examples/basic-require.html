@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src="../../../vendor/require.js/require.js"></script>
+<script>
+require([ '../package.require',
+], function(){
+	var ctx		= new THREEx.Context().boilerplate().start()
+
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	ctx.add( mesh );
+
+	ctx.hook(function(delta, now){
+		mesh.rotation.x += 0.1 * delta*Math.PI*2;
+		mesh.rotation.y += 0.2 * delta*Math.PI*2;
+	})
+})
+</script>

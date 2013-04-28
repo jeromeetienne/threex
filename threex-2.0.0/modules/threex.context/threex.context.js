@@ -55,6 +55,7 @@ THREEx.Context.prototype.hook	= function(){
 //////////////////////////////////////////////////////////////////////////////////
 
 THREEx.Context.prototype.boilerplate	= function(){
+	console.assert(THREEx.BoilerPlate, 'this function depends on THREEx.BoilerPlate . it doesnt seems to be there');
 	var boilerPlate	= new THREEx.BoilerPlate(this.renderer, this.camera)
 	this.userData.boilerPlate	= boilerPlate;
 	return this;	// for chained API
