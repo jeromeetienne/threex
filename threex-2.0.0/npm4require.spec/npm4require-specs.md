@@ -9,7 +9,6 @@ There is only 2 files required
 * this is the configuration file required by package.require.js
 * it use ```package.require.js``` principles
 
-
 ## FAQs
 
 ### how to load a package.require.js module without require.js ?
