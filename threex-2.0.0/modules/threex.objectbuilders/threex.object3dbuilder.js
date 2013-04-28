@@ -3,7 +3,12 @@ var THREEx	= THREEx || {};
 
 THREEx.Object3DBuilder	= function(object3D){
 	console.assert(object3D instanceof THREE.Object3D)
+	this.content	= object3D;
 	this.object3D	= object3D;
+}
+
+THREEx.createObject3D	= function(object3D){
+	return new THREEx.Object3DBuilder(object3D)
 }
 
 /**

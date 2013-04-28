@@ -1,4 +1,0 @@
-define( [ './threex.creators'
-	], function(){
-	// ...
-});

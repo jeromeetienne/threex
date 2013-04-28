@@ -7,7 +7,7 @@
 <script src="../../threex.windowresize/threex.windowresize.js"></script>
 <script src="../../threex.boilerplate/threex.boilerplate.js"></script>
 
-<script src="../threex.builder.js"></script>
+<script src="../threex.createdefaultgeometry.js"></script>
 <script src="../threex.object3dbuilder.js"></script>
 <script src="../threex.meshbuilder.js"></script>
 <script src="../threex.convertarguments.js"></script>
@@ -17,14 +17,10 @@
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
 	var material	= new THREE.MeshNormalMaterial();
 	var mesh	= new THREE.Mesh( geometry, material );
-	//ctx.add( mesh );
-	
-	window.builder	= THREEx.build(mesh)
-		.scaleBy(2)
-		.addTo(ctx)
+	THREEx.createMesh(mesh).translateX(2).addTo(ctx)
 
-	// ctx.hook(function(delta, now){
-	// 	mesh.rotation.x += 0.1 * delta*Math.PI*2;
-	// 	mesh.rotation.y += 0.2 * delta*Math.PI*2;
-	// })
+	var cube	= THREEx.createCube(1,2,1).addTo(ctx)
+	
+	THREEx.createCircle().addTo(ctx)
+		.translateX(-1)
 </script></body>
