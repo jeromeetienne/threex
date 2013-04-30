@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+
+<!-- to get threex.boilerplate without require.js -->
+<script src="../../threex.loop/threex.loop.js"></script>
+<script src="../../threex.context/threex.context.js"></script>
+<script src="../../threex.windowresize/threex.windowresize.js"></script>
+<script src="../../threex.boilerplate/threex.boilerplate.js"></script>
+
+<script src="../threex.convertarguments.js"></script>
+<script src="../threex.createdefaultgeometry.js"></script>
+<script src="../threex.object3dbuilder.js"></script>
+<script src="../threex.meshbuilder.js"></script>
+<script src="../threex.geometrybuilder.js"></script>
+<script src="../threex.materialbuilder.js"></script>
+<body><script>
+	var ctx		= new THREEx.Context().boilerplate().start()
+
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);	
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+
+window.mesh =	THREEx.createMesh(mesh).addTo(ctx)
+		.translateX(2)
+		.material()
+			.visible(false)
+			.back()
+		.geometry()
+			.translate(1,0,0)
+			.rotateZ(Math.PI/3)
+			.back()
+
+window.mesh.material().visible(false)
+	var cube	= THREEx.createCube(1,2,1).addTo(ctx)
+	
+	THREEx.createCircle().addTo(ctx)
+		.translateX(-1)
+</script></body>

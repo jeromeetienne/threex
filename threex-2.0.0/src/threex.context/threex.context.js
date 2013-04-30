@@ -45,14 +45,28 @@ THREEx.Context.prototype.start	= function(){
 	return this;	// for chained API
 }
 
-THREEx.Context.prototype.hook	= function(){
-	this.loop.hook.apply(this.loop, arguments)
+THREEx.Context.prototype.stop	= function(){
+	this.loop.stop.apply(this.loop, arguments)
 	return this;	// for chained API
+}
+
+THREEx.Context.prototype.hook	= function(){
+	return this.loop.hook.apply(this.loop, arguments)
+}
+
+THREEx.Context.prototype.unhook	= function(){
+	return this.loop.unhook.apply(this.loop, arguments)
 }
 
 //////////////////////////////////////////////////////////////////////////////////
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * TODO this should be in threex.boilerplate
+ * * it isnt due to an issue in require.js
+ * * how to force order in module loading into package.require.js
+ */
 
 THREEx.Context.prototype.boilerplate	= function(){
 	console.assert(THREEx.BoilerPlate, 'this function depends on THREEx.BoilerPlate . it doesnt seems to be there');

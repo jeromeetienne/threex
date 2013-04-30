@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src="../../../vendor/require.js/require.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+require([ '../package.require.js'
+], function(){
+	// init renderer
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	// init scene
+	var scene	= new THREE.Scene();
+	// init camera
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z	= 3;
+
+	// init an controls for camera
+	var controls	= new THREE.OrbitControls( camera );
+
+	// put a cube in the middle of the scene
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+
+	// handle the render loop
+	(function animate(){
+		// keep looping
+		requestAnimationFrame( animate );
+		// update controls
+		controls.update();
+		// render scene
+		renderer.render( scene, camera );
+	})();
+})
+</script></body>

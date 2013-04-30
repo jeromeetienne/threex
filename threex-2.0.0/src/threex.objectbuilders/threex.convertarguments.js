@@ -120,9 +120,9 @@ THREEx.ConvertArguments.identity	= function(value){
 	return value;
 };
 
-THREEx.ConvertArguments.toBoolean	= function(value){
-	if( args.length === 1 && typeof(value) === 'boolean'){
-		return value;
+THREEx.ConvertArguments.toBoolean	= function(args){
+	if( args.length === 1 && typeof(args[0]) === 'boolean'){
+		return args[0];
 	}else{
 		console.assert(false, "invalid parameter");
 	}

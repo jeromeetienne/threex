@@ -12,15 +12,19 @@
 		</style>
 	</head>
 	<body>
-		<script src="../vendor/three.js/build/three.min.js"></script>
+
+		<script src="../../../vendor/three.js/build/three.min.js"></script>
+
 		<script>
 
 			var camera, scene, renderer;
+			var mesh;
 
 			init();
 			animate();
 
 			function init() {
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -32,14 +36,22 @@
 
 				var geometry	= new THREE.CubeGeometry( 1, 1, 1);
 				var material	= new THREE.MeshNormalMaterial();
-				var mesh	= new THREE.Mesh( geometry, material );
+				mesh	= new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 			}
 
 			function animate() {
+
 				requestAnimationFrame( animate );
+
+				mesh.rotation.x += 0.005;
+				mesh.rotation.y += 0.01;
+
 				renderer.render( scene, camera );
+
 			}
+
 		</script>
+
 	</body>
 </html>

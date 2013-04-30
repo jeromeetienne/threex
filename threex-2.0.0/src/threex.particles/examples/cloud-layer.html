@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+
+<!-- include code of threex.boilerplate -->
+<script src="../../threex.context/threex.context.js"></script>
+<script src="../../threex.loop/threex.loop.js"></script>
+<script src="../../threex.boilerplate/threex.boilerplate.js"></script>
+<script src="../../threex.windowresize/threex.windowresize.js"></script>
+
+<!-- main function -->
+<body><script>
+	var ctx		= new THREEx.Context().boilerplate().start()
+	
+	ctx.renderer.setClearColor('skyblue',1)
+	
+	// init sprite material
+	var texture	= THREE.ImageUtils.loadTexture('../images/cloud10.png')
+	var material	= new THREE.SpriteMaterial({
+		map			: texture,
+		useScreenCoordinates	: false
+	});
+	material.color.set('lightgrey')
+
+	// spread uniform layer of cloud	
+	var center	= new THREE.Vector3(0, -4, -6);
+	var range	= new THREE.Vector3(10,6, 16)
+	for(var i = 0; i < 100; i++){
+		var sprite	= new THREE.Sprite(material)
+		sprite.position.x	= center.x + (Math.random()-0.5)*range.x
+		sprite.position.y	= center.y + (Math.random()-0.5)*range.y
+		sprite.position.z	= center.z + (Math.random()-0.5)*range.z
+		sprite.rotation		= Math.random() * Math.PI*2
+		sprite.scale.multiplyScalar(2 + (Math.random()-0.5)*0.4)
+		sprite.scale.x	*= 5
+		ctx.add(sprite)
+	}
+</script></body>

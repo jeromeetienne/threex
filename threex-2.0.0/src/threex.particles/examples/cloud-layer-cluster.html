@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+
+<!-- include code of threex.boilerplate -->
+<script src="../../threex.context/threex.context.js"></script>
+<script src="../../threex.loop/threex.loop.js"></script>
+<script src="../../threex.boilerplate/threex.boilerplate.js"></script>
+<script src="../../threex.windowresize/threex.windowresize.js"></script>
+
+<!-- main function -->
+<body><script>
+	var ctx		= new THREEx.Context().boilerplate().start()
+	ctx.renderer.setClearColor('skyblue',1)
+	
+	// init sprite material
+	var texture	= THREE.ImageUtils.loadTexture('../images/cloud10.png')
+	var material	= new THREE.SpriteMaterial({
+		map			: texture,
+		useScreenCoordinates	: false,
+	})
+	material.color.set('grey')
+
+	// spread uniform layer of cloud
+	var centerClouds= new THREE.Vector3( 0, -1.0, -6)
+	var rangeClouds	= new THREE.Vector3(20,  0.2, 16)
+	var range	= new THREE.Vector3( 4,  0.1,  2)
+
+	var nClusters	= 30
+	var center	= new THREE.Vector3()
+	for(var i = 0; i < nClusters; i++){
+		center.x 	= centerClouds.x + (Math.random()-0.5)*rangeClouds.x
+		center.y	= centerClouds.y + (Math.random()-0.5)*rangeClouds.y
+		center.z	= centerClouds.z + (Math.random()-0.5)*rangeClouds.z
+		var nClouds	= 2 + Math.floor( 3*Math.random() )
+		for(var j = 0; j < nClouds; j++){
+			var sprite	= new THREE.Sprite(material)
+			sprite.position.x	= center.x + (Math.random()-0.5)*range.x
+			sprite.position.y	= center.y + (Math.random()-0.5)*range.y
+			sprite.position.z	= center.z + (Math.random()-0.5)*range.z
+			sprite.rotation		= Math.random() * Math.PI*2
+			sprite.scale.multiplyScalar(4 + (Math.random()-0.5)*0.4)
+			ctx.add(sprite)
+		}
+	}
+</script></body>

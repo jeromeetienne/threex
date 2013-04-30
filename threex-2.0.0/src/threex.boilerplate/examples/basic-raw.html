@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<script src="vendor/three.min.js"></script>
-<script src="vendor/require.js"></script>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<!-- include code of threex.boilerplate -->
+<script src="../../threex.context/threex.context.js"></script>
+<script src="../../threex.loop/threex.loop.js"></script>
+<script src="../../threex.resize/threex.resize.js"></script>
+<!-- main function -->
 <script>
-require([ '../src/threex.boilerplate/package.require'
-], function(){
 	var ctx		= new THREEx.Context().boilerplate().start()
 
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
@@ -15,5 +17,4 @@ require([ '../src/threex.boilerplate/package.require'
 		mesh.rotation.x += 0.1 * delta*Math.PI*2;
 		mesh.rotation.y += 0.2 * delta*Math.PI*2;
 	})
-})
 </script>

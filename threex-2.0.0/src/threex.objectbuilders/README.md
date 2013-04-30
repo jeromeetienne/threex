@@ -24,3 +24,9 @@ THREEx.createMesh(mesh)
 		.color('pink')
 		.back()
 ```
+
+## FAQs
+
+### rename tquery.creators
+* THREEx.Creator(mesh)
+* threex.creator = module name
