@@ -9,7 +9,6 @@ THREEx.LeapViewerSwipe	= function(opts){
 	// listen to gestureTracking event
 	controller.addEventListener('gestureTracking', function(gesture, data){
 		var userData	= data.userData;
-
 		// keep only swipe gesture
 		if( gesture.type !== 'swipe' )		return;
 

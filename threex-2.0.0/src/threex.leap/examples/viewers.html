@@ -8,6 +8,9 @@
 <script src='../threex.leapviewerpointable.js'></script>
 <script src='../threex.leapviewertap.js'></script>
 <script src='../threex.leapviewerswipe.js'></script>
+<script src='../threex.leapviewercircle.js'></script>
+<script src='../threex.leapviewerhandsphere.js'></script>
+<script src='../threex.leapviewerhandpalm.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
@@ -24,21 +27,36 @@
 	// listen to raw frame
 	controller.addEventListener('frame', function(frame){
 		if( frame.valid !== true )	return;
-		console.log('received valid frame')
+		//console.log('received valid frame')
 	})
 	// init pointable viewer
-	var viewerPointable	= new THREEx.LeapViewerPointable({
+	new THREEx.LeapViewerPointable({
 		container	: scene,
 		controller	: controller
 	})
 	// init tap viewer
-	var viewerTap		= new THREEx.LeapViewerTap({
+	new THREEx.LeapViewerTap({
 		container	: scene,
 		controller	: controller,
 		loop		: loop
 	})
 	// init swipe viewer
-	var viewerTap		= new THREEx.LeapViewerSwipe({
+	new THREEx.LeapViewerSwipe({
+		container	: scene,
+		controller	: controller
+	})
+	// init circle viewer
+	new THREEx.LeapViewerCircle({
+		container	: scene,
+		controller	: controller
+	})
+	// init handsphere viewer
+	new THREEx.LeapViewerHandSphere({
+		container	: scene,
+		controller	: controller
+	})
+	// init handspalm viewer
+	new THREEx.LeapViewerHandPalm({
 		container	: scene,
 		controller	: controller
 	})
