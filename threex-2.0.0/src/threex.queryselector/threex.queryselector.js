@@ -83,19 +83,6 @@ THREEx.QuerySelector.select	= function(selector, object3D){
 	return objects;
 }
 
-if( THREEx.Context ){
-	THREEx.Context.prototype.querySelector	= function(selector, object3D){
-		object3D	= object3D || ctx.scene;
-		var objects	= THREEx.QuerySelector.select(selector, object3D)
-		return objects.length > 0 ? objects[0] : null;
-	}
-	THREEx.Context.prototype.querySelectorAll	= function(selector, object3D){
-		object3D	= object3D || ctx.scene;
-		var objects	= THREEx.QuerySelector.select(selector, object3D)
-		return objects;
-	}
-}
-
 THREEx.QuerySelector._crawls	= function(object3D, selectorItems)
 {
 	console.assert( selectorItems.length >= 1 );
@@ -169,40 +156,5 @@ THREEx.QuerySelector._selectItemMatch	= function(object3D, selectorItem){
 	}.bind(this));
 
 	return completed ? true : false;	
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-//		expose this API in THREEx.Mesh					//
-//////////////////////////////////////////////////////////////////////////////////
-
-THREEx.Mesh.prototype.name	= function(value){
-	if( value === undefined )	return THREEx.QuerySelector.name(this, value);
-	THREEx.QuerySelector.name(this, value);
-	return this;
-}
-THREEx.Mesh.prototype.domId	= function(value){
-	if( value === undefined )	return THREEx.QuerySelector.domId(this, value);
-	THREEx.QuerySelector.domId(this, value);
-	return this;
-}
-THREEx.Mesh.prototype.domClasses= function(value){
-	if( value === undefined )	return THREEx.QuerySelector.domClasses(this, value);
-	THREEx.QuerySelector.domClasses(this, value);
-	return this;
-}
-
-THREEx.Mesh.prototype.hasClass	= function(value){
-	THREEx.QuerySelector.hasClass(this, value);
-	return this;
-}
-
-THREEx.Mesh.prototype.addClass	= function(value){
-	THREEx.QuerySelector.addClass(this, value);
-	return this;
-}
-
-THREEx.Mesh.prototype.removeClass	= function(value){
-	THREEx.QuerySelector.removeClass(this, value);
-	return this;
 }
 

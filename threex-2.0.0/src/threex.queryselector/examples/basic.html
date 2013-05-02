@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src="../threex.queryselector.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z = 3;
+
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	
+	THREEx.QuerySelector.domId(mesh, 'superId');
+	THREEx.QuerySelector.addClass(mesh, 'superClass');
+	
+	console.assert( THREEx.QuerySelector.select('#superId', scene).length === 1 );
+	console.assert( THREEx.QuerySelector.select('#superId', scene)[0] === mesh );
+	console.assert( THREEx.QuerySelector.select('#superIdFake', scene).length === 0 );
+	console.assert( THREEx.QuerySelector.select('.superClass', scene).length === 1);
+	console.assert( THREEx.QuerySelector.select('.superClass', scene)[0] === mesh );
+	console.assert( THREEx.QuerySelector.select('.superClassFake', scene).length === 0 );
+
+	;(function animate(){
+		requestAnimationFrame( animate );
+
+		mesh.rotation.x += 0.005;
+		mesh.rotation.y += 0.01;
+
+		renderer.render( scene, camera );
+	})();
+</script></body>
