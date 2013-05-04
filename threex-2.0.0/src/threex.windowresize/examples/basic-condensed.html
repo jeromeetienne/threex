@@ -15,9 +15,9 @@
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
 	var material	= new THREE.MeshNormalMaterial();
 	var mesh	= new THREE.Mesh( geometry, material );
-	scene.add( mesh );
+	scene.add( mesh )
 
-	(function animate(){
+	;(function animate(){
 		requestAnimationFrame( animate );
 
 		mesh.rotation.x += 0.005;

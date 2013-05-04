@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src="../../../vendor/require.js/require.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+require([ '../package.require.js'
+], function(){
+	// init renderer
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	// init scene
+	var scene	= new THREE.Scene();
+	// init camera
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z	= 3;
+	
+	var composer	= new THREEx.EffectComposer(renderer)
+		.renderPass(scene, camera)
+		.sepia()
+		.finish()
+
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh( geometry, material )
+	scene.add( mesh )
+
+
+	var lastTime	= null;
+	requestAnimationFrame(function(now){
+		// keep looping
+		requestAnimationFrame( arguments.callee );
+		// compute delta in seconds
+		var delta	= (now - (lastTime ? lastTime : now-1000/60)) / 1000
+		lastTime	= now;
+
+		mesh.rotation.x += 0.005;
+		mesh.rotation.y += 0.01;
+
+		composer.update(delta);
+	});
+})
+</script></body>
