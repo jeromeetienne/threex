@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <script src="../../../vendor/three.js/build/three.min.js"></script>
 <script src="../../../vendor/require.js/require.js"></script>
-<script src="../threex.glow.js"></script>
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
-require([ '../../threex.effectcomposer/package.require.js'
+require([ '../package.require.js'
 ], function(){
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer();
@@ -38,7 +37,7 @@ require([ '../../threex.effectcomposer/package.require.js'
 	scene.add( torus2 )
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
+	//		init glow							//
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var materialOn	= new THREE.MeshBasicMaterial()
@@ -54,27 +53,39 @@ require([ '../../threex.effectcomposer/package.require.js'
 		return material				
 	})
 	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
+	//		BLEND main scene with glow.renderTexture			//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var composer	= new THREEx.EffectComposer(renderer)
-		.renderPass(scene, camera)
-		.blendPass(glow.renderTarget, 0.5, 2)
-		.finish()
+	var composer	= new THREE.EffectComposer(renderer);
+	// add Render Pass
+	var effect	= new THREE.RenderPass(scene, camera);
+	composer.addPass( effect );
+	// add Blend Pass - to blend with glow.renderTarget
+	var effect	= new THREE.ShaderPass( THREE.BlendShader, 'tDiffuse1');
+	effect.uniforms['tDiffuse2' ].value	= glow.renderTarget;
+	effect.uniforms['mixRatio' ].value	= 0.5;
+	effect.uniforms['opacity' ].value	= 2;
+	composer.addPass( effect );	
+	// mark the last pass as ```renderToScreen```
+	composer.passes[composer.passes.length-1].renderToScreen	= true;
 
-	var lastTime	= null;
-	requestAnimationFrame(function(now){
+	//////////////////////////////////////////////////////////////////////////////////
+	//		rendering loop							//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var lastTime	= Date.now()/1000;
+	requestAnimationFrame(function animate(now){
 		// keep looping
-		requestAnimationFrame( arguments.callee );
+		requestAnimationFrame( animate );
 		// compute delta in seconds
-		var delta	= (now - (lastTime ? lastTime : now-1000/60)) / 1000
+		var delta	= (now - lastTime)/1000
 		lastTime	= now;
 
 		mesh.rotation.x += 0.005;
 		mesh.rotation.y += 0.01;
 
 		glow.update(delta)
-		composer.update(delta);
-	});
+		composer.render(delta);
+	})
 })
 </script></body>
