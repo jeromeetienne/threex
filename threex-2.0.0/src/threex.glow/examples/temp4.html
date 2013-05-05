@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <script src="../../../vendor/three.js/build/three.min.js"></script>
 <script src="../../../vendor/require.js/require.js"></script>
+<script src="../threex.glow.js"></script>
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
 require([ '../../threex.effectcomposer/package.require.js'
-	, ''
 ], function(){
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer();
@@ -16,51 +16,50 @@ require([ '../../threex.effectcomposer/package.require.js'
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.z	= 3;
 	
-	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
+	var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15)
 	var material	= new THREE.MeshNormalMaterial()
 	var mesh	= new THREE.Mesh( geometry, material )
+	mesh.scale.set(1,1,1).multiplyScalar(2)
 	scene.add( mesh )
+	mesh.userData.domClasses	+= ' glowing'
 
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
+	var material	= new THREE.MeshNormalMaterial()
+	var torus1	= new THREE.Mesh( geometry, material )
+	torus1.position.x	= 0.5;
+	torus1.scale.set(1,1,1).multiplyScalar(1/2)
+	mesh.add( torus1 )
+
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
+	var material	= new THREE.MeshNormalMaterial()
+	var torus2	= new THREE.Mesh( geometry, material )
+	torus2.position.x	= -0.5;
+	torus2.scale.set(1,1,1).multiplyScalar(1/2)
+	scene.add( torus2 )
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
+	var materialOn	= new THREE.MeshBasicMaterial()
+	materialOn.color.set(0x88ccff)
+	var materialOff	= new THREE.MeshBasicMaterial()
+	materialOff.color.set('black')
 
-
-	var sceneGlow	= new THREE.Scene();
-
-	var material	= new THREE.MeshNormalMaterial()
-	var meshGlow	= new THREE.Mesh( mesh.geometry.clone(), material )
-	meshGlow.position	= mesh.position
-	meshGlow.rotation	= mesh.rotation
-	meshGlow.scale		= mesh.scale
-	sceneGlow.add( meshGlow )
-
-	// setup the RenderTarget
-	var textureW	= window.innerWidth
-	var textureH	= window.innerHeight
-	var renderTarget= new THREE.WebGLRenderTarget(textureW, textureH, {
-		minFilter	: THREE.LinearFilter,
-		magFilter	: THREE.NearestFilter,
-		format		: THREE.RGBFormat
+	var glow	= new THREEx.Glow(renderer, camera);
+	glow.copyScene(scene, function(srcObject){
+		var domClasses	= srcObject.userData.domClasses
+		var glowing	= domClasses && domClasses.match(/glowing/)
+		var material	= glowing ? materialOn	: materialOff
+		return material				
 	})
-
-	var blurLevel	= 3
-	var glowComposer= new THREEx.EffectComposer(renderer, renderTarget)
-		.renderPass(sceneGlow, camera)
-		.copy()
-		.horizontalBlur(blurLevel).verticalBlur(blurLevel)
-		.horizontalBlur(blurLevel).verticalBlur(blurLevel)
-		.finish()
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-
 	var composer	= new THREEx.EffectComposer(renderer)
 		.renderPass(scene, camera)
-		.blendPass(renderTarget, 0.5, 2)
+		.blendPass(glow.renderTarget, 0.5, 2)
 		.finish()
 
 	var lastTime	= null;
@@ -74,7 +73,7 @@ require([ '../../threex.effectcomposer/package.require.js'
 		mesh.rotation.x += 0.005;
 		mesh.rotation.y += 0.01;
 
-		glowComposer.update(delta)
+		glow.update(delta)
 		composer.update(delta);
 	});
 })
