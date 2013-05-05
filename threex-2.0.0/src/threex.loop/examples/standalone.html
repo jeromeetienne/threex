@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z = 3;
+
+	/**
+	 * First attempt at a small standalone implementation of THREEx.Loop
+	 * * no priority handled
+	 */
+
+	var THREEx	= THREEx || {};
+	THREEx.Loop	= function(){
+		var callbacks	= []
+		var reqId	= 0
+		return {
+			start	: function(){
+				var lastTime	= Date.now()
+				reqId	= requestAnimationFrame(function threexLoopAnimation(now){
+					reqId		= requestAnimationFrame(threexLoopAnimation);
+					var delta	= now - lastTime;
+					lastTime	= now
+					callbacks.forEach(function(callback){
+						callback(delta/1000, now/1000)						
+					})
+				})
+				return  this;			
+			},
+			stop	: function(){ cancelAnimationFrame(reqId)	},
+			hook	: function(callback){ callbacks.push(callback)	},
+			unhook	: function(callback){ callbacks.splice( callbacks.indexOf(callback), 1) },
+		}
+	}
+
+
+
+	
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	
+	var loop	= new THREEx.Loop().start();
+	loop.hook(function(){
+		mesh.rotation.x += 0.005;
+		mesh.rotation.y += 0.01;		
+	})
+
+	loop.hook(function(){
+		renderer.render( scene, camera );		
+	})
+</script></body>
