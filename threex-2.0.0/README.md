@@ -21,3 +21,4 @@ You can store your extension the way you like.
 If you pick npm, see ```npm4require``` guidelines, another which is vendor.js.
 You can store and publish your packages thru npm, module mangement for node.js.
 
+[readme driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html)
