@@ -11,43 +11,43 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 			format		: THREE.RGBFormat
 		})		
 	}
-	this.renderTarget = renderTarget;
+	this.renderTarget = renderTarget
 	
-	var scene	= new THREE.Scene;
-	this.scene	= scene;
+	var scene	= new THREE.Scene
+	this.scene	= scene
 
 	console.assert( THREE.HorizontalBlurShader )
 	console.assert( THREE.VerticalBlurShader )
 
-	var blurHLevel	= 0.003;
-	var blurVLevel	= 0.004;
+	var blurHLevel	= 0.003
+	var blurVLevel	= 0.004
 
 	var composer	= new THREE.EffectComposer( renderer, renderTarget );
 	this.composer	= composer
 
 	// add Render Pass
 	var effect	= new THREE.RenderPass(scene, camera);
-	composer.addPass( effect );
+	composer.addPass( effect )
 
 	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader );
-	effect.uniforms[ 'h' ].value	= blurHLevel
-	composer.addPass( effect );
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+	effect.uniforms[ 'h' ].value	= blurHLevel 
+	composer.addPass( effect )
 
 	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader );
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
 	effect.uniforms[ 'v' ].value	= blurVLevel
-	composer.addPass( effect );
+	composer.addPass( effect )
 
 	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader );
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= blurHLevel
-	composer.addPass( effect );
+	composer.addPass( effect )
 
 	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader );
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= blurHLevel
-	composer.addPass( effect );
+	composer.addPass( effect )
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
