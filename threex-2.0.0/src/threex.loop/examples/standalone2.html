@@ -13,10 +13,26 @@
 	var material	= new THREE.MeshNormalMaterial();
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
+	
+	/**
+	 * * here the function are hooked in a array of function
+	 * * function are push/removed in the array with normal array function
+	 * * simple as it is very vendor.js
+	 * 
+	 * ## how to handle priority
+	 * * possible handling of priority with function wrapper to store the priority ?
+	 *   * with a special sort function
+	 * * simpler is to have multiple array per section
+	 *   * updateFcts
+	 *   * renderUpdateFcts
+	 *   * postRenderUpdateFcts
+	 *   * i like this one. it is super simple
+	 * * 
+	 */
 
 	var updateFcts	= [];
-	updateFcts.push(function(){
-		mesh.rotation.x += 0.005;
+	updateFcts.push(function(delta, now){
+		mesh.rotation.x += 1 * delta;
 		mesh.rotation.y += 0.01;		
 	})
 
@@ -24,16 +40,17 @@
 		renderer.render( scene, camera );		
 	})
 
-	var lastTimeMsec= Date.now()
-	;(function animate(nowMsec){
+	// loop runner
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
 		// keep looping
 		requestAnimationFrame( animate );
 		// measure time
-		var deltaMsec	= nowMsec - lastTimeMsec;
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
 		lastTimeMsec	= nowMsec
 		// call each update function
-		updateFcts.forEach(function(updateFn){
-			updateFn(deltaMsec/1000, nowMsec/1000)
+		updateFcts.forEach(function(updateFn){	updateFn(deltaMsec/1000, nowMsec/1000)
 		})
-	})();
+	})
 </script></body>

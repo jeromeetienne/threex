@@ -5,15 +5,21 @@ threex.glow makes it easy to add glowing objects into your scene.
 It is a selective glow, so it is possible to have some glowing objects 
 along with non glowing objects on the same scene.
 
-**stage**: super early
+## Status
+stable
 
-## TODO 
-* find a proper API
-  * clone the scenegraph
-    * how to do it ?
-  * how to tune the material per glowing object
-    * part of the cloning scenegraph issue ?
-  * how to mix the glowing ```renderTarget``` with the normal input
-    * simply expose the .renderTarget and up to the caller to blend it ?
-* make it independant of threex.effectcomposer
-  * simple, use three.js directly
+## Change Logs
+* v1.0 initial version
+  * reasonable API
+  * basic demos
+
+## FAQs
+* how to make it fast
+  * as the output of the glow is blurred a lot, it is possible to reduce significantly
+  the size of the renderTarget without much artefacts
+
+## Possible improvements
+* to get the glow, it is cloning the geometry and render the whole scene
+  * it consumes memory in cpu/gpu
+  * it is doing another additional render of non-glowing object just to get the depth
+  * possible to share depth map ? if so it would be possible to rerender only the glowing object and using the depth map from the first render.

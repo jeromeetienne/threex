@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
+<script src="../../../vendor/three.js/examples/js/shaders/BokehShader.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	var postprocessing	= {};
+	// init renderer
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	// init scene
+	var scene	= new THREE.Scene();
+	// init camera
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 30 );
+	camera.position.z	= 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		if( event.shiftKey === false )	return	
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false )
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * 0.01
+		camera.position.y += (mouse.y*5 - camera.position.y) * 0.01
+		camera.lookAt( scene.position )
+	})	
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Create Initial Scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	for(var x = -2; x <= 2; x+=4){
+		for(var y = -3; y < 3; y++){
+			for(var z = -20; z < 2; z+=2){
+				var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15)
+				var material	= new THREE.MeshNormalMaterial()
+				var mesh	= new THREE.Mesh( geometry, material )
+				scene.add( mesh )
+				mesh.position.x	= x;
+				mesh.position.y	= y;
+				mesh.position.z	= z;
+			}
+		}
+	}
+
+
+	renderer.autoClear = false;
+	var material_depth = new THREE.MeshDepthMaterial();
+	initPostprocessing()
+
+
+	updateFcts.push(function(){
+		if( true ){
+			renderer.clear();
+			// Render scene into texture
+			scene.overrideMaterial = null;
+			renderer.render( scene, camera, postprocessing.rtTextureColor, true );
+			// Render depth into texture
+			scene.overrideMaterial = material_depth;
+			renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
+			// Render bokeh composite
+			renderer.render( postprocessing.scene, postprocessing.camera );
+		} else {
+			renderer.clear();
+			renderer.render( scene, camera );
+		}
+	})
+
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Loop Runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+
+	function initPostprocessing() {
+
+		postprocessing.scene = new THREE.Scene();
+		var height	= window.innerHeight
+		postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+		postprocessing.camera.position.z = 100;
+
+		postprocessing.scene.add( postprocessing.camera );
+
+		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+		postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
+		postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
+
+		var bokeh_shader = THREE.BokehShader;
+
+		postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
+
+		postprocessing.bokeh_uniforms['tColor'].value = postprocessing.rtTextureColor;
+		postprocessing.bokeh_uniforms['tDepth'].value = postprocessing.rtTextureDepth;
+		postprocessing.bokeh_uniforms['aspect'].value = window.innerWidth / height;
+
+		postprocessing.bokeh_uniforms['focus'].value	= 0.80;
+		postprocessing.bokeh_uniforms['aperture'].value	= 0.03;
+		postprocessing.bokeh_uniforms['maxblur'].value	= 0.015;
+
+		postprocessing.materialBokeh = new THREE.ShaderMaterial( {
+
+			uniforms: postprocessing.bokeh_uniforms,
+			vertexShader: bokeh_shader.vertexShader,
+			fragmentShader: bokeh_shader.fragmentShader
+
+		} );
+
+		postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
+		postprocessing.quad.position.z = - 500;
+		postprocessing.scene.add( postprocessing.quad );
+
+		var effectController  = {
+			focus	: postprocessing.bokeh_uniforms['focus'].value,
+			aperture: postprocessing.bokeh_uniforms['aperture'].value,
+			maxblur	: postprocessing.bokeh_uniforms['maxblur'].value
+		};
+		var onChange = function( ) {
+			postprocessing.bokeh_uniforms['focus'].value = effectController.focus;
+			postprocessing.bokeh_uniforms['aperture'].value = effectController.aperture;
+			postprocessing.bokeh_uniforms['maxblur'].value = effectController.maxblur;
+		};
+		onChange();
+		var gui = new dat.GUI();
+		gui.add( effectController, 'focus', 0.0, 1.2, 0.025 ).onChange( onChange );
+		gui.add( effectController, 'aperture', 0.001, 0.06, 0.0001 ).onChange( onChange );
+		gui.add( effectController, 'maxblur', 0.0, 0.03, 0.00025 ).onChange( onChange );
+	}
+</script></body>

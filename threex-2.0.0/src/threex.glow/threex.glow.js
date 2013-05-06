@@ -3,11 +3,11 @@ var THREEx	= THREEx || {};
 THREEx.Glow	= function(renderer, camera, renderTarget){
 	// setup the RenderTarget
 	if( renderTarget === undefined ){
-		var textureW	= Math.floor(window.innerWidth/4)
-		var textureH	= Math.floor(window.innerHeight/4)
+		var textureW	= Math.floor(renderer.domElement.offsetWidth/8)
+		var textureH	= Math.floor(renderer.domElement.offsetHeight/8)
 		renderTarget	= new THREE.WebGLRenderTarget(textureW, textureH, {
 			minFilter	: THREE.LinearFilter,
-			magFilter	: THREE.NearestFilter,
+			magFilter	: THREE.LinearFilter,
 			format		: THREE.RGBFormat
 		})		
 	}
@@ -19,8 +19,8 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	console.assert( THREE.HorizontalBlurShader )
 	console.assert( THREE.VerticalBlurShader )
 
-	var blurHLevel	= 0.003
-	var blurVLevel	= 0.004
+	var blurHLevel	= 0.005;
+	var blurVLevel	= 0.01;
 
 	var composer	= new THREE.EffectComposer( renderer, renderTarget );
 	this.composer	= composer
@@ -33,7 +33,6 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= blurHLevel 
 	composer.addPass( effect )
-
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
 	effect.uniforms[ 'v' ].value	= blurVLevel
@@ -41,12 +40,11 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-	effect.uniforms[ 'h' ].value	= blurHLevel
+	effect.uniforms[ 'h' ].value	= blurHLevel 
 	composer.addPass( effect )
-
 	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-	effect.uniforms[ 'h' ].value	= blurHLevel
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+	effect.uniforms[ 'v' ].value	= blurVLevel
 	composer.addPass( effect )
 
 	// mark the last pass as ```renderToScreen```
