@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
+<script src="../../../vendor/three.js/examples/js/shaders/BokehShader.js"></script>
+<script src="../threex.depthoffield.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	// init renderer
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	// init scene
+	var scene	= new THREE.Scene();
+	// init camera
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 30 );
+	camera.position.z	= 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		if( event.shiftKey === false )	return	
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false )
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * 0.01
+		camera.position.y += (mouse.y*5 - camera.position.y) * 0.01
+		camera.lookAt( scene.position )
+	})	
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Create Initial Scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	for(var x = -2; x <= 2; x+=4){
+		for(var y = -3; y < 3; y++){
+			for(var z = -20; z < 2; z+=2){
+				var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15)
+				var material	= new THREE.MeshNormalMaterial()
+				var mesh	= new THREE.Mesh( geometry, material )
+				scene.add( mesh )
+				mesh.position.x	= x;
+				mesh.position.y	= y;
+				mesh.position.z	= z;
+			}
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		init and render THREEx.DepthOfField				//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var depthOfField= new THREEx.DepthOfField()
+	updateFcts.push(function(){
+		depthOfField.render(renderer, scene, camera)
+	})		
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		dat.gui on THREEx.DepthOfField					//
+	//////////////////////////////////////////////////////////////////////////////////
+	var effectController  = {
+		focus	: depthOfField.uniforms['focus'].value,
+		aperture: depthOfField.uniforms['aperture'].value,
+		maxblur	: depthOfField.uniforms['maxblur'].value
+	};
+	var onChange = function( ) {
+		depthOfField.uniforms['focus'].value		= effectController.focus;
+		depthOfField.uniforms['aperture'].value	= effectController.aperture;
+		depthOfField.uniforms['maxblur'].value	= effectController.maxblur;
+	};
+	onChange();
+	var gui = new dat.GUI();
+	gui.add( effectController, 'focus', 0.0, 1.2, 0.025 ).onChange( onChange );
+	gui.add( effectController, 'aperture', 0.001, 0.06, 0.0001 ).onChange( onChange );
+	gui.add( effectController, 'maxblur', 0.0, 0.03, 0.00025 ).onChange( onChange );
+
+
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Loop Runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

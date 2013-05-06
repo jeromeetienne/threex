@@ -3,7 +3,6 @@
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../../../vendor/three.js/examples/js/shaders/BokehShader.js"></script>
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
-	var pproc	= {};
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -50,9 +49,7 @@
 	}
 
 
-	renderer.autoClear = false;
-	var material_depth = new THREE.MeshDepthMaterial();
-	initPostprocessing()
+	var pproc	= initDepthOfField()
 
 
 	updateFcts.push(function(){
@@ -77,7 +74,7 @@
 		})
 	})
 
-	function initPostprocessing() {
+	function initDepthOfField() {
 		// init scene
 		var scene	= new THREE.Scene()
 		// init camera
@@ -127,6 +124,7 @@
 		scene.add( mesh )
 
 		// export values
+		var pproc	= {}
 		pproc.scene	= scene
 		pproc.camera	= camera
 		pproc.mesh	= mesh
@@ -135,13 +133,16 @@
 		pproc.renderTargetDepth	= renderTargetDepth;		
 		pproc.renderTargetColor	= renderTargetColor;
 		
+		var materialDepth	= new THREE.MeshDepthMaterial();
+
 		pproc.render	= function(renderer, scene, camera){
+			renderer.autoClear = false;
 			renderer.clear();
 			// Render scene into texture
 			scene.overrideMaterial = null;
 			renderer.render( scene, camera, this.renderTargetColor, true );
 			// Render depth into texture
-			scene.overrideMaterial = material_depth;
+			scene.overrideMaterial = materialDepth;
 			renderer.render( scene, camera, this.renderTargetDepth, true );
 			// Render bokeh composite
 			renderer.render( this.scene, this.camera );
@@ -163,5 +164,7 @@
 		gui.add( effectController, 'focus', 0.0, 1.2, 0.025 ).onChange( onChange );
 		gui.add( effectController, 'aperture', 0.001, 0.06, 0.0001 ).onChange( onChange );
 		gui.add( effectController, 'maxblur', 0.0, 0.03, 0.00025 ).onChange( onChange );
+		
+		return pproc;
 	}
 </script></body>
