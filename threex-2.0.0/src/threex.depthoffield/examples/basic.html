@@ -53,9 +53,9 @@
 	//		init and render THREEx.DepthOfField				//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var depthOfField= new THREEx.DepthOfField()
+	var depthOfField= new THREEx.DepthOfField(renderer)
 	updateFcts.push(function(){
-		depthOfField.render(renderer, scene, camera)
+		depthOfField.render(scene, camera)
 	})		
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -64,18 +64,35 @@
 	var effectController  = {
 		focus	: depthOfField.uniforms['focus'].value,
 		aperture: depthOfField.uniforms['aperture'].value,
-		maxblur	: depthOfField.uniforms['maxblur'].value
+		maxblur	: depthOfField.uniforms['maxblur'].value,
+		presetRealist	: function(){
+			effectController.focus		= 0.80
+			effectController.aperture	= 0.006
+			effectController.maxblur	= 0.004
+			onChange()
+		},
+		presetExagerated: function(){
+			effectController.focus		= 0.80
+			effectController.aperture	= 0.03
+			effectController.maxblur	= 0.015
+			onChange()
+		},
 	};
 	var onChange = function( ) {
-		depthOfField.uniforms['focus'].value		= effectController.focus;
+		depthOfField.uniforms['focus'].value	= effectController.focus;
 		depthOfField.uniforms['aperture'].value	= effectController.aperture;
 		depthOfField.uniforms['maxblur'].value	= effectController.maxblur;
 	};
 	onChange();
 	var gui = new dat.GUI();
-	gui.add( effectController, 'focus', 0.0, 1.2, 0.025 ).onChange( onChange );
-	gui.add( effectController, 'aperture', 0.001, 0.06, 0.0001 ).onChange( onChange );
-	gui.add( effectController, 'maxblur', 0.0, 0.03, 0.00025 ).onChange( onChange );
+	gui.add( effectController, 'focus', 0.0, 1.2, 0.025 )
+		.listen().onChange( onChange )
+	gui.add( effectController, 'aperture', 0.001, 0.06, 0.0001 )
+		.listen().onChange( onChange )
+	gui.add( effectController, 'maxblur', 0.0, 0.03, 0.00025 )
+		.listen().onChange( onChange )
+	gui.add( effectController, 'presetRealist' )
+	gui.add( effectController, 'presetExagerated' )
 
 
 	

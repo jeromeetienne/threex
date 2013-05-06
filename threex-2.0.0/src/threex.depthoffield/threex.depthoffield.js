@@ -1,28 +1,35 @@
+/**
+ * vendor.js framework definition
+ * @type {Object}
+ */
 var THREEx	= THREEx || {};
 
 /**
- * TODO put the renderer as ctor parameter
+ * setup a depth of field rendering
+ * 
+ * @todo handle resizing
+ * @param {THREE.WebGLRenderer} renderer the renderer to use
  */
-THREEx.DepthOfField	= function(){
+THREEx.DepthOfField	= function(renderer){
+	var rendererW	= renderer.domElement.offsetWidth
+	var rendererH	= renderer.domElement.offsetHeight
 	// init scene
 	var scene	= new THREE.Scene()
 	// init camera
 	var camera	= new THREE.OrthographicCamera(
-		  -window.innerWidth/2
-		,  window.innerWidth/2
-		,  window.innerHeight/2
-		, -window.innerHeight/2
-		, -10000, 10000 );
+		  -rendererW/2,  rendererW/2
+		,  rendererH/2, -rendererH/2
+		, -10000, 10000);
 	camera.position.z = 100;
 	scene.add( camera );
 
 	// init render target
-	var renderTargetDepth	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+	var renderTargetDepth	= new THREE.WebGLRenderTarget(rendererW, rendererH, {
 		minFilter	: THREE.LinearFilter,
 		magFilter	: THREE.LinearFilter,
 		format		: THREE.RGBFormat
 	})
-	var renderTargetColor	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+	var renderTargetColor	= new THREE.WebGLRenderTarget(rendererW, rendererH, {
 		minFilter	: THREE.LinearFilter,
 		magFilter	: THREE.LinearFilter,
 		format		: THREE.RGBFormat
@@ -32,11 +39,13 @@ THREEx.DepthOfField	= function(){
 	var uniforms	= THREE.UniformsUtils.clone( THREE.BokehShader.uniforms );
 	uniforms['tColor'].value	= renderTargetColor;
 	uniforms['tDepth'].value	= renderTargetDepth;
-	uniforms['aspect'].value	= window.innerWidth / window.innerHeight;
+	uniforms['aspect'].value	= rendererW / rendererH;
 	uniforms['focus'].value		= 0.80
+
 	// exagerated setting 
 	uniforms['aperture'].value	= 0.03
 	uniforms['maxblur'].value	= 0.015
+
 	// realist setting - thanks @lmg
 	// uniforms['aperture'].value	= 0.006
 	// uniforms['maxblur'].value	= 0.004
@@ -47,7 +56,7 @@ THREEx.DepthOfField	= function(){
 		vertexShader	: THREE.BokehShader.vertexShader,
 		fragmentShader	: THREE.BokehShader.fragmentShader
 	})
-	var geometry	= new THREE.PlaneGeometry( window.innerWidth, window.innerHeight )
+	var geometry	= new THREE.PlaneGeometry( rendererW, rendererH )
 	var mesh	= new THREE.Mesh( geometry, material )
 	mesh.position.z = -500
 	scene.add( mesh )
@@ -56,11 +65,18 @@ THREEx.DepthOfField	= function(){
 	this.scene	= scene
 	this.camera	= camera
 	this.uniforms	= uniforms
+	this.renderer	= renderer
 	this.renderTargetDepth	= renderTargetDepth;		
 	this.renderTargetColor	= renderTargetColor;
 }
 
-THREEx.DepthOfField.prototype.render = function(renderer, scene, camera){
+/**
+ * render the scene with a depthOfField
+ * @param  {THREE.Scene} scene  the scene to render
+ * @param  {THREE.Camera} camera the camera to use
+ */
+THREEx.DepthOfField.prototype.render = function(scene, camera){
+	var renderer	= this.renderer
 	renderer.autoClear = false;
 	renderer.clear();
 	// Render scene into texture
