@@ -3,7 +3,7 @@
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../../../vendor/three.js/examples/js/shaders/BokehShader.js"></script>
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
-	var postprocessing	= {};
+	var pproc	= {};
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -56,20 +56,7 @@
 
 
 	updateFcts.push(function(){
-		if( true ){
-			renderer.clear();
-			// Render scene into texture
-			scene.overrideMaterial = null;
-			renderer.render( scene, camera, postprocessing.rtTextureColor, true );
-			// Render depth into texture
-			scene.overrideMaterial = material_depth;
-			renderer.render( scene, camera, postprocessing.rtTextureDepth, true );
-			// Render bokeh composite
-			renderer.render( postprocessing.scene, postprocessing.camera );
-		} else {
-			renderer.clear();
-			renderer.render( scene, camera );
-		}
+		pproc.render(renderer, scene, camera)
 	})
 
 	
@@ -91,51 +78,85 @@
 	})
 
 	function initPostprocessing() {
+		// init scene
+		var scene	= new THREE.Scene()
+		// init camera
+		var camera	= new THREE.OrthographicCamera(
+			  -window.innerWidth/2
+			,  window.innerWidth/2
+			,  window.innerHeight/2
+			, -window.innerHeight/2
+			, -10000, 10000 );
+		camera.position.z = 100;
+		scene.add( camera );
 
-		postprocessing.scene = new THREE.Scene();
-		var height	= window.innerHeight
-		postprocessing.camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
-		postprocessing.camera.position.z = 100;
+		// init render target
+		var renderTargetDepth	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+			minFilter	: THREE.LinearFilter,
+			magFilter	: THREE.LinearFilter,
+			format		: THREE.RGBFormat
+		})
+		var renderTargetColor	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+			minFilter	: THREE.LinearFilter,
+			magFilter	: THREE.LinearFilter,
+			format		: THREE.RGBFormat
+		})
 
-		postprocessing.scene.add( postprocessing.camera );
+		// init uniforms
+		var uniforms	= THREE.UniformsUtils.clone( THREE.BokehShader.uniforms );
+		uniforms['tColor'].value	= renderTargetColor;
+		uniforms['tDepth'].value	= renderTargetDepth;
+		uniforms['aspect'].value	= window.innerWidth / window.innerHeight;
+		uniforms['focus'].value		= 0.80
+		// exagerated setting 
+		uniforms['aperture'].value	= 0.03
+		uniforms['maxblur'].value	= 0.015
+		// realist setting - thanks @lmg
+		// uniforms['aperture'].value	= 0.006
+		// uniforms['maxblur'].value	= 0.004
 
-		var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
-		postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
-		postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
+		// init mesh
+		var material	= new THREE.ShaderMaterial({
+			uniforms	: uniforms,
+			vertexShader	: THREE.BokehShader.vertexShader,
+			fragmentShader	: THREE.BokehShader.fragmentShader
+		})
+		var geometry	= new THREE.PlaneGeometry( window.innerWidth, window.innerHeight )
+		var mesh	= new THREE.Mesh( geometry, material )
+		mesh.position.z = -500
+		scene.add( mesh )
 
-		var bokeh_shader = THREE.BokehShader;
-
-		postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
-
-		postprocessing.bokeh_uniforms['tColor'].value = postprocessing.rtTextureColor;
-		postprocessing.bokeh_uniforms['tDepth'].value = postprocessing.rtTextureDepth;
-		postprocessing.bokeh_uniforms['aspect'].value = window.innerWidth / height;
-
-		postprocessing.bokeh_uniforms['focus'].value	= 0.80;
-		postprocessing.bokeh_uniforms['aperture'].value	= 0.03;
-		postprocessing.bokeh_uniforms['maxblur'].value	= 0.015;
-
-		postprocessing.materialBokeh = new THREE.ShaderMaterial( {
-
-			uniforms: postprocessing.bokeh_uniforms,
-			vertexShader: bokeh_shader.vertexShader,
-			fragmentShader: bokeh_shader.fragmentShader
-
-		} );
-
-		postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
-		postprocessing.quad.position.z = - 500;
-		postprocessing.scene.add( postprocessing.quad );
-
+		// export values
+		pproc.scene	= scene
+		pproc.camera	= camera
+		pproc.mesh	= mesh
+		pproc.uniforms	= uniforms
+		pproc.material	= material;
+		pproc.renderTargetDepth	= renderTargetDepth;		
+		pproc.renderTargetColor	= renderTargetColor;
+		
+		pproc.render	= function(renderer, scene, camera){
+			renderer.clear();
+			// Render scene into texture
+			scene.overrideMaterial = null;
+			renderer.render( scene, camera, this.renderTargetColor, true );
+			// Render depth into texture
+			scene.overrideMaterial = material_depth;
+			renderer.render( scene, camera, this.renderTargetDepth, true );
+			// Render bokeh composite
+			renderer.render( this.scene, this.camera );
+		}.bind(pproc)
+		
+		// init dat.gui
 		var effectController  = {
-			focus	: postprocessing.bokeh_uniforms['focus'].value,
-			aperture: postprocessing.bokeh_uniforms['aperture'].value,
-			maxblur	: postprocessing.bokeh_uniforms['maxblur'].value
+			focus	: uniforms['focus'].value,
+			aperture: uniforms['aperture'].value,
+			maxblur	: uniforms['maxblur'].value
 		};
 		var onChange = function( ) {
-			postprocessing.bokeh_uniforms['focus'].value = effectController.focus;
-			postprocessing.bokeh_uniforms['aperture'].value = effectController.aperture;
-			postprocessing.bokeh_uniforms['maxblur'].value = effectController.maxblur;
+			uniforms['focus'].value		= effectController.focus;
+			uniforms['aperture'].value	= effectController.aperture;
+			uniforms['maxblur'].value	= effectController.maxblur;
 		};
 		onChange();
 		var gui = new dat.GUI();
