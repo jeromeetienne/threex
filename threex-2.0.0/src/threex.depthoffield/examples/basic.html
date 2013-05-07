@@ -21,16 +21,15 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	var mouse	= {x : 0, y : 0}
 	document.addEventListener('mousemove', function(event){
-		if( event.shiftKey === false )	return	
+		if(event.shiftKey === false)	return
 		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	}, false )
+	}, false)
 	updateFcts.push(function(delta, now){
 		camera.position.x += (mouse.x*5 - camera.position.x) * 0.01
 		camera.position.y += (mouse.y*5 - camera.position.y) * 0.01
-		camera.lookAt( scene.position )
-	})	
-
+		camera.lookAt(scene.position)
+	})
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Create Initial Scene						//
@@ -42,9 +41,9 @@
 				var material	= new THREE.MeshNormalMaterial()
 				var mesh	= new THREE.Mesh( geometry, material )
 				scene.add( mesh )
-				mesh.position.x	= x;
-				mesh.position.y	= y;
-				mesh.position.z	= z;
+				mesh.position.x	= x
+				mesh.position.y	= y
+				mesh.position.z	= z
 			}
 		}
 	}
@@ -61,48 +60,46 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		dat.gui on THREEx.DepthOfField					//
 	//////////////////////////////////////////////////////////////////////////////////
-	var effectController  = {
+	var guiVariables  = {
 		focus	: depthOfField.uniforms['focus'].value,
 		aperture: depthOfField.uniforms['aperture'].value,
 		maxblur	: depthOfField.uniforms['maxblur'].value,
 		presetRealist	: function(){
-			effectController.focus		= 0.80
-			effectController.aperture	= 0.006
-			effectController.maxblur	= 0.004
+			guiVariables.focus	= 0.80
+			guiVariables.aperture	= 0.006
+			guiVariables.maxblur	= 0.004
 			onChange()
 		},
 		presetExagerated: function(){
-			effectController.focus		= 0.80
-			effectController.aperture	= 0.03
-			effectController.maxblur	= 0.015
+			guiVariables.focus	= 0.80
+			guiVariables.aperture	= 0.03
+			guiVariables.maxblur	= 0.015
 			onChange()
 		},
-	};
-	var onChange = function( ) {
-		depthOfField.uniforms['focus'].value	= effectController.focus;
-		depthOfField.uniforms['aperture'].value	= effectController.aperture;
-		depthOfField.uniforms['maxblur'].value	= effectController.maxblur;
-	};
-	onChange();
-	var gui = new dat.GUI();
-	gui.add( effectController, 'focus', 0.0, 1.2, 0.025 )
+	}
+	var onChange = function(){
+		depthOfField.uniforms['focus'].value	= guiVariables.focus
+		depthOfField.uniforms['aperture'].value	= guiVariables.aperture
+		depthOfField.uniforms['maxblur'].value	= guiVariables.maxblur
+	}
+	onChange()
+	var gui = new dat.GUI()
+	gui.add( guiVariables, 'focus'		, 0.0  , 2   , 0.02500 )
 		.listen().onChange( onChange )
-	gui.add( effectController, 'aperture', 0.001, 0.06, 0.0001 )
+	gui.add( guiVariables, 'aperture'	, 0.001, 0.06, 0.0001  )
 		.listen().onChange( onChange )
-	gui.add( effectController, 'maxblur', 0.0, 0.03, 0.00025 )
+	gui.add( guiVariables, 'maxblur'	, 0.0  , 0.03, 0.00025 )
 		.listen().onChange( onChange )
-	gui.add( effectController, 'presetRealist' )
-	gui.add( effectController, 'presetExagerated' )
+	gui.add( guiVariables, 'presetRealist' )
+	gui.add( guiVariables, 'presetExagerated' )
 
-
-	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Loop Runner							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var lastTimeMsec= null
 	requestAnimationFrame(function animate(nowMsec){
 		// keep looping
-		requestAnimationFrame( animate );
+		requestAnimationFrame( animate )
 		// measure time
 		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
 		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
