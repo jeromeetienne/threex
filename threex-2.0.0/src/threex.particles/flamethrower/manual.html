@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='threex.textureutils.js'></script>
+<script src='miditrigger.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -16,11 +17,11 @@
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	var urls	= [
-		'../images/flame/flame00.png',
-		'../images/flame/flame01.png',
-		'../images/flame/flame02.png',
-		'../images/flame/flame03.png',
-		'../images/flame/flame04.png',
+		// '../images/flame/flame00.png',
+		// '../images/flame/flame01.png',
+		// '../images/flame/flame02.png',
+		// '../images/flame/flame03.png',
+		// '../images/flame/flame04.png',
 		'../images/flame/flame05.png',
 		'../images/flame/flame06.png',
 		'../images/flame/flame07.png',
@@ -43,24 +44,46 @@
 		'../images/flame/flame24.png'
 	];
 	
+	
+	
 //////////////////////////////////////////////////////////////////////////////////
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 
+	// handle emit rate with a MidiTrigger
+	var emitTrigger	= new MidiTrigger(0.2, 0.5)
+	emitTrigger.start();
+	document.addEventListener('mousedown'	, function(){ emitTrigger.start()	})
+	document.addEventListener('mouseup'	, function(){ emitTrigger.stop()	})
 
 	loadTremulousFlameParticules(urls, function(texture, urls){
 		console.log('arguments', arguments)
-		
-		var flameThrower	= new FlameThrower(texture, urls.length, scene)
-		var rate		= 15;
-	 	setInterval(function(){
+		// to debug the texture		
+		// document.body.appendChild(texture.image)
+		// texture.image.style.position	= 'absolute'
+		// texture.image.style.top		= '0px'
+
+		// create emitter
+		var emitter	= new FlameThrower(texture, urls.length, scene)
+		// emit based on rate
+		var lastEmit	= 0;
+		updateFcts.push(function(delta, now){
+			// rate limiter emition	
+			var rate	= 15 * emitTrigger.intensity();
+			if( rate === 0 || now - lastEmit < 1/rate )	return;
+			lastEmit	= now;
+
 			var position	= new THREE.Vector3(-3,0,0)
 			//var position	= new THREE.Vector3(0,-1,-2)
 			var position	= new THREE.Vector3(-4,0,-3)
-			var velocity	= new THREE.Vector3(8, 0, 0)
+			var velocity	= new THREE.Vector3(7, 0, 0)
 			// var velocity	= new THREE.Vector3(0, 1, -6)
-			flameThrower.emit(position, velocity);
-		}, 1/rate*1000);
+			emitter.emit(position, velocity);
+		});
+		// update emitter
+		updateFcts.push(function(delta, now){
+			emitter.update(delta, now);			
+		})
 	})
 
 	function loadTremulousFlameParticules(urls, onReady){
@@ -112,22 +135,32 @@
 //////////////////////////////////////////////////////////////////////////////////
 	
 function FlameThrower(texture, nTiles, container){
+	// handle local loop
+	var updateFcts	= [];
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+
+	// handle tweening
 	var age2Friction= (function(){
 		var gradient	= createLinearGradient([
 			{x : 0.00, y: 1.00}, {x : 0.50, y: 1.00},
-			{x : 0.70, y: 0.90}, {x : 1.00, y: 0.90}
+			{x : 0.70, y: 0.95}, {x : 1.00, y: 0.95}
 		]);
-		return function(age, maxAge){
-			return gradient(age/maxAge)
-		}
+		return function(age, maxAge){ return gradient(age/maxAge)	}
+	})();
+	var age2Opacity	= (function(){
+		var tween	= createTweenMidi(1, 0.1, 0.5)
+		return function(age, maxAge){ return tween(age/maxAge)	}
 	})();
 	var age2uvOffset= function(age, maxAge){
 		var imageIdx	= Math.floor(age/maxAge * nTiles);
-		var uvOffsetY	= imageIdx * 1/nTiles;
+		var uvOffsetY	= 1 - imageIdx * 1/nTiles;
 		return uvOffsetY
 	}
-
-	// load the texture
+	// put the emmiter
 	this.emit	= function(position, velocity){
 		// randomize the initial position
 		position	= position.clone()
@@ -135,7 +168,7 @@ function FlameThrower(texture, nTiles, container){
 		var material	= new THREE.SpriteMaterial({
 			map			: texture,
 			useScreenCoordinates	: false,
-			// transparent		: true,
+			transparent		: true,
 			blending		: THREE.AdditiveBlending
 		})
 		material.uvScale.set(1, 1/nTiles)
@@ -162,11 +195,10 @@ function FlameThrower(texture, nTiles, container){
 		// set acceleration
 		var acceleration= new THREE.Vector3(0, 2, 0)
 		// init opacity
-		var age2Opacity	= createTweenMidi(maxAge, 0.1*maxAge, 0.2*maxAge)
-		material.opacity= age2Opacity(0)
+		material.opacity= age2Opacity(0, maxAge)
 		
 		var birthDate	= Date.now()/1000
-		var callback	= function(delta, now){
+		updateFcts.push(function callback(delta, now){
 			var age	= Date.now()/1000 - birthDate
 			if( age >= maxAge ){
 				sprite.parent.remove(sprite)
@@ -182,12 +214,10 @@ function FlameThrower(texture, nTiles, container){
 			// make it grow
 			sprite.scale.multiplyScalar( 1.015 )
 			// handle opacity
-			material.opacity= age2Opacity(age)
+			material.opacity= age2Opacity(age, maxAge)
 			// init uvOffset
 			material.uvOffset.set(0, age2uvOffset(age, maxAge))
-
-		}
-		updateFcts.push(callback)
+		})
 	}
 	function createTweenMidi(maxAge, attackTime, releaseTime){
 		return function(age){
