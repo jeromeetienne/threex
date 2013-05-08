@@ -1,5 +1,5 @@
 ## TODO 
-* handle a granular sound for intensity
+* DONE handle a granular sound for intensity
 * DONE handle a trigger with a variation of intensity
 * DONE better handling of the rate limit
 * DONE put the .update(delta, now) function* DONE bug in the sprite handling i think

@@ -89,7 +89,7 @@ THREEx.TextureUtils.loadImages	= function(urls, onLoad){
 	// load all the images and convert them
 	var flow	= Flow();
 	urls.forEach(function(url, idx){
-		flow.seq(function(next){
+		flow.par(function(next){
 			var image	= new Image;
 			// TODO what if the images isnt properly loaded
 			image.onload	= function(){

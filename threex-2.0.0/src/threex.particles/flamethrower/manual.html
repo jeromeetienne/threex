@@ -22,13 +22,13 @@
 		// '../images/flame/flame02.png',
 		// '../images/flame/flame03.png',
 		// '../images/flame/flame04.png',
-		'../images/flame/flame05.png',
-		'../images/flame/flame06.png',
-		'../images/flame/flame07.png',
-		'../images/flame/flame08.png',
-		'../images/flame/flame09.png',
-		'../images/flame/flame10.png',
-		'../images/flame/flame11.png',
+		// '../images/flame/flame05.png',
+		// '../images/flame/flame06.png',
+		// '../images/flame/flame07.png',
+		// '../images/flame/flame08.png',
+		// '../images/flame/flame09.png',
+		// '../images/flame/flame10.png',
+		// '../images/flame/flame11.png',
 		'../images/flame/flame12.png',
 		'../images/flame/flame13.png',
 		'../images/flame/flame14.png',
@@ -44,14 +44,44 @@
 		'../images/flame/flame24.png'
 	];
 	
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
+if( window.webkitAudioContext ){
+	var audioCtx	= new webkitAudioContext();	
+	var url		= 'flamethrower-freesoundloop.wav';
+	loadSoundWebAudio(url, function(buffer){
+		var source	= audioCtx.createBufferSource();
+		source.buffer	= buffer;
+		source.loop	= true;
+		source.start(0);
+		updateFcts.push(function(delta, now){
+			var intensity	= emitTrigger.intensity()
+			source.playbackRate.value	= 0.5 + intensity*1.5;
+			source.gain.value		= intensity*3;
+		});
+		
+		source.connect(audioCtx.destination);
+	})
 	
-	
+	function loadSoundWebAudio(url, onLoad, onError){
+		var request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		request.responseType = 'arraybuffer';
+		request.onload = function() {
+			audioCtx.decodeAudioData(request.response, onLoad, onError);
+		}
+		request.send();
+	}		
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 
 	// handle emit rate with a MidiTrigger
-	var emitTrigger	= new MidiTrigger(0.2, 0.5)
+	var emitTrigger	= new MidiTrigger(0.2, 0.2)
 	emitTrigger.start();
 	document.addEventListener('mousedown'	, function(){ emitTrigger.start()	})
 	document.addEventListener('mouseup'	, function(){ emitTrigger.stop()	})
@@ -83,7 +113,7 @@
 		// update emitter
 		updateFcts.push(function(delta, now){
 			emitter.update(delta, now);			
-		})
+		}) 
 	})
 
 	function loadTremulousFlameParticules(urls, onReady){
