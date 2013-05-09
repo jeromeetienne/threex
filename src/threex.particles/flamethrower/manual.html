@@ -59,9 +59,8 @@ if( window.webkitAudioContext ){
 		updateFcts.push(function(delta, now){
 			var intensity	= emitTrigger.intensity()
 			source.playbackRate.value	= 0.5 + intensity*1.5;
-			source.gain.value		= intensity*3;
+			source.gain.value		= intensity*30;
 		});
-		
 		source.connect(audioCtx.destination);
 	})
 	
