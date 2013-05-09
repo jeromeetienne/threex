@@ -3,6 +3,7 @@
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../../../vendor/three.js/examples/js/shaders/BokehShader.js"></script>
 <script src="../threex.depthoffield.js"></script>
+<script src="../threex.depthoffielddatgui.js"></script>
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer();
@@ -57,41 +58,8 @@
 		depthOfField.render(scene, camera)
 	})		
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//		dat.gui on THREEx.DepthOfField					//
-	//////////////////////////////////////////////////////////////////////////////////
-	var guiVariables  = {
-		focus	: depthOfField.uniforms['focus'].value,
-		aperture: depthOfField.uniforms['aperture'].value,
-		maxblur	: depthOfField.uniforms['maxblur'].value,
-		presetRealist	: function(){
-			guiVariables.focus	= 0.80
-			guiVariables.aperture	= 0.006
-			guiVariables.maxblur	= 0.004
-			onChange()
-		},
-		presetExagerated: function(){
-			guiVariables.focus	= 0.80
-			guiVariables.aperture	= 0.03
-			guiVariables.maxblur	= 0.015
-			onChange()
-		},
-	}
-	var onChange = function(){
-		depthOfField.uniforms['focus'].value	= guiVariables.focus
-		depthOfField.uniforms['aperture'].value	= guiVariables.aperture
-		depthOfField.uniforms['maxblur'].value	= guiVariables.maxblur
-	}
-	onChange()
 	var gui = new dat.GUI()
-	gui.add( guiVariables, 'focus'		, 0.0  , 2   , 0.02500 )
-		.listen().onChange( onChange )
-	gui.add( guiVariables, 'aperture'	, 0.001, 0.06, 0.0001  )
-		.listen().onChange( onChange )
-	gui.add( guiVariables, 'maxblur'	, 0.0  , 0.03, 0.00025 )
-		.listen().onChange( onChange )
-	gui.add( guiVariables, 'presetRealist' )
-	gui.add( guiVariables, 'presetExagerated' )
+	THREEx.depthOfFieldDatGui(depthOfField, gui)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Loop Runner							//
