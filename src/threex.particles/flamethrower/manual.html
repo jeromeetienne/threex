@@ -48,22 +48,11 @@
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 
-if( window.webkitAudioContext ){
-	var audioCtx	= new webkitAudioContext();	
+window.AudioContext	= window.AudioContext || window.webkitAudioContext
+if( AudioContext ){
+	var audioCtx	= new AudioContext();	
 	var url		= 'flamethrower-freesoundloop.wav';
-	loadSoundWebAudio(url, function(buffer){
-		var source	= audioCtx.createBufferSource();
-		source.buffer	= buffer;
-		source.loop	= true;
-		source.start(0);
-		updateFcts.push(function(delta, now){
-			var intensity	= emitTrigger.intensity()
-			source.playbackRate.value	= 0.5 + intensity*1.5;
-			source.gain.value		= intensity*30;
-		});
-		source.connect(audioCtx.destination);
-	})
-	
+
 	function loadSoundWebAudio(url, onLoad, onError){
 		var request = new XMLHttpRequest();
 		request.open('GET', url, true);
@@ -73,6 +62,25 @@ if( window.webkitAudioContext ){
 		}
 		request.send();
 	}		
+
+	loadSoundWebAudio(url, function(buffer){
+		var sourceNode	= audioCtx.createBufferSource();
+		sourceNode.buffer	= buffer;
+		sourceNode.loop	= true;
+
+		var gainNode	= audioCtx.createGainNode()
+		sourceNode.connect(gainNode);
+		gainNode.connect(audioCtx.destination);
+console.log('gain', gainNode)
+
+		sourceNode.start(0);
+		updateFcts.push(function(delta, now){
+			var intensity	= emitTrigger.intensity()
+			sourceNode.playbackRate.value	= 0.5 + intensity*1.5;
+			gainNode.gain.value		= intensity*30;
+		});
+	})
+	
 }
 
 //////////////////////////////////////////////////////////////////////////////////
