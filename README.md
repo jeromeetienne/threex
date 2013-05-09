@@ -22,3 +22,5 @@ If you pick npm, see ```npm4require``` guidelines, another which is vendor.js.
 You can store and publish your packages thru npm, module mangement for node.js.
 
 [readme driven development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html)
+
+the old threex is in [jeromeetienne/threex](https://github.com/jeromeetienne/threex-v0)
