@@ -3,8 +3,8 @@ var THREEx	= THREEx || {};
 THREEx.Glow	= function(renderer, camera, renderTarget){
 	// setup the RenderTarget
 	if( renderTarget === undefined ){
-		var textureW	= Math.floor(renderer.domElement.offsetWidth/8)
-		var textureH	= Math.floor(renderer.domElement.offsetHeight/8)
+		var textureW	= Math.floor(renderer.domElement.offsetWidth /4)
+		var textureH	= Math.floor(renderer.domElement.offsetHeight/4)
 		renderTarget	= new THREE.WebGLRenderTarget(textureW, textureH, {
 			minFilter	: THREE.LinearFilter,
 			magFilter	: THREE.LinearFilter,
@@ -16,36 +16,32 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	var scene	= new THREE.Scene
 	this.scene	= scene
 
-	console.assert( THREE.HorizontalBlurShader )
-	console.assert( THREE.VerticalBlurShader )
 
-	var blurHLevel	= 0.005;
-	var blurVLevel	= 0.01;
-
+	// create the composer
 	var composer	= new THREE.EffectComposer( renderer, renderTarget );
 	this.composer	= composer
 
 	// add Render Pass
 	var effect	= new THREE.RenderPass(scene, camera);
 	composer.addPass( effect )
-
-	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-	effect.uniforms[ 'h' ].value	= blurHLevel 
-	composer.addPass( effect )
-	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-	effect.uniforms[ 'v' ].value	= blurVLevel
-	composer.addPass( effect )
-
-	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-	effect.uniforms[ 'h' ].value	= blurHLevel 
-	composer.addPass( effect )
-	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-	effect.uniforms[ 'v' ].value	= blurVLevel
-	composer.addPass( effect )
+	
+	// configuration 
+	var blurHLevel	= 0.003
+	var blurVLevel	= 0.006
+	var nBlurPass	= 2
+	console.assert( THREE.HorizontalBlurShader )
+	console.assert( THREE.VerticalBlurShader )
+	// loop for blur pass
+	for(var i = 0; i < nBlurPasses; i++){
+		// add HorizontalBlur Pass
+		var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+		effect.uniforms[ 'h' ].value	= blurHLevel 
+		composer.addPass( effect )
+		// add HorizontalBlur Pass
+		var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+		effect.uniforms[ 'v' ].value	= blurVLevel
+		composer.addPass( effect )
+	}
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
@@ -56,7 +52,8 @@ THREEx.Glow.prototype.update = function(delta, now) {
 };
 
 /**
- * copy the scene 
+ * copy the scene. This is a helper function. you can build you scene the way you want
+ * 
  * @param  {THREE.Scene} srcScene   the scene to copy
  * @param  {Function} materialCb callback called to determined material of THREE.Mesh's
  * @return {THREE.Scene}            the just-built scene

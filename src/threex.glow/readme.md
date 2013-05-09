@@ -5,6 +5,15 @@ threex.glow makes it easy to add glowing objects into your scene.
 It is a selective glow, so it is possible to have some glowing objects 
 along with non glowing objects on the same scene.
 
+## Algorithm
+* it is starting from a existing scene
+* you render this scene in a render target using THREE.MeshBasicMaterial
+* if the object is supposed to glow, you render it in the glowing color
+* if the object is NOT supposed to glow, you render it in black
+* this render target is then blurred
+* the original scene is rendered normally, and then blended with the blur rendertarget
+* it is that simple.
+
 ## Status
 stable
 
