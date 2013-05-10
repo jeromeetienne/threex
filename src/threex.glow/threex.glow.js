@@ -28,20 +28,27 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	// configuration 
 	var blurHLevel	= 0.003
 	var blurVLevel	= 0.006
-	var nBlurPass	= 2
+
 	console.assert( THREE.HorizontalBlurShader )
 	console.assert( THREE.VerticalBlurShader )
-	// loop for blur pass
-	for(var i = 0; i < nBlurPasses; i++){
-		// add HorizontalBlur Pass
-		var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-		effect.uniforms[ 'h' ].value	= blurHLevel 
-		composer.addPass( effect )
-		// add HorizontalBlur Pass
-		var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-		effect.uniforms[ 'v' ].value	= blurVLevel
-		composer.addPass( effect )
-	}
+
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+	effect.uniforms[ 'h' ].value	= blurHLevel 
+	composer.addPass( effect )
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+	effect.uniforms[ 'v' ].value	= blurVLevel
+	composer.addPass( effect )
+
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+	effect.uniforms[ 'h' ].value	= blurHLevel 
+	composer.addPass( effect )
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+	effect.uniforms[ 'v' ].value	= blurVLevel
+	composer.addPass( effect )
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;

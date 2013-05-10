@@ -10,6 +10,9 @@
 <script src="../../../vendor/three.js/examples/js/shaders/HorizontalBlurShader.js"></script>
 <script src="../../../vendor/three.js/examples/js/shaders/VerticalBlurShader.js"></script>
 <script src="../threex.glow.js"></script>
+<!-- include for threex.glowdatgui -->
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
+<script src="../threex.glowdatgui.js"></script>
 <!-- includes for the examples to blend the output of threex.glow -->
 <script src="../../../vendor/three.js/examples/js/shaders/BlendShader.js"></script>
 <!-- Start the code itself -->
@@ -62,6 +65,10 @@
 		var material	= glowing ? materialOn	: materialOff
 		return material				
 	})
+console.log('glow', glow)
+window.glow = glow
+
+	new THREEx.glowDatGui(glow)
 	//////////////////////////////////////////////////////////////////////////////////
 	//		blend main scene with glow.renderTexture			//
 	//////////////////////////////////////////////////////////////////////////////////
