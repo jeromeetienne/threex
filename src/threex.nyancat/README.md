@@ -8,6 +8,9 @@ It is made out of the
 
 ## How to use it
 
+You can find running code in ```examples/basic.html```.
+[demo live](http://jeromeetienne.github.io/threex/src/threex.nyancat/examples/basic.html)
+
 ### threex.nyancat.js
 To get poptart, the cat itself, include ```threex.nyancat.js``` and do
 ```
