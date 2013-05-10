@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='js/threex.textureutils.js'></script>
+<script src='js/fartscroll.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -42,47 +43,7 @@
 		'images/flame/flame23.png',
 		'images/flame/flame24.png'
 	];
-	
-//////////////////////////////////////////////////////////////////////////////////
-//		handle granular audio						//
-//////////////////////////////////////////////////////////////////////////////////
 
-// TODO put that in the particle itself ?
-
-window.AudioContext	= window.AudioContext || window.webkitAudioContext
-if( AudioContext ){
-	var audioCtx	= new AudioContext();	
-	var url		= 'sounds/flamethrower-freesoundloop.wav';
-	function loadSoundWebAudio(url, onLoad, onError){
-		onLoad	= onLoad	|| function(){}
-		onError	= onError	|| function(){}
-		var request = new XMLHttpRequest();
-		request.open('GET', url, true);
-		request.responseType = 'arraybuffer';
-		request.onload = function() {
-			audioCtx.decodeAudioData(request.response, onLoad, onError);
-		}
-		request.send();
-	}
-
-	loadSoundWebAudio(url, function(buffer){
-		var sourceNode	= audioCtx.createBufferSource();
-		sourceNode.buffer	= buffer;
-		sourceNode.loop	= true;
-
-		var gainNode	= audioCtx.createGainNode()
-		sourceNode.connect(gainNode);
-		gainNode.connect(audioCtx.destination);
-
-		sourceNode.start(0);
-		updateFcts.push(function(delta, now){
-			var intensity	= emitTrigger.intensity()
-			sourceNode.playbackRate.value	= 0.5 + intensity*1.5;
-			gainNode.gain.value		= intensity*30;
-		});
-	})
-	
-}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		handle trigger							//
@@ -90,9 +51,7 @@ if( AudioContext ){
 // TODO put that in the particle itself ?
 	// handle emit rate with a MidiTrigger
 	var emitTrigger	= new MidiTrigger(0.2, 0.2)
-	emitTrigger.start();
-	document.addEventListener('mousedown'	, function(){ emitTrigger.start()	})
-	document.addEventListener('mouseup'	, function(){ emitTrigger.stop()	})
+
 	/**
 	 * trigger with a attack, a sustain and a release. like midi notes
 	 * 
@@ -114,6 +73,30 @@ if( AudioContext ){
 			}else	return 1;					// sustain in-progress
 		}
 	}
+
+	var fartScroll	= new FartScroll();
+	document.addEventListener('mousedown'	, function(){
+		emitTrigger.start()
+		var soundIdx	= fartScroll.play()
+		var durations	= [
+			0.5,
+			0.2,
+			0.4,
+			0.1,
+			0.4,
+			0.8,
+			0.6,
+			0.1,
+			0.1,
+			0.5,
+		];
+		var duration	= durations[soundIdx]
+		setTimeout(function(){
+			console.log('stop emit', duration)
+			emitTrigger.stop()
+		}, duration*1000)
+	})
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -241,7 +224,7 @@ function FlameThrower(texture, nTiles, container){
 		var uvOffset	= age2uvOffset(0, maxAge)
 		material.uvOffset.set(0, uvOffset)
 
-		var maxAge	= 1.2 + (Math.random()-0.5)*0
+		var maxAge	= 0.8 + (Math.random()-0.5)*0
 
 		// set velocity
 		var speed	= velocity.length()
