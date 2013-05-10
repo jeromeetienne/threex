@@ -88,7 +88,7 @@ function WhiteSmokeTrail(position, loop, container){
 			}
 			sprite.scale.set(1,1,1).multiplyScalar( tweenScale(age) )
 			material.opacity= tweenOpacity(age)
-			material.color.setHSL( (age/maxAge) * 0.22 + 0.90, 1, 0.5 );
+//			material.color.setHSL( (age/maxAge) * 0.22 + 0.90, 1, 0.5 );
 		})
 	});
 	function createTweenMidi(maxAge, attackTime, releaseTime){

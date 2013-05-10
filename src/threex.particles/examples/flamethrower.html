@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='threex.textureutils.js'></script>
-<script src='miditrigger.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -45,23 +44,27 @@
 	];
 	
 //////////////////////////////////////////////////////////////////////////////////
-//		comment								//
+//		handle granular audio						//
 //////////////////////////////////////////////////////////////////////////////////
+
+// TODO put that in the particle itself ?
 
 window.AudioContext	= window.AudioContext || window.webkitAudioContext
 if( AudioContext ){
 	var audioCtx	= new AudioContext();	
-	var url		= 'flamethrower-freesoundloop.wav';
-
+	var url		= 'sounds/flamethrower-freesoundloop.wav';
 	function loadSoundWebAudio(url, onLoad, onError){
+		onLoad	= onLoad	|| function(){}
+		onError	= onError	|| function(){}
 		var request = new XMLHttpRequest();
 		request.open('GET', url, true);
 		request.responseType = 'arraybuffer';
 		request.onload = function() {
+			console.log('requert', request)
 			audioCtx.decodeAudioData(request.response, onLoad, onError);
 		}
 		request.send();
-	}		
+	}
 
 	loadSoundWebAudio(url, function(buffer){
 		var sourceNode	= audioCtx.createBufferSource();
@@ -71,7 +74,6 @@ if( AudioContext ){
 		var gainNode	= audioCtx.createGainNode()
 		sourceNode.connect(gainNode);
 		gainNode.connect(audioCtx.destination);
-console.log('gain', gainNode)
 
 		sourceNode.start(0);
 		updateFcts.push(function(delta, now){
@@ -83,23 +85,43 @@ console.log('gain', gainNode)
 	
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-//		comment								//
-//////////////////////////////////////////////////////////////////////////////////
-
+	//////////////////////////////////////////////////////////////////////////////////
+	//		handle trigger							//
+	//////////////////////////////////////////////////////////////////////////////////
+// TODO put that in the particle itself ?
 	// handle emit rate with a MidiTrigger
 	var emitTrigger	= new MidiTrigger(0.2, 0.2)
 	emitTrigger.start();
 	document.addEventListener('mousedown'	, function(){ emitTrigger.start()	})
 	document.addEventListener('mouseup'	, function(){ emitTrigger.stop()	})
+	/**
+	 * trigger with a attack, a sustain and a release. like midi notes
+	 * 
+	 * @param {Number} attackDelay  nb second for the attack phase
+	 * @param {Number} releaseDelay nb second for the release phase
+	 * @param {Number} maxValue     the maximum value of the intensity
+	 */
+	function MidiTrigger(attackDelay, releaseDelay){
+		var lastStart	= 0, lastStop	= 0;
+		this.start	= function(){ lastStart = Date.now()/1000 }
+		this.stop	= function(){ lastStop  = Date.now()/1000 }
+		this.intensity	= function(){
+			var present	= Date.now()/1000
+			if( lastStop >= lastStart ){				// release in-progress or overs
+				if(present - lastStop >= releaseDelay) return 0 // release over
+				return 1 - (present - lastStop) / releaseDelay	// release inprogress
+			}else if( present - lastStart <= attackDelay ){ 	// attack in-progress
+				return (present - lastStart) / attackDelay
+			}else	return 1;					// sustain in-progress
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+// TODO put that in the particle itself ?
 
 	loadTremulousFlameParticules(urls, function(texture, urls){
-		console.log('arguments', arguments)
-		// to debug the texture		
-		// document.body.appendChild(texture.image)
-		// texture.image.style.position	= 'absolute'
-		// texture.image.style.top		= '0px'
-
 		// create emitter
 		var emitter	= new FlameThrower(texture, urls.length, scene)
 		// emit based on rate
