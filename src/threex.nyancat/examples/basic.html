@@ -43,7 +43,7 @@
 	var nyanStars	= new THREEx.NyanCatStars()
 	scene.add( nyanStars.container )
 	updateFcts.push(function(delta, now){
-		if( paused )	return
+		if( paused )	return 
 		nyanStars.update(delta, now)
 	})
 
