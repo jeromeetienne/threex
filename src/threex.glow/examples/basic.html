@@ -53,22 +53,24 @@
 	//		init glow							//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var materialOn	= new THREE.MeshBasicMaterial()
-	materialOn.color.set(0x88ccff)
-	var materialOff	= new THREE.MeshBasicMaterial()
-	materialOff.color.set('black')
-
+	// create the glow itself
 	var glow	= new THREEx.Glow(renderer, camera);
+
+	// you can add a dat.gui on it if you want, it helps fine tune your parameters
+	new THREEx.addGlow2DatGui(glow)
+
+	// prepare the scene for the glow rendering. 
+	// You are free to build it the way you want.
+	// THREEx.glow doesn't care much.
+	var materialOn	= new THREE.MeshBasicMaterial({ color: 0x88ccff })
+	var materialOff	= new THREE.MeshBasicMaterial({ color: 'black'  })
 	glow.copyScene(scene, function(srcObject){
 		var domClasses	= srcObject.userData.domClasses
 		var glowing	= domClasses && domClasses.match(/glowing/)
 		var material	= glowing ? materialOn	: materialOff
 		return material				
 	})
-console.log('glow', glow)
-window.glow = glow
 
-	new THREEx.glowDatGui(glow)
 	//////////////////////////////////////////////////////////////////////////////////
 	//		blend main scene with glow.renderTexture			//
 	//////////////////////////////////////////////////////////////////////////////////

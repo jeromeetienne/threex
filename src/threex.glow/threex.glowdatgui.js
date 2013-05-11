@@ -4,11 +4,8 @@
  */
 var THREEx	= THREEx || {};
 
-
-
-
-THREEx.glowDatGui	= function(glow, datGui){
-	datGui	= datGui || new dat.GUI()
+THREEx.addGlow2DatGui	= function(glow, datGui){
+	datGui		= datGui || new dat.GUI()
 	var passes	= glow.composer.passes
 	// options
 	var options  = {
