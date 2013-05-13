@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	renderer.setClearColor('black',1)
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
+	camera.position.z = 6;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*40 - camera.position.x) * 0.01
+		camera.position.y += (mouse.y*40 - camera.position.y) * 0.01
+		camera.lookAt( scene.position )
+	})
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
+
+;(function(){
+//return
+	var parent	= new THREE.Object3D();
+	scene.add(parent)
+	parent.scale.set(1,1,1).multiplyScalar(1)
+	
+	var COLOR1	= new THREE.Color('red')
+	var COLOR2	= new THREE.Color('pink')
+	var COLOR1 = new THREE.Color(0x77bbff);
+	var COLOR2 = new THREE.Color(0x8ec5e5);
+	var COLOR3 = new THREE.Color(0x97a8ba);
+	var size	= 1;
+	// GLYPH (BIG ONE)
+
+	var glyph = new THREE.Mesh( 
+		new THREE.IcosahedronGeometry(1.4, 2),
+		new THREE.MeshBasicMaterial({
+			color: COLOR1,
+			opacity: 1,
+			wireframe: true,
+			wireframeLinewidth: 4
+		})
+	);
+	parent.add( glyph );
+
+	// GLYPH2 (CORE)
+	var glyph2 = new THREE.Mesh( 
+		new THREE.IcosahedronGeometry(1, 1),
+		new THREE.MeshPhongMaterial({
+			color: COLOR1,
+			specular: COLOR1,
+			shading: THREE.FlatShading,
+			opacity: 0.9,
+			ambient: 0x202830
+		})
+	);
+	parent.add( glyph2 );
+	
+
+	// GLYPHE2 WIREFRAME
+	var glyph2wf = new THREE.Mesh( 
+		glyph2.geometry.clone(),
+		new THREE.MeshBasicMaterial({
+			color: COLOR2,
+			wireframe: true,
+			opacity: 1,
+			wireframeLinewidth: 4
+		})
+	);
+	glyph2wf.position = glyph2.position;
+	glyph2wf.rotation = glyph2.rotation;
+	glyph2wf.scale.copy(glyph2.scale).multiplyScalar(1.01)
+	parent.add( glyph2wf );	
+	
+	// GLYPHE2 GLOW OCCLUDER
+	var glyph2oc = new THREE.Mesh( 
+		glyph2.geometry.clone(),
+		new THREE.MeshPhongMaterial({
+			color: 0x000000,
+			specular: 0x000000,
+			shading: THREE.FlatShading,
+			opacity: 0.9,
+			ambient: 0x000000
+		})
+	);
+	glyph2oc.position = glyph2.position;
+	glyph2oc.rotation = glyph2.rotation;
+	glyph2oc.scale.copy(glyph2.scale)
+	parent.add( glyph2oc );
+
+	updateFcts.push(function(delta, now){
+		glyph.rotation.x += 0.004;
+		glyph.rotation.z -= 0.003;
+		
+		glyph2.rotation.x -= 0.004;
+		glyph2.rotation.z += 0.003;	
+	})
+})()
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
+;(function(){
+	var COLOR1 = new THREE.Color(0x77bbff);
+	var COLOR2 = new THREE.Color(0x8ec5e5);
+	var COLOR3 = new THREE.Color(0x97a8ba);
+	
+	// CUBE PARTICLES
+	var material = new THREE.ParticleBasicMaterial({
+		color		: COLOR1,
+		map		: THREE.ImageUtils.loadTexture( "pixel.png" ), 
+		blending	: THREE.AdditiveBlending, 
+		depthTest	: true, 
+		transparent	: true
+	});
+
+	var geometry	= new THREE.Geometry();
+	var vertices	= geometry.vertices
+	for(var i = 0; i < 5000; i++ ) {
+		var vector3	= new THREE.Vector3()
+		var angle	= Math.random() * Math.PI*2
+		vector3.x	= Math.cos(angle)
+		vector3.z	= Math.sin(angle)
+		vector3.setLength(0.5 + 0.4*(Math.random()-0.5) )
+		vector3.y	= (Math.random()-0.5)
+		vertices.push( vector3 )
+	}
+
+	var cube = new THREE.ParticleSystem( geometry, material );
+	cube.dynamic = true;
+	cube.sortParticles = true;
+	scene.add( cube );
+	cube.scale.set(1,1,1).multiplyScalar(4)
+	
+	var speeds	= [];
+	for( i = 0; i < vertices.length; i++ ){		
+		speeds[i]	= Math.random()*0.08+0.02;
+	}
+
+	updateFcts.push(function(delta, now){
+		for(var i = 0; i < vertices.length; i++){
+			var position	 = vertices[i];
+			position.y	+= speeds[i] * delta;
+			if( position.y > 0.5 )	position.y = -0.5;
+		}
+	})
+
+})()
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

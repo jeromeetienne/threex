@@ -17,7 +17,8 @@ along with non glowing objects on the same scene.
 hmm it may not appear that simple at first, but stay with me here :)
 
 ## How to use it
-
+We gonna explain here the content of ```examples/basic.html```.
+So you can make tests and experiments on running code, while learning.
 You include ```threex.glow.js``` in your code.
 then you create create the glow itself
 
