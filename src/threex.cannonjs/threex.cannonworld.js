@@ -6,7 +6,7 @@ THREEx.CannonWorld	= function(){
 	this.origin	= origin
 	
 	origin.broadphase	= new CANNON.NaiveBroadphase()
-	origin.gravity.set(0,0,0)
+	origin.gravity.set(0,-9.81,0)
 	origin.solver.iterations = 10
 
 	var timerId	= null;
@@ -15,9 +15,9 @@ THREEx.CannonWorld	= function(){
 	 * @param  {Number} period the period to use for update. default to 1/60seconds
 	 */
 	this.start	= function(period){
-		period	= period === undefined ? period : 1/60;
-		var timerId	= setInterval(function(){
-	        	origin.step(period);		
+		period	= period !== undefined ? period : 1/60;
+		timerId	= setInterval(function(){
+			origin.step(period);		
 		}, period*1000)		
 		return this;
 	}.bind(this)

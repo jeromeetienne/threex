@@ -130,12 +130,12 @@
 
 	var geometry	= new THREE.Geometry();
 	var vertices	= geometry.vertices
-	for(var i = 0; i < 5000; i++ ) {
+	for(var i = 0; i < 10000; i++ ) {
 		var vector3	= new THREE.Vector3()
 		var angle	= Math.random() * Math.PI*2
 		vector3.x	= Math.cos(angle)
 		vector3.z	= Math.sin(angle)
-		vector3.setLength(0.5 + 0.4*(Math.random()-0.5) )
+		vector3.setLength(0.5 + 0.2*(Math.random()-0.5) )
 		vector3.y	= (Math.random()-0.5)
 		vertices.push( vector3 )
 	}

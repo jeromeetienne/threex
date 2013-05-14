@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+
+<script src='../../threex.loop/threex.loop.js'></script>
+
+<script src='../vendor/leap.js'></script>
+<script src='../threex.leapcontroller.js'></script>
+<script src='../threex.leapviewerpointable.js'></script>
+<script src='../threex.leapviewertap.js'></script>
+<script src='../threex.leapviewerswipe.js'></script>
+<script src='../threex.leapviewercircle.js'></script>
+<script src='../threex.leapviewerhandsphere.js'></script>
+<script src='../threex.leapviewerhandpalm.js'></script>
+
+<!-- get threex.context and its dependancies  -->
+<script src="../../threex.context/THREEx.Context.js"></script>
+<script src="../../threex.loop/THREEx.Loop.js"></script>
+
+
+<script src='../../threex.particles/examples/js/fartscroll.js'></script>
+
+
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	
+	renderer.setClearColor('black')
+
+	var loop	= new THREEx.Loop().start()	
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z = 3;
+
+	// init leap controller
+	var controller	= new THREEx.LeapController()
+	// listen to raw frame
+	controller.addEventListener('frame', function(frame){
+		if( frame.valid !== true )	return;
+		//console.log('received valid frame')
+	})
+	// // init pointable viewer
+	// new THREEx.LeapViewerPointable({
+	// 	container	: scene,
+	// 	controller	: controller
+	// })
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+THREEx.LeapViewerPointable2	= function(opts){
+	// handle arguments
+	opts		= opts	|| {}
+	var container	= opts.container	|| console.assert(false)
+	var controller	= opts.controller	|| console.assert(false)
+	console.assert(container instanceof THREE.Object3D)
+	console.assert(controller instanceof THREEx.LeapController)
+
+	// listen to pointableTracking event
+	controller.addEventListener('pointableTracking', function(pointable, data){
+		data.emitter.addEventListener('update', function(pointable, data){
+			// update position
+			var position	= controller.convertPosition(pointable.tipPosition)
+			trailPosition.copy(position)
+		});
+	})
+}
+
+	new THREEx.LeapViewerPointable2({
+		container	: scene,
+		controller	: controller
+	})
+	var trailPosition	= new THREE.Vector3
+
+	new WhiteSmokeTrail(trailPosition, loop, scene)
+
+	
+	
+	
+	// render the scene
+	;(function animate(){
+		requestAnimationFrame( animate );
+		renderer.render( scene, camera );
+	})();
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
+function WhiteSmokeTrail(position, loop, container){
+	var texture	= THREE.ImageUtils.loadTexture('../../threex.particles/examples/images/blue_particle.jpg')
+	var maxAge	= 1;
+	var tweenOpacity= createTweenMidi(maxAge, 0.33*maxAge, 0.33*maxAge);
+	var tweenScale	= (function(){
+		var tweenMidi	= createTweenMidi(maxAge, 0.2*maxAge, 0.2*maxAge);
+		return function(age){
+			return (1 + 1 * tweenMidi(age)) * 0.2
+		}
+	})();
+	var lastEmit	= 0;
+	var prevPosition= new THREE.Vector3().copy(position);
+	loop.hook(function(delta, now){
+		// rate limiter emittion
+		var rate = 70;
+		if( rate === 0 || now - lastEmit < 1/rate )	return;
+		lastEmit	= now;
+
+		// init sprite material
+		var material	= new THREE.SpriteMaterial({
+			map			: texture,
+			useScreenCoordinates	: false,
+			color			: 0xAA4488,
+			transparent		: true,
+			blending		: THREE.AdditiveBlending
+		})
+		// init sprite
+		var sprite	= new THREE.Sprite(material)
+		//sprite.rotation	= Math.random() * Math.PI*2
+		sprite.position.copy( position )
+		container.add( sprite )
+
+		// compute velocity
+		var velocity	= position.clone().sub(prevPosition).normalize();
+		prevPosition.copy( position )
+
+		// start a little bit behind the container
+		sprite.position.add( velocity.clone().multiplyScalar(-0.1) )
+		// init pattern
+		sprite.scale.set(1,1,1).multiplyScalar( tweenScale(0) )
+		material.opacity= tweenOpacity(0)
+
+		var birthDate	= now;
+		var callback	= loop.hook(function(delta, now){
+			var age	= now - birthDate;
+			if( age >= maxAge ){
+				sprite.parent.remove(sprite)
+				loop.unhook(callback)
+				return;	
+			}
+			sprite.scale.set(1,1,1).multiplyScalar( tweenScale(age) )
+			material.opacity= tweenOpacity(age)
+//			material.color.setHSL( (age/maxAge) * 0.22 + 0.90, 1, 0.5 );
+		})
+	});
+	function createTweenMidi(maxAge, attackTime, releaseTime){
+		return function(age){
+			if( age < attackTime ){
+				return age / attackTime
+			}else if( age < maxAge - releaseTime ){
+				return 1;
+			}else{
+				return (maxAge - age) / releaseTime
+			}
+		}	
+	}
+}
+</script></body>
