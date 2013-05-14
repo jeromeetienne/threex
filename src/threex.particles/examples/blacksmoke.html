@@ -19,8 +19,9 @@
 	mesh.position.y	= -0.5;
 	mesh.rotation.x	= Math.PI/2;
 
-	
-	new BlackSmoke(mesh.position, loop, scene)
+	var position	= new THREE.Vector3
+	var emitter	= new BlackSmoke(scene).start(mesh.position)
+	loop.hook(function(delta, now){	emitter.update(delta, now)	})
 
 	loop.hook(function(delta, now){
 		renderer.render( scene, camera );
@@ -30,7 +31,8 @@
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 	
-function BlackSmoke(position, loop, container){
+function BlackSmoke(container){
+	var updateFcts	= []
 	var texture	= THREE.ImageUtils.loadTexture('images/cloud10.png')
 	var center	= new THREE.Vector3(0,-0.8, 0)
 	var maxAge	= 1.5;
@@ -44,13 +46,8 @@ function BlackSmoke(position, loop, container){
 		}
 	})();
 	var age2Opacity	= createTweenMidi(maxAge, 0.05*maxAge, 0.4*maxAge);
-	var lastEmit	= 0;
-	loop.hook(function(delta, now){
-		// rate limiter emition
-		var rate = 5;
-		if( rate === 0 || now - lastEmit < 1/rate )	return;
-		lastEmit	= now;
 
+	this.emit	= function(position){
 		// init sprite material
 		var material	= new THREE.SpriteMaterial({
 			map			: texture,
@@ -75,12 +72,12 @@ function BlackSmoke(position, loop, container){
 		sprite.rotation	= Math.random() * Math.PI*2
 		material.opacity= age2Opacity(0)
 		
-		var birthDate	= now;
-		var callback	= loop.hook(function(delta, now){
+		var birthDate	= Date.now()/1000;
+		updateFcts.push(function callback(delta, now){
 			var age	= now - birthDate;
 			if( age >= maxAge ){
 				sprite.parent.remove(sprite)
-				loop.unhook(callback)
+				updateFcts.splice(updateFcts.indexOf(callback),1)
 				return;	
 			}
 			// handle friction
@@ -90,8 +87,30 @@ function BlackSmoke(position, loop, container){
 			// make it grow
 			sprite.scale.multiplyScalar( 1.005 )
 			material.opacity	= age2Opacity(age)
+		})		
+	}
+	var _loopCb	= null;
+	this.start	= function(position, rate){
+		rate	= rate !== undefined ? rate : 5;
+		var lastEmit	= 0;
+		updateFcts.push(_loopCb	= function(delta, now){
+			// rate limiter emition
+			if( rate === 0 || now - lastEmit < 1/rate )	return;
+			lastEmit	= now;
+
+			this.emit(position)
+		}.bind(this))
+		return this;
+	}
+	this.stop	= function(){
+		updateFcts.splice(updateFcts.indexOf(_loopCb),1)
+		return this;
+	}
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
 		})
-	})
+	}
 
 	function createTweenMidi(maxAge, attackTime, releaseTime){
 		return function(age){

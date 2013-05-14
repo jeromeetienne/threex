@@ -50,70 +50,7 @@
 // TODO put that in the particle itself ?
 
 window.AudioContext	= window.AudioContext || window.webkitAudioContext
-if( AudioContext ){
-	var audioCtx	= new AudioContext();	
-	var url		= 'sounds/flamethrower-freesoundloop.wav';
-	function loadSoundWebAudio(url, onLoad, onError){
-		onLoad	= onLoad	|| function(){}
-		onError	= onError	|| function(){}
-		var request = new XMLHttpRequest();
-		request.open('GET', url, true);
-		request.responseType = 'arraybuffer';
-		request.onload = function() {
-			audioCtx.decodeAudioData(request.response, onLoad, onError);
-		}
-		request.send();
-	}
 
-	loadSoundWebAudio(url, function(buffer){
-		var sourceNode	= audioCtx.createBufferSource();
-		sourceNode.buffer	= buffer;
-		sourceNode.loop	= true;
-
-		var gainNode	= audioCtx.createGainNode()
-		sourceNode.connect(gainNode);
-		gainNode.connect(audioCtx.destination);
-
-		sourceNode.start(0);
-		updateFcts.push(function(delta, now){
-			var intensity	= emitTrigger.intensity()
-			sourceNode.playbackRate.value	= 0.5 + intensity*1.5;
-			gainNode.gain.value		= intensity*30;
-		});
-	})
-	
-}
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		handle trigger							//
-	//////////////////////////////////////////////////////////////////////////////////
-// TODO put that in the particle itself ?
-	// handle emit rate with a MidiTrigger
-	var emitTrigger	= new MidiTrigger(0.2, 0.2)
-	emitTrigger.start();
-	document.addEventListener('mousedown'	, function(){ emitTrigger.start()	})
-	document.addEventListener('mouseup'	, function(){ emitTrigger.stop()	})
-	/**
-	 * trigger with a attack, a sustain and a release. like midi notes
-	 * 
-	 * @param {Number} attackDelay  nb second for the attack phase
-	 * @param {Number} releaseDelay nb second for the release phase
-	 * @param {Number} maxValue     the maximum value of the intensity
-	 */
-	function MidiTrigger(attackDelay, releaseDelay){
-		var lastStart	= 0, lastStop	= 0;
-		this.start	= function(){ lastStart = Date.now()/1000 }
-		this.stop	= function(){ lastStop  = Date.now()/1000 }
-		this.intensity	= function(){
-			var present	= Date.now()/1000
-			if( lastStop >= lastStart ){				// release in-progress or overs
-				if(present - lastStop >= releaseDelay) return 0 // release over
-				return 1 - (present - lastStop) / releaseDelay	// release inprogress
-			}else if( present - lastStart <= attackDelay ){ 	// attack in-progress
-				return (present - lastStart) / attackDelay
-			}else	return 1;					// sustain in-progress
-		}
-	}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -121,27 +58,33 @@ if( AudioContext ){
 // TODO put that in the particle itself ?
 
 	loadTremulousFlameParticules(urls, function(texture, urls){
+		// create sound
+		var sound	= new FlameThrowerWebAudio()
+		// update sound
+		updateFcts.push(function(delta, now){ sound.update(delta, now)	}) 
+
 		// create emitter
 		var emitter	= new FlameThrower(texture, urls.length, scene)
-		// emit based on rate
-		var lastEmit	= 0;
-		updateFcts.push(function(delta, now){
-			// rate limiter emition	
-			var rate	= 15 * emitTrigger.intensity();
-			if( rate === 0 || now - lastEmit < 1/rate )	return;
-			lastEmit	= now;
-
-			var position	= new THREE.Vector3(-3,0,0)
-			//var position	= new THREE.Vector3(0,-1,-2)
-			var position	= new THREE.Vector3(-4,0,-3)
-			var velocity	= new THREE.Vector3(7, 0, 0)
-			// var velocity	= new THREE.Vector3(0, 1, -6)
-			emitter.emit(position, velocity);
-		});
 		// update emitter
-		updateFcts.push(function(delta, now){
-			emitter.update(delta, now);			
-		}) 
+		updateFcts.push(function(delta, now){ emitter.update(delta, now)	}) 
+
+		var position	= new THREE.Vector3(-3,0,0)
+		//var position	= new THREE.Vector3(0,-1,-2)
+		var position	= new THREE.Vector3(-4,0,-3)
+		var velocity	= new THREE.Vector3(7, 0, 0)
+		emitter.start(position, velocity)
+
+		// start the trigger and 
+		emitter.trigger.start();
+		sound.trigger.start();
+		document.addEventListener('mousedown'	, function(){
+			emitter.trigger.start()
+			sound.trigger.start();			
+		})
+		document.addEventListener('mouseup'	, function(){
+			emitter.trigger.stop()	
+			sound.trigger.stop()	
+		})
 	})
 
 	function loadTremulousFlameParticules(urls, onReady){
@@ -195,12 +138,9 @@ if( AudioContext ){
 function FlameThrower(texture, nTiles, container){
 	// handle local loop
 	var updateFcts	= [];
-	this.update	= function(delta, now){
-		updateFcts.forEach(function(updateFct){
-			updateFct(delta, now)
-		})
-	}
-
+	// init trigger
+	var trigger	= new MidiTrigger(0.2, 0.2)
+	this.trigger	= trigger;
 	// handle tweening
 	var age2Friction= (function(){
 		var gradient	= createLinearGradient([
@@ -219,9 +159,9 @@ function FlameThrower(texture, nTiles, container){
 		return uvOffsetY
 	}
 	// put the emmiter
-	this.emit	= function(position, velocity){
+	this.emit	= function(startPosition, initialVelocity){
 		// randomize the initial position
-		position	= position.clone()
+		var position	= startPosition.clone()
 		// init sprite material
 		var material	= new THREE.SpriteMaterial({
 			map			: texture,
@@ -244,8 +184,8 @@ function FlameThrower(texture, nTiles, container){
 		var maxAge	= 1.2 + (Math.random()-0.5)*0
 
 		// set velocity
-		var speed	= velocity.length()
-		velocity	= velocity.clone().normalize()
+		var speed	= initialVelocity.length()
+		var velocity	= initialVelocity.clone().normalize()
 		velocity.x	+= (Math.random()-0.5)*0.0
 		velocity.y	+= (Math.random()-0.5)*0.2
 		velocity.z	+= (Math.random()-0.5)*0.0
@@ -277,6 +217,51 @@ function FlameThrower(texture, nTiles, container){
 			material.uvOffset.set(0, age2uvOffset(age, maxAge))
 		})
 	}
+	var _loopCb	= null;
+	this.start	= function(startPosition, initialVelocity, maxRate){
+		maxRate	= maxRate !== undefined ? maxRate : 15
+		var lastEmit	= 0;
+		updateFcts.push(_loopCb	= function(delta, now){
+			// rate limiter emition
+			var rate	= maxRate * trigger.intensity();
+			if( rate === 0 || now - lastEmit < 1/rate )	return;
+			lastEmit	= now;
+			// emit one
+			this.emit(startPosition, initialVelocity)
+		}.bind(this))
+		return this;
+	}
+	this.stop	= function(){
+		updateFcts.splice(updateFcts.indexOf(_loopCb),1)
+		return this;
+	}
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+
+	/**
+	 * trigger with a attack, a sustain and a release. like midi notes
+	 * 
+	 * @param {Number} attackDelay  nb second for the attack phase
+	 * @param {Number} releaseDelay nb second for the release phase
+	 * @param {Number} maxValue     the maximum value of the intensity
+	 */
+	function MidiTrigger(attackDelay, releaseDelay){
+		var lastStart	= 0, lastStop	= 0;
+		this.start	= function(){ lastStart = Date.now()/1000 }
+		this.stop	= function(){ lastStop  = Date.now()/1000 }
+		this.intensity	= function(){
+			var present	= Date.now()/1000
+			if( lastStop >= lastStart ){				// release in-progress or overs
+				if(present - lastStop >= releaseDelay) return 0 // release over
+				return 1 - (present - lastStop) / releaseDelay	// release inprogress
+			}else if( present - lastStart <= attackDelay ){ 	// attack in-progress
+				return (present - lastStart) / attackDelay
+			}else	return 1;					// sustain in-progress
+		}
+	}
 	function createTweenMidi(maxAge, attackTime, releaseTime){
 		return function(age){
 			if( age < attackTime ){
@@ -307,6 +292,74 @@ function FlameThrower(texture, nTiles, container){
 		}
 	}
 }
+
+
+function FlameThrowerWebAudio(){
+	// init trigger
+	var trigger	= new MidiTrigger(0.2, 0.2)
+	this.trigger	= trigger;
+
+	
+	this.isAvailable= AudioContext ? true : false;	
+	var audioCtx	= new AudioContext();	
+	var url		= 'sounds/flamethrower-freesoundloop.wav';
+	var updateFcts	= []
+	loadSoundWebAudio(url, function(buffer){
+		var sourceNode	= audioCtx.createBufferSource();
+		sourceNode.buffer	= buffer;
+		sourceNode.loop	= true;
+
+		var gainNode	= audioCtx.createGainNode()
+		sourceNode.connect(gainNode);
+		gainNode.connect(audioCtx.destination);
+
+		sourceNode.start(0);
+		updateFcts.push(function(delta, now){
+			var intensity	= trigger.intensity()
+			sourceNode.playbackRate.value	= 0.5 + intensity*1.5;
+			gainNode.gain.value		= intensity*30;
+		});
+	})	
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+	
+	function loadSoundWebAudio(url, onLoad, onError){
+		onLoad	= onLoad	|| function(){}
+		onError	= onError	|| function(){}
+		var request = new XMLHttpRequest();
+		request.open('GET', url, true);
+		request.responseType = 'arraybuffer';
+		request.onload = function() {
+			audioCtx.decodeAudioData(request.response, onLoad, onError);
+		}
+		request.send();
+	}
+	/**
+	 * trigger with a attack, a sustain and a release. like midi notes
+	 * 
+	 * @param {Number} attackDelay  nb second for the attack phase
+	 * @param {Number} releaseDelay nb second for the release phase
+	 * @param {Number} maxValue     the maximum value of the intensity
+	 */
+	function MidiTrigger(attackDelay, releaseDelay){
+		var lastStart	= 0, lastStop	= 0;
+		this.start	= function(){ lastStart = Date.now()/1000 }
+		this.stop	= function(){ lastStop  = Date.now()/1000 }
+		this.intensity	= function(){
+			var present	= Date.now()/1000
+			if( lastStop >= lastStart ){				// release in-progress or overs
+				if(present - lastStop >= releaseDelay) return 0 // release over
+				return 1 - (present - lastStop) / releaseDelay	// release inprogress
+			}else if( present - lastStart <= attackDelay ){ 	// attack in-progress
+				return (present - lastStart) / attackDelay
+			}else	return 1;					// sustain in-progress
+		}
+	}
+}
+
 
 
 </script></body>
