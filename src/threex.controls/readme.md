@@ -2,4 +2,4 @@ threex.controls
 ===============
 
 * load all the controls in three.js/examples/js/controls
-* just a convenience package to ease download
+* just a convenience require.js package to ease download

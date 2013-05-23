@@ -53,14 +53,14 @@ return
 	var mesh	= new THREE.Mesh(geometry, material)
 	mesh.position.y	= 3
 	scene.add( mesh );
-	var physicsBody	= new THREEx.CannonBody({
+	var body	= new THREEx.CannonBody({
 		mesh	: mesh
 	}).addTo(physicsWorld)
 	updateFcts.push(function(delta, now){
-		physicsBody.update(delta, now)
+		body.update(delta, now)
 	});	
 
-	physicsBody.origin.angularVelocity.set(0,0,40);
+	body.origin.angularVelocity.set(0,0,40);
 
 //	physicsBody.origin.angularDamping	= 0.0;
 //	physicsBody.origin.linearDamping	= 0.0;
@@ -149,12 +149,12 @@ return
 	mesh.position.z	= 0
 	scene.add( mesh );
 	// init physics
-	var physicsBody	= new THREEx.CannonBody({
+	var body	= new THREEx.CannonBody({
 		mesh		: mesh,
 		mass		: 0
 	}).addTo(physicsWorld)
 	updateFcts.push(function(delta, now){
-		physicsBody.update(delta, now)
+		body.update(delta, now)
 	});	
 })()
 
@@ -174,7 +174,7 @@ return
 	// place domino
 	var nDomino	= 11;
 	for(var i = 0; i < nDomino; i++){
-		;(function(){
+		;(function(){	// to get variables closure
 			var mesh	= new THREE.Mesh(geometry, material)
 			mesh.position.x	= (i - nDomino/2) * 0.5
 			mesh.position.y	= 0.5
@@ -182,12 +182,12 @@ return
 			mesh.useQuaternion	= true;
 			mesh.lookAt(mesh.position.clone().add(new THREE.Vector3(1,0,0)))
 			scene.add( mesh )
-			var physicsBody	= new THREEx.CannonBody({
+			var body	= new THREEx.CannonBody({
 				mesh		: mesh,
 				mass		: 0.5,
 			}).addTo(physicsWorld)
 			updateFcts.push(function(delta, now){
-				physicsBody.update(delta, now)
+				body.update(delta, now)
 			});
 		})()
 	}

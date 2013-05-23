@@ -9,6 +9,11 @@ THREEx.CannonWorld	= function(){
 	origin.gravity.set(0,-9.81,0)
 	origin.solver.iterations = 10
 
+	// origin.quatNormalizeSkip = 0;
+	// origin.quatNormalizeFast = false;
+	origin.solver.setSpookParams(300,10);
+//	origin.solver.iterations = 5;
+                
 	var timerId	= null;
 	/**
 	 * start periodically updating - it must not be done on animation frame

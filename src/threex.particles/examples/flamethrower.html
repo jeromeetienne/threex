@@ -43,14 +43,6 @@
 		'images/flame/flame24.png'
 	];
 	
-//////////////////////////////////////////////////////////////////////////////////
-//		handle granular audio						//
-//////////////////////////////////////////////////////////////////////////////////
-
-// TODO put that in the particle itself ?
-
-window.AudioContext	= window.AudioContext || window.webkitAudioContext
-
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -64,7 +56,8 @@ window.AudioContext	= window.AudioContext || window.webkitAudioContext
 		updateFcts.push(function(delta, now){ sound.update(delta, now)	}) 
 
 		// create emitter
-		var emitter	= new FlameThrower(texture, urls.length, scene)
+		var nTiles	= urls.length 
+		var emitter	= new FlameThrowerEmitter(texture, nTiles, scene)
 		// update emitter
 		updateFcts.push(function(delta, now){ emitter.update(delta, now)	}) 
 
@@ -135,7 +128,7 @@ window.AudioContext	= window.AudioContext || window.webkitAudioContext
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 	
-function FlameThrower(texture, nTiles, container){
+function FlameThrowerEmitter(texture, nTiles, container){
 	// handle local loop
 	var updateFcts	= [];
 	// init trigger
@@ -294,7 +287,17 @@ function FlameThrower(texture, nTiles, container){
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * granular sound for FlameThrowerEmitter with WebAudio API
+ */
 function FlameThrowerWebAudio(){
+	// webaudio API shim
+	window.AudioContext	= window.AudioContext || window.webkitAudioContext
+
 	// init trigger
 	var trigger	= new MidiTrigger(0.2, 0.2)
 	this.trigger	= trigger;
