@@ -1,27 +1,36 @@
-/*global CANNON:true */
-
 /**
  * @class CANNON.Constraint
  * @brief Constraint base class
  * @author schteppe
+ * @param CANNON.Body bodyA
+ * @param CANNON.Body bodyB
  */
-CANNON.Constraint = function(){
+CANNON.Constraint = function(bodyA,bodyB){
 
-  /**
-   * @property array equations
-   * @brief A number of CANNON.Equation's that belongs to this Constraint
-   * @memberof CANNON.Constraint
-   */
-  this.equations = [];
-  this.id = -1;
+    /**
+     * @property Array equations
+     * @memberOf CANNON.Constraint
+     * @brief Equations to be solved in this constraint
+     */
+    this.equations = [];
+
+    /**
+     * @property CANNON.Body bodyA
+     * @memberOf CANNON.Constraint
+     */
+    this.bodyA = bodyA;
+
+    /**
+     * @property CANNON.Body bodyB
+     * @memberOf CANNON.Constraint
+     */
+    this.bodyB = bodyB;
 };
-CANNON.Constraint.prototype.constructor = CANNON.Constraint;
 
 /**
  * @method update
- * @memberof CANNON.Constraint
- * @brief Updates the internal numbers, calculates the Jacobian etc.
+ * @memberOf CANNON.Constraint
  */
 CANNON.Constraint.prototype.update = function(){
-    throw "update() not implemented in this Constraint subclass!";
+    throw new Error("method update() not implmemented in this Constraint subclass!");
 };

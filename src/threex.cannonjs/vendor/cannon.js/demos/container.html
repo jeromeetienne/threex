@@ -1,9 +1,9 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>cannon.js - container demo</title>
     <meta charset="utf-8">
-    <style>* {margin:0;padding:0}</style>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
   </head>
   <body>
     <script src="../build/cannon.js"></script>
@@ -12,13 +12,17 @@
     <script src="../libs/Three.js"></script>
     <script src="../libs/Detector.js"></script>
     <script src="../libs/Stats.js"></script>
+    <script src="../libs/smoothie.js"></script>
     <script>
 
-      var demo = new CANNON.Demo({
-        stepFrequency:120
-      });
+     /**
+      * A container filled with spheres.
+      */
+
+      var demo = new CANNON.Demo();
       var nx=4, ny=4;
 
+      // Test scalability - add scenes for different number of spheres
       demo.addScene((nx*ny*4)+ " spheres", function(){   createContainer(demo,nx,ny,4);    });
       demo.addScene((nx*ny*8)+ " spheres", function(){   createContainer(demo,nx,ny,8);    });
       demo.addScene((nx*ny*15)+" spheres", function(){   createContainer(demo,nx,ny,15);   });
@@ -32,16 +36,27 @@
       
         // Create world
         var world = demo.getWorld();
-        world.solver.setSpookParams(10000,7);
-        world.solver.iterations = 25;
-        world.gravity.set(0,0,-40);
-      
+        //world.broadphase = new CANNON.GridBroadphase(new CANNON.Vec3(-10,-10,0),new CANNON.Vec3(10,10,20),5,5,10);
+
+        // Tweak contact properties.
+        world.defaultContactMaterial.contactEquationStiffness = 1e11; // Contact stiffness - use to make softer/harder contacts
+        world.defaultContactMaterial.contactEquationRegularizationTime = 2; // Stabilization time in number of timesteps
+        
+        // Max solver iterations: Use more for better force propagation, but keep in mind that it's not very computationally cheap!
+        world.solver.iterations = 10;
+
+        world.gravity.set(0,0,-30);
+
+        // Since we have many bodies and they don't move very much, we can use the less accurate quaternion normalization
+        world.quatNormalizeFast = true;
+        world.quatNormalizeSkip = 8; // ...and we do not have to normalize every step.
+
         // Materials
         var stone = new CANNON.Material('stone');
         var stone_stone = new CANNON.ContactMaterial(stone,
       					       stone,
       					       0.3, // friction
-      					       0.3  // Restitution
+      					       0.2  // Restitution
       					       );
         world.addContactMaterial(stone_stone);
       
@@ -79,7 +94,7 @@
         planeYmax.position.set(0,5,0);
         world.add(planeYmax);
       
-        // Sphere on plane
+        // Create spheres
         var rand = 0.1;
         var h = 0;
         var sphereShape = new CANNON.Sphere(1); // Sharing shape saves memory

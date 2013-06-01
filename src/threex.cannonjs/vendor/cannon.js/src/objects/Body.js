@@ -1,18 +1,15 @@
-/*global CANNON:true */
-
 /**
  * @class CANNON.Body
  * @brief Base class for all body types.
  * @param string type
  * @extends CANNON.EventTarget
+ * @event collide The body object dispatches a "collide" event whenever it collides with another body. Event parameters are "with" (the body it collides with) and "contact" (the contact equation that is generated).
  */
 CANNON.Body = function(type){
 
     CANNON.EventTarget.apply(this);
 
     this.type = type;
-
-    var that = this;
 
     /**
     * @property CANNON.World world
@@ -36,6 +33,11 @@ CANNON.Body = function(type){
     * @todo dispatch an event from the World instead
     */
     this.postStep = null;
+
+    this.vlambda = new CANNON.Vec3();
+
+    this.collisionFilterGroup = 1;
+    this.collisionFilterMask = 1;
 };
 
 /*

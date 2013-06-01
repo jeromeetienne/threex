@@ -6,19 +6,56 @@
 
 <script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
 
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
-	var renderer	= new THREE.WebGLRenderer();
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 6;
+	camera.position.z = 6
 
 	var physicsWorld= new THREEx.CannonWorld().start();
-
 	
+	physicsWorld.origin.defaultContactMaterial.friction = 0.005
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	renderer.shadowMapEnabled	= true
+	//renderer.shadowMapType	= THREE.PCFSoftShadowMap
+
+;(function(){
+	var light	= new THREE.AmbientLight( 0x444444 );
+	scene.add( light );
+
+	var light	= new THREE.DirectionalLight( 0xcccccc, 1 );
+	light.position.set(5,5,5);
+	light.target.position.set( 0, 0, 0 );
+
+	light.castShadow	= true;
+	light.shadowCameraNear	= 0.01;
+	light.shadowCameraFar	= 15;
+	light.shadowCameraFov	= 45;
+
+	light.shadowCameraLeft	= -8;
+	light.shadowCameraRight	=  8;
+	light.shadowCameraTop	=  5;
+	light.shadowCameraBottom= -5;
+
+	//light.shadowCameraVisible = true;
+
+	light.shadowBias	= 0.001
+	light.shadowDarkness	= 0.5
+
+	light.shadowMapWidth	= 1024
+	light.shadowMapHeight	= 1024
+
+	scene.add( light );	
+})();
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -28,8 +65,8 @@
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
 	}, false)
 	updateFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * 0.01
-		camera.position.y += (mouse.y*5 - camera.position.y) * 0.01
+		camera.position.x += (mouse.x*10 - camera.position.x) * 0.05
+		camera.position.y += (mouse.y*10 - camera.position.y) * 0.05
 		camera.lookAt( scene.position )
 	})
 	
@@ -37,121 +74,35 @@
 	// fetch the texture
 	var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
 	texture.wrapS	= texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 3, 2 );
-
-
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		add an object and make it move					//
-	//////////////////////////////////////////////////////////////////////////////////
-
-;(function(){
-return
-	var geometry	= new THREE.SphereGeometry(0.5)
-//	var geometry	= new THREE.CubeGeometry(1,1,1)
-	var material	= new THREE.MeshNormalMaterial()
-	var mesh	= new THREE.Mesh(geometry, material)
-	mesh.position.y	= 3
-	scene.add( mesh );
-	var body	= new THREEx.CannonBody({
-		mesh	: mesh
-	}).addTo(physicsWorld)
-	updateFcts.push(function(delta, now){
-		body.update(delta, now)
-	});	
-
-	body.origin.angularVelocity.set(0,0,40);
-
-//	physicsBody.origin.angularDamping	= 0.0;
-//	physicsBody.origin.linearDamping	= 0.0;
-})()
-	//////////////////////////////////////////////////////////////////////////////////
-	//		result ball							//
-	//////////////////////////////////////////////////////////////////////////////////
-;(function(){
-	var geometry	= new THREE.SphereGeometry(0.5, 16, 32)
-//	var geometry	= new THREE.CubeGeometry(1,1,1)
-	var material	= new THREE.MeshBasicMaterial({
-		color	: 0x88aaff,
-		map	: texture
-	})
-	var mesh	= new THREE.Mesh(geometry, material)
-	var nDomino	= 11;
-	mesh.position.x	= (nDomino/2)*0.5 + 0.5
-	mesh.position.y	= +0.5
-	scene.add( mesh );
-	var physicsBody	= new THREEx.CannonBody({
-		mesh	: mesh,
-		mass	: 0.01
-	}).addTo(physicsWorld)
-	updateFcts.push(function(delta, now){
-		physicsBody.update(delta, now)
-	});	
-})()
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		falling ball							//
-	//////////////////////////////////////////////////////////////////////////////////
-;(function(){
-	var geometry	= new THREE.SphereGeometry(0.5, 16, 32)
-//	var geometry	= new THREE.CubeGeometry(1,1,1)
-	var material	= new THREE.MeshBasicMaterial({
-		color	: 0x88ffaa,
-		map	: texture
-	})
-	var mesh	= new THREE.Mesh(geometry, material)
-	var nDomino	= 11;
-	mesh.position.x	= -(nDomino/2)*0.5 - 0.5
-	mesh.position.y	= +3
-	scene.add( mesh );
-	var physicsBody	= new THREEx.CannonBody({
-		mesh	: mesh,
-		//mass	: 1000
-	}).addTo(physicsWorld)
-	updateFcts.push(function(delta, now){
-		physicsBody.update(delta, now)
-	});	
-})()
-
-	// // result ball
-	// var object	= tQuery.createSphere(0.5, 16, 32).addTo(world)
-	// 	.setLambertMaterial().color(0x88aaff).map(texture).back()
-	// 	.castShadow(true)
-	// 	.translateY(+0.5)
-	// 	.translateZ((nDomino/2)*0.5 + 0.5)
-	// 	.enablePhysics({
-	// 		mass	: 0.01,			
-	// 	})
-
-	// // falling ball
-	// var object	= tQuery.createSphere(0.5, 16, 32).addTo(world)
-	// 	.setLambertMaterial().color(0x88ffaa).map(texture).back()
-	// 	.castShadow(true)
-	//  	.translateY(10)
-	// 	.translateZ(-(nDomino/2)*0.5 - 0.6)
-	//  	.enablePhysics({
-	// 		mass	: 1000
-	//  	})
-
+	texture.repeat.set( 4, 4 );
+	texture.anisotropy	= 16
 
 //////////////////////////////////////////////////////////////////////////////////
 //		Ground								//
 //////////////////////////////////////////////////////////////////////////////////
 
 ;(function(){
-	var geometry	= new THREE.CubeGeometry(8, 0.5, 5, 3, 3, 3);
+	var geometry	= new THREE.PlaneGeometry(8, 8, 4, 4);
 	new THREE.SubdivisionModifier(2).modify(geometry)
-	var material	= new THREE.MeshBasicMaterial({
-		map	: texture
+	
+	var material	= new THREE.MeshPhongMaterial({
+		map	: texture,
+		bumpMap	: texture,
+		bumpScale: 0.03
 	});
+	material.side	= THREE.DoubleSide
 	var mesh	= new THREE.Mesh(geometry, material);
-	mesh.position.y	= -0.25
-	mesh.position.z	= 0
 	scene.add( mesh );
+	
+	mesh.useQuaternion	= true;
+	mesh.lookAt(mesh.position.clone().add(new THREE.Vector3(0,1,0)))
+
+	mesh.receiveShadow	= true;
+
 	// init physics
 	var body	= new THREEx.CannonBody({
-		mesh		: mesh,
-		mass		: 0
+		mesh	: mesh,
+		mass	: 0
 	}).addTo(physicsWorld)
 	updateFcts.push(function(delta, now){
 		body.update(delta, now)
@@ -163,32 +114,69 @@ return
 //////////////////////////////////////////////////////////////////////////////////
 
 ;(function(){
+//return
 	// build domino geometry and material
 	var geometry	= new THREE.CubeGeometry(0.5, 1, 0.2, 3,3,3);
 	new THREE.SubdivisionModifier(2).modify(geometry)
+
+	//var geometry	= new THREE.SphereGeometry(0.2, 16, 16)
 	
-	var material	= new THREE.MeshBasicMaterial({
+	var material	= new THREE.MeshPhongMaterial({
 		color	: 0xffaa88,
-		map	: texture
+		map	: texture,
+		bumpMap	: texture,
+		bumpScale: 0.01
 	})
+
+	var rectLength	= 6, rectWidth = 6;
+	var shape	= new THREE.Shape();
+	shape.moveTo( -rectLength/2, -rectWidth/2 );
+	shape.lineTo( -rectLength/2,  rectWidth/2 );
+	shape.lineTo(  rectLength/2,  rectWidth/2 );
+	shape.lineTo(  rectLength/2, -rectWidth/2 );
+	shape.lineTo( -rectLength/2, -rectWidth/2 );
+
+	var radius	= 3;
+	var shape	= new THREE.Shape();
+	shape.moveTo( 0, radius );
+	shape.quadraticCurveTo(  radius,  radius, radius, 0 );
+	shape.quadraticCurveTo(  radius, -radius, 0, -radius );
+	shape.quadraticCurveTo( -radius, -radius, -radius, 0 );
+	shape.quadraticCurveTo( -radius,  radius, 0, radius );
+
+	var points	= shape.getSpacedPoints(35, true)
+console.log('points', points)
+
 	// place domino
-	var nDomino	= 11;
-	for(var i = 0; i < nDomino; i++){
+	for(var i = 0; i < points.length; i++){
 		;(function(){	// to get variables closure
 			var mesh	= new THREE.Mesh(geometry, material)
-			mesh.position.x	= (i - nDomino/2) * 0.5
+			mesh.position.x	= points[i].x
 			mesh.position.y	= 0.5
-			mesh.position.z	= 0
+			mesh.position.z	= points[i].y
+			mesh.castShadow	= true;
+
 			mesh.useQuaternion	= true;
-			mesh.lookAt(mesh.position.clone().add(new THREE.Vector3(1,0,0)))
+			var target	= points[((i+1)+points.length)%points.length]
+			mesh.lookAt(new THREE.Vector3(target.x,0.5,target.y))
+
 			scene.add( mesh )
+
 			var body	= new THREEx.CannonBody({
-				mesh		: mesh,
-				mass		: 0.5,
+				mesh	: mesh,
 			}).addTo(physicsWorld)
+
 			updateFcts.push(function(delta, now){
 				body.update(delta, now)
 			});
+			
+			
+			// Add an force to the center
+			if( i === 0 ){
+				var worldPoint	= new CANNON.Vec3(mesh.position.x, mesh.position.y+0.5, mesh.position.z);
+				var force	= new CANNON.Vec3(200,0,0);
+				body.origin.applyForce(force,worldPoint);		
+			}
 		})()
 	}
 })()

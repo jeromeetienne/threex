@@ -1,9 +1,9 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>cannon.js - sleep demo</title>
     <meta charset="utf-8">
-    <style>* {margin:0;padding:0}</style>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
   </head>
   <body>
     <script src="../build/cannon.js"></script>
@@ -12,6 +12,7 @@
     <script src="../libs/Three.js"></script>
     <script src="../libs/Detector.js"></script>
     <script src="../libs/Stats.js"></script>
+    <script src="../libs/smoothie.js"></script>
     <script>
 
       /**
@@ -19,19 +20,19 @@
        * Why is this handy? Well, it can help you get a more stable simulation, and increase performance. No collision detection is made between sleeping bodies (and static ones).
        */
 
-      var demo = new CANNON.Demo({
-        stepFrequency:180,
-        k:4000
-      });
+      var demo = new CANNON.Demo();
       var size = 1;
 
       // Sleep demo
       demo.addScene("Sleep",function(){
-      
+
         // Create world and collision detection
         var world = demo.getWorld();
         world.gravity.set(0,0,-10);
         world.broadphase = new CANNON.NaiveBroadphase();
+
+        world.defaultContactMaterial.contactEquationStiffness = 1e7;
+        world.defaultContactMaterial.contactEquationRegularizationTime = 5;
 
         // Create ground plane
         var groundShape = new CANNON.Plane();
@@ -49,7 +50,7 @@
 
         // Sleep parameters
         sphereBody.sleepSpeedLimit = 0.1; // Body will feel sleepy if speed<1 (speed == norm of velocity)
-        sphereBody.sleepTimeLimit = 1000; // Body falls asleep after 1000ms of sleepiness
+        sphereBody.sleepTimeLimit = 1; // Body falls asleep after 1s of sleepiness
 
         sphereBody.addEventListener("sleepy",function(event){
           console.log("The sphere is feeling sleepy...");

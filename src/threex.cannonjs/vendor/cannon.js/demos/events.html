@@ -1,9 +1,9 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>cannon.js - events demo</title>
     <meta charset="utf-8">
-    <style>* {margin:0;padding:0}</style>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
   </head>
   <body>
     <script src="../build/cannon.js"></script>
@@ -12,16 +12,24 @@
     <script src="../libs/Three.js"></script>
     <script src="../libs/Detector.js"></script>
     <script src="../libs/Stats.js"></script>
+    <script src="../libs/smoothie.js"></script>
     <script>
 
-      var demo = new CANNON.Demo({ stepFrequency:180 });
+    /**
+     * For demonstrating events.
+     */
+
+      var demo = new CANNON.Demo();
       var size = 1;
       
       demo.addScene("'collide' event",function(){
       
           // Create world
           var world = demo.getWorld();
-          world.solver.setSpookParams(5000,10);
+
+          world.defaultContactMaterial.contactEquationStiffness = 5e7;
+          world.defaultContactMaterial.contactEquationRegularizationTime = 4;
+
           world.gravity.set(0,0,-20);
       
           // ground plane
@@ -38,10 +46,11 @@
           world.add(sphereBody);
           demo.addVisual(sphereBody);
           
-          // Add collide event
+          // When a body collides with another body, they both dispatch the "collide" event.
           sphereBody.addEventListener("collide",function(e){
               alert("The sphere just collided with the ground!");
-              sphereBody.velocity.set(0,0,0);
+              console.log("Collided with body:",e.with);
+              console.log("Contact between bodies:",e.contact);
           });
           
         });

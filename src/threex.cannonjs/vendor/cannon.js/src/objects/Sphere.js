@@ -1,5 +1,3 @@
-/*global CANNON:true */
-
 /**
  * @brief Spherical rigid body
  * @class CANNON.Sphere
@@ -14,7 +12,7 @@ CANNON.Sphere = function(radius){
      * @property float radius
      * @memberof CANNON.Sphere
      */
-    this.radius = radius!=undefined ? Number(radius) : 1.0;
+    this.radius = radius!==undefined ? Number(radius) : 1.0;
     this.type = CANNON.Shape.types.SPHERE;
 };
 CANNON.Sphere.prototype = new CANNON.Shape();
@@ -33,8 +31,9 @@ CANNON.Sphere.prototype.volume = function(){
     return 4.0 * Math.PI * this.radius / 3.0;
 };
 
-CANNON.Sphere.prototype.boundingSphereRadius = function(){
-    return this.radius;
+CANNON.Sphere.prototype.computeBoundingSphereRadius = function(){
+    this.boundingSphereRadiusNeedsUpdate = false;
+    this.boundingSphereRadius = this.radius;
 };
 
 CANNON.Sphere.prototype.calculateWorldAABB = function(pos,quat,min,max){

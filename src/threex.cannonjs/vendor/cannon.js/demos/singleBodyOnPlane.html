@@ -1,9 +1,9 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>cannon.js - single body on plane demo</title>
     <meta charset="utf-8">
-    <style>* {margin:0;padding:0}</style>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
   </head>
   <body>
     <script src="../build/cannon.js"></script>
@@ -12,9 +12,10 @@
     <script src="../libs/Three.js"></script>
     <script src="../libs/Detector.js"></script>
     <script src="../libs/Stats.js"></script>
+    <script src="../libs/smoothie.js"></script>
     <script>
 
-      var demo = new CANNON.Demo({ stepFrequency:180 });
+      var demo = new CANNON.Demo();
       var size = 2;
       
       demo.addScene("Sphere",function(){
@@ -33,10 +34,12 @@
       
         // Create world
         var world = demo.getWorld();
-        world.gravity.set(0,0,-40);
+        world.gravity.set(0,0,-10);
         world.broadphase = new CANNON.NaiveBroadphase();
-        world.solver.iterations = 20;
-        world.solver.setSpookParams(10000,10);
+        world.solver.iterations = 10;
+
+        world.defaultContactMaterial.contactEquationStiffness = 1e7;
+        world.defaultContactMaterial.contactEquationRegularizationTime = 4;
       
         // ground plane
         var groundShape = new CANNON.Plane();
@@ -47,7 +50,7 @@
         // Shape on plane
         var shapeBody = new CANNON.RigidBody(30,shape);
         var pos = new CANNON.Vec3(0,0,size);
-        shapeBody.position.set(0,0,size*2);
+        shapeBody.position.set(0,size,size*2);
         shapeBody.velocity.set(0,0,0);
         shapeBody.angularVelocity.set(0,0,0);
         world.add(shapeBody);

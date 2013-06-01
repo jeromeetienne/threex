@@ -1,11 +1,9 @@
-/*global CANNON:true */
-
 /**
  * @class CANNON.Demo
  * @brief Demo framework class. If you want to learn how to connect Cannon.js with Three.js, please look at the examples/ instead.
  * @param Object options
  */
- CANNON.Demo = function(options){
+CANNON.Demo = function(options){
 
     // API
     this.removeVisual = removeVisual;
@@ -19,27 +17,28 @@
 
     // Global settings
     var settings = {
-       stepFrequency:60,
-       quatNormalizeSkip:2,
-       quatNormalizeFast:true,
-       gx:0.0,
-       gy:0.0,
-       gz:0.0,
-       iterations:3,
-       k:1000,
-       d:3,
-       scene:0,
-       paused:false,
-       rendermode:"solid",
-       constraints:false,
-       contacts:false,  // Contact points
-       cm2contact:false, // center of mass to contact points
-       normals:false, // contact normals
-       axes:false, // "local" frame axes
-       particleSize:0.1,
-       paused:false,
-       shadows:true,
-       aabbs:false,
+        stepFrequency:60,
+        quatNormalizeSkip:2,
+        quatNormalizeFast:true,
+        gx:0.0,
+        gy:0.0,
+        gz:0.0,
+        iterations:3,
+        tolerance:0.0001,
+        k:1000,
+        d:3,
+        scene:0,
+        paused:false,
+        rendermode:"solid",
+        constraints:false,
+        contacts:false,  // Contact points
+        cm2contact:false, // center of mass to contact points
+        normals:false, // contact normals
+        axes:false, // "local" frame axes
+        particleSize:0.1,
+        shadows:true,
+        aabbs:false,
+        profiling:false,
     };
 
     // Extend settings with options
@@ -50,13 +49,16 @@
         }
     }
 
-    if(settings.stepFrequency % 60 != 0)
+    if(settings.stepFrequency % 60 !== 0){
         throw new Error("stepFrequency must be a multiple of 60.");
+    }
 
     var bodies = [];
     var visuals = [];
     var scenes = [];
     var gui = null;
+    var smoothie = null;
+    var smoothieCanvas = null;
     var scenePicker = {};
 
     var three_contactpoint_geo = new THREE.SphereGeometry( 0.1, 6, 6);
@@ -83,11 +85,11 @@
     });
     var bboxGeometry = new THREE.CubeGeometry(1,1,1);
     var bboxMaterial = new THREE.MeshBasicMaterial({
-    color: materialColor,
-    wireframe:true
+        color: materialColor,
+        wireframe:true
     });
     var bboxMeshCache = new GeometryCache(function(){
-    return new THREE.Mesh(bboxGeometry,bboxMaterial);
+        return new THREE.Mesh(bboxGeometry,bboxMaterial);
     });
     var distanceConstraintMeshCache = new GeometryCache(function(){
         var geometry = new THREE.Geometry();
@@ -162,35 +164,39 @@
                 }
             }
         }
-    };
+    }
 
-    var light, scene, ambient, stats;
+    var light, scene, ambient, stats, info;
 
     function setRenderMode(mode){
-        if(renderModes.indexOf(mode)==-1)
+        if(renderModes.indexOf(mode) === -1){
             throw new Error("Render mode "+mode+" not found!");
+        }
 
         switch(mode){
-            case "solid":
-                currentMaterial = solidMaterial;
-                light.intensity = 1;
-                ambient.color.setHex(0x222222);
-                break;
-            case "wireframe":
-                currentMaterial = wireframeMaterial;
-                light.intensity = 0;
-                ambient.color.setHex(0xffffff);
-                break;
+        case "solid":
+            currentMaterial = solidMaterial;
+            light.intensity = 1;
+            ambient.color.setHex(0x222222);
+            break;
+        case "wireframe":
+            currentMaterial = wireframeMaterial;
+            light.intensity = 0;
+            ambient.color.setHex(0xffffff);
+            break;
         }
 
         function setMaterial(node,mat){
-            if(node.material)
+            if(node.material){
                 node.material = mat;
-            for(var i=0; i<node.children.length; i++)
+            }
+            for(var i=0; i<node.children.length; i++){
                 setMaterial(node.children[i],mat);
+            }
         }
-        for(var i=0; i<visuals.length; i++)
+        for(var i=0; i<visuals.length; i++){
             setMaterial(visuals[i],currentMaterial);
+        }
         settings.rendermode = mode;
     }
 
@@ -202,17 +208,19 @@
     * @param function A function that takes one argument, app, and initializes a physics scene. The function runs app.setWorld(body), app.addVisual(body), app.removeVisual(body) etc.
     */
     function addScene(title,initfunc){
-        if(typeof(title)!="string")
+        if(typeof(title) !== "string"){
             throw new Error("1st argument of Demo.addScene(title,initfunc) must be a string!");
-        if(typeof(initfunc)!="function")
+        }
+        if(typeof(initfunc)!=="function"){
             throw new Error("2nd argument of Demo.addScene(title,initfunc) must be a function!");
+        }
         scenes.push(initfunc);
         var idx = scenes.length-1;
         scenePicker[title] = function(){
             changeScene(idx);
         };
         sceneFolder.add(scenePicker,title);
-    };
+    }
 
     /**
     * @method restartCurrentScene
@@ -230,12 +238,18 @@
                 b.initQuaternion.copy(b.quaternion);
             }
         }
-    };
+    }
 
     function makeSureNotZero(vec){
-        if(vec.x==0.0) vec.x = 1e-6;
-        if(vec.y==0.0) vec.y = 1e-6;
-        if(vec.z==0.0) vec.z = 1e-6;
+        if(vec.x===0.0){
+            vec.x = 1e-6;
+        }
+        if(vec.y===0.0){
+            vec.y = 1e-6;
+        }
+        if(vec.z===0.0){
+            vec.z = 1e-6;
+        }
     }
 
     function updateVisuals(){
@@ -257,8 +271,8 @@
                 for(var ij=0; ij < 2; ij++){
                     var  mesh = contactMeshCache.request(),
                     c = world.contacts[ci],
-                    b = ij==0 ? c.bi : c.bj,
-                    r = ij==0 ? c.ri : c.rj;
+                    b = ij===0 ? c.bi : c.bj,
+                    r = ij===0 ? c.ri : c.rj;
                     mesh.position.set( b.position.x + r.x , b.position.y + r.y , b.position.z + r.z );
                 }
             }
@@ -272,8 +286,8 @@
                 for(var ij=0; ij < 2; ij++){
                     var  line = cm2contactMeshCache.request(),
                     c = world.contacts[ci],
-                    b = ij==0 ? c.bi : c.bj,
-                    r = ij==0 ? c.ri : c.rj;
+                    b = ij===0 ? c.bi : c.bj,
+                    r = ij===0 ? c.ri : c.rj;
                     line.scale.set( r.x, r.y, r.z);
                     makeSureNotZero(line.scale);
                     b.position.copy(line.position);
@@ -288,18 +302,22 @@
             // Lines for distance constraints
             for(var ci=0; ci<world.constraints.length; ci++){
                 var c = world.constraints[ci];
-                if(!(c instanceof CANNON.DistanceConstraint))
+                if(!(c instanceof CANNON.DistanceConstraint)){
                     continue;
+                }
 
-                var bi=c.body_i, bj=c.body_j, line = distanceConstraintMeshCache.request();
+                var nc = c.equations.normal;
+
+                var bi=nc.bi, bj=nc.bj, line = distanceConstraintMeshCache.request();
                 var i=bi.id, j=bj.id;
 
                 // Remember, bj is either a Vec3 or a Body.
                 var v;
-                if(bj.position)
+                if(bj.position){
                     v = bj.position;
-                else
+                } else {
                     v = bj;
+                }
                 line.scale.set( v.x-bi.position.x,
                                 v.y-bi.position.y,
                                 v.z-bi.position.z );
@@ -311,23 +329,22 @@
             // Lines for distance constraints
             for(var ci=0; ci<world.constraints.length; ci++){
                 var c = world.constraints[ci];
-                if(!(c instanceof CANNON.PointToPointConstraint))
+                if(!(c instanceof CANNON.PointToPointConstraint)){
                     continue;
-
-                var bi=c.body_i, bj=c.body_j, relLine1 = p2pConstraintMeshCache.request(), relLine2 = p2pConstraintMeshCache.request(), diffLine = p2pConstraintMeshCache.request();
+                }
+                var n = c.equations.normal;
+                var bi=n.bi, bj=n.bj, relLine1 = p2pConstraintMeshCache.request(), relLine2 = p2pConstraintMeshCache.request(), diffLine = p2pConstraintMeshCache.request();
                 var i=bi.id, j=bj.id;
 
-                relLine1.scale.set( c.ri.x, c.ri.y, c.ri.z );
-                relLine2.scale.set( c.rj.x, c.rj.y, c.rj.z );
-                diffLine.scale.set( c.piWorld.x-c.pjWorld.x,
-                                    c.piWorld.y-c.pjWorld.y,
-                                    c.piWorld.z-c.pjWorld.z );
+                relLine1.scale.set( n.ri.x, n.ri.y, n.ri.z );
+                relLine2.scale.set( n.rj.x, n.rj.y, n.rj.z );
+                diffLine.scale.set( -n.penetrationVec.x, -n.penetrationVec.y, -n.penetrationVec.z );
                 makeSureNotZero(relLine1.scale);
                 makeSureNotZero(relLine2.scale);
                 makeSureNotZero(diffLine.scale);
                 bi.position.copy(relLine1.position);
                 bj.position.copy(relLine2.position);
-                c.pjWorld.copy(diffLine.position);
+                n.bj.position.vadd(n.rj,diffLine.position);
             }
         }
         p2pConstraintMeshCache.hideCached();
@@ -367,8 +384,12 @@
         if(settings.aabbs){
             for(var i=0; i<bodies.length; i++){
                 var b = bodies[i];
-                if(b.calculateAABB){
-                    b.calculateAABB();
+                if(b.computeAABB){
+                    
+                    if(b.aabbNeedsUpdate){
+                        b.computeAABB();
+                    }
+
                     // Todo: cap the infinite AABB to scene AABB, for now just dont render
                     if( isFinite(b.aabbmax.x) &&
                         isFinite(b.aabbmax.y) &&
@@ -415,6 +436,7 @@
     animate();
 
     function init() {
+
         container = document.createElement( 'div' );
         document.body.appendChild( container );
 
@@ -459,6 +481,15 @@
         renderer.domElement.style.top = MARGIN + 'px';
         container.appendChild( renderer.domElement );
 
+        // Add info
+        info = document.createElement( 'div' );
+        info.style.position = 'absolute';
+        info.style.top = '10px';
+        info.style.width = '100%';
+        info.style.textAlign = 'center';
+        info.innerHTML = '<a href="http://github.com/schteppe/cannon.js">cannon.js</a> - javascript 3d physics';
+        container.appendChild( info );
+
         document.addEventListener('mousemove',onDocumentMouseMove);
         window.addEventListener('resize',onWindowResize);
 
@@ -474,6 +505,63 @@
         stats.domElement.style.top = '0px';
         stats.domElement.style.zIndex = 100;
         container.appendChild( stats.domElement );
+
+        // Smoothie (test)
+        smoothieCanvas = document.createElement("canvas");
+        smoothieCanvas.style.position = 'absolute';
+        smoothieCanvas.style.top = '0px';
+        smoothieCanvas.style.zIndex = 100;
+        container.appendChild( smoothieCanvas );
+        smoothie = new SmoothieChart({
+            maxDataSetLength:100,
+            millisPerPixel:10,
+            grid: {
+                strokeStyle:'rgb(125, 125, 125)',
+                fillStyle:'rgb(0, 0, 0)',
+                lineWidth: 1,
+                millisPerLine: 250,
+                verticalSections: 6
+            },
+            labels: {
+                fillStyle:'rgb(180, 180, 180)'
+            }
+        });
+        smoothie.streamTo(smoothieCanvas);
+        // Create time series for each profile label
+        var lines = {};
+        var colors = [[255, 0, 0],[0, 255, 0],[0, 0, 255],[255,255,0],[255,0,255],[0,255,255]];
+        var i=0;
+        for(var label in world.profile){
+            var c = colors[i%colors.length];
+            lines[label] = new TimeSeries({
+                label : label,
+                fillStyle : "rgb("+c[0]+","+c[1]+","+c[2]+")",
+                maxDataLength : 500,
+            });
+            i++;
+        }
+
+        // Add a random value to each line every second
+        world.addEventListener("postStep",function(evt) {
+            for(var label in world.profile)
+                lines[label].append(world.time * 1000, world.profile[label]);
+        });
+
+        // Add to SmoothieChart
+        var i=0;
+        for(var label in world.profile){
+            var c = colors[i%colors.length];
+            smoothie.addTimeSeries(lines[label],{
+                strokeStyle : "rgb("+c[0]+","+c[1]+","+c[2]+")",
+                fillStyle:"rgba("+c[0]+","+c[1]+","+c[2]+",0.3)",
+                lineWidth:1
+            });
+            i++;
+        }
+        world.doProfiling = false;
+        smoothie.stop();
+        smoothieCanvas.style.display = "none";
+
 
         // Trackball controls
         controls = new THREE.TrackballControls( camera, renderer.domElement );
@@ -541,38 +629,41 @@
 
         if(e.keyCode){
             switch(e.keyCode){
-                case 32: // Space - restart
+            case 32: // Space - restart
                 restartCurrentScene();
                 break;
 
-                case 104:
-                if(stats.domElement.style.display=="none")
+            case 104: // h - toggle widgets
+                if(stats.domElement.style.display=="none"){
                     stats.domElement.style.display = "block";
-                else
+                    info.style.display = "block";
+                } else {
                     stats.domElement.style.display = "none";
+                    info.style.display = "none";
+                }
                 break;
 
-                case 97: // a - AABBs
+            case 97: // a - AABBs
                 settings.aabbs = !settings.aabbs;
                 updategui();
                 break;
 
-                case 99: // c - constraints
+            case 99: // c - constraints
                 settings.constraints = !settings.constraints;
                 updategui();
                 break;
 
-                case 112: // p
+            case 112: // p
                 settings.paused = !settings.paused;
                 updategui();
                 break;
 
-                case 115: // s
+            case 115: // s
                 updatePhysics();
                 updateVisuals();
                 break;
 
-                case 109: // m - toggle materials
+            case 109: // m - toggle materials
                 var idx = renderModes.indexOf(settings.rendermode);
                 idx++;
                 idx = idx % renderModes.length; // begin at 0 if we exceeded number of modes
@@ -580,15 +671,15 @@
                 updategui();
                 break;
 
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                case 56:
-                case 57:
+            case 49:
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+            case 55:
+            case 56:
+            case 57:
                 // Change scene
                 // Only for numbers 1-9 and if no input field is active
                 if(scenes.length > e.keyCode-49 && !document.activeElement.localName.match(/input/)){
@@ -626,12 +717,30 @@
                 renderer.clearTarget( light.shadowMap );
             }
         });
-    rf.add(settings,'aabbs');
+        rf.add(settings,'aabbs');
+        rf.add(settings,'profiling').onChange(function(profiling){
+            if(profiling){
+                world.doProfiling = true;
+                smoothie.start();
+                smoothieCanvas.style.display = "block";
+            } else {
+                world.doProfiling = false;
+                smoothie.stop();
+                smoothieCanvas.style.display = "none";
+            }
+
+        });
 
         // World folder
         var wf = gui.addFolder('World');
         // Pause
-        wf.add(settings, 'paused');
+        wf.add(settings, 'paused').onChange(function(p){
+            /*if(p){
+                smoothie.stop();
+            } else {
+                smoothie.start();
+            }*/
+        });
         wf.add(settings, 'stepFrequency',60,60*10).step(60);
         var maxg = 100;
         wf.add(settings, 'gx',-maxg,maxg).onChange(function(gx){
@@ -666,6 +775,9 @@
         sf.add(settings, 'd',0,20).step(0.1).onChange(function(d){
             world.solver.setSpookParams(world.solver.k,d);
         });
+        sf.add(settings, 'tolerance',0.0,10.0).step(0.01).onChange(function(t){
+            world.solver.tolerance = t;
+        });
 
         // Scene picker
         var sceneFolder = gui.addFolder('Scenes');
@@ -683,12 +795,12 @@
         var mesh;
         switch(shape.type){
 
-            case CANNON.Shape.types.SPHERE:
+        case CANNON.Shape.types.SPHERE:
             var sphere_geometry = new THREE.SphereGeometry( shape.radius, 8, 8);
             mesh = new THREE.Mesh( sphere_geometry, currentMaterial );
             break;
 
-            case CANNON.Shape.types.PLANE:
+        case CANNON.Shape.types.PLANE:
             var geometry = new THREE.PlaneGeometry( 10, 10 , 4 , 4 );
             mesh = new THREE.Object3D();
             var submesh = new THREE.Object3D();
@@ -702,15 +814,14 @@
             mesh.add(submesh);
             break;
 
-            case CANNON.Shape.types.BOX:
+        case CANNON.Shape.types.BOX:
             var box_geometry = new THREE.CubeGeometry(  shape.halfExtents.x*2,
                                                         shape.halfExtents.y*2,
                                                         shape.halfExtents.z*2 );
             mesh = new THREE.Mesh( box_geometry, currentMaterial );
             break;
 
-            case CANNON.Shape.types.CONVEXPOLYHEDRON:
-
+        case CANNON.Shape.types.CONVEXPOLYHEDRON:
             var verts = [];
             for(var i=0; i<shape.vertices.length; i++){
                 verts.push(new THREE.Vector3(shape.vertices[i].x,
@@ -722,7 +833,7 @@
 
             break;
 
-            case CANNON.Shape.types.COMPOUND:
+        case CANNON.Shape.types.COMPOUND:
             // recursive compounds
             var o3d = new THREE.Object3D();
             for(var i = 0; i<shape.childShapes.length; i++){
@@ -742,7 +853,7 @@
             }
             break;
 
-            default:
+        default:
             throw "Visual type not recognized: "+shape.type;
         }
 
@@ -789,6 +900,8 @@
         settings.gz = world.gravity.z+0.0;
         settings.k = world.solver.k;
         settings.d = world.solver.d;
+        settings.quatNormalizeSkip = world.quatNormalizeSkip;
+        settings.quatNormalizeFast = world.quatNormalizeFast;
         updategui();
 
         restartGeometryCaches();
@@ -816,7 +929,7 @@
     };
 
     function removeVisual(body){
-        if(body.visualref!=undefined){
+        if(body.visualref){
             var old_b = [];
             var old_v = [];
             var n = bodies.length;
@@ -826,7 +939,7 @@
             }
             var id = body.visualref.visualId;
             for(var j=0; j<old_b.length; j++){
-                if(j!=id){
+                if(j !== id){
                     var i = j>id ? j-1 : j;
                     bodies[i] = old_b[j];
                     visuals[i] = old_v[j];
@@ -847,10 +960,11 @@
     function GeometryCache(createFunc){
         var that=this, geometries=[], gone=[];
         this.request = function(){
-            if(geometries.length)
+            if(geometries.length){
                 geo = geometries.pop();
-            else
+            } else{
                 geo = createFunc();
+            }
             scene.add(geo);
             gone.push(geo);
             return geo;

@@ -1,9 +1,8 @@
-/*global CANNON:true */
-
 /**
  * @class CANNON.Shape
  * @author schteppe
  * @brief Base class for shapes
+ * @todo Should have a mechanism for caching bounding sphere radius instead of calculating it each time
  */
 CANNON.Shape = function(){
 
@@ -15,20 +14,35 @@ CANNON.Shape = function(){
      */
     this.type = 0;
 
-    // Local AABB's
     this.aabbmin = new CANNON.Vec3();
     this.aabbmax = new CANNON.Vec3();
+
+    this.boundingSphereRadius = 0;
+    this.boundingSphereRadiusNeedsUpdate = true;
 };
 CANNON.Shape.prototype.constructor = CANNON.Shape;
 
 /**
- * @method boundingSphereRadius
+ * @method computeBoundingSphereRadius
  * @memberof CANNON.Shape
- * @brief Get the bounding sphere radius from this shape
+ * @brief Computes the bounding sphere radius. The result is stored in the property .boundingSphereRadius
  * @return float
  */
-CANNON.Shape.prototype.boundingSphereRadius = function(){
-  throw "boundingSphereRadius() not implemented for shape type "+this.type;
+CANNON.Shape.prototype.computeBoundingSphereRadius = function(){
+    throw "computeBoundingSphereRadius() not implemented for shape type "+this.type;
+};
+
+/**
+ * @method getBoundingSphereRadius
+ * @memberof CANNON.Shape
+ * @brief Returns the bounding sphere radius. The result is stored in the property .boundingSphereRadius
+ * @return float
+ */
+CANNON.Shape.prototype.getBoundingSphereRadius = function(){
+	if (this.boundingSphereRadiusNeedsUpdate) {
+		this.computeBoundingSphereRadius();
+	}
+	return this.boundingSphereRadius;
 };
 
 /**
@@ -38,7 +52,7 @@ CANNON.Shape.prototype.boundingSphereRadius = function(){
  * @return float
  */
 CANNON.Shape.prototype.volume = function(){
-  throw "volume() not implemented for shape type "+this.type;
+    throw "volume() not implemented for shape type "+this.type;
 };
 
 /**
@@ -49,7 +63,7 @@ CANNON.Shape.prototype.volume = function(){
  * @see http://en.wikipedia.org/wiki/List_of_moments_of_inertia
  */
 CANNON.Shape.prototype.calculateLocalInertia = function(mass,target){
-  throw "calculateLocalInertia() not implemented for shape type "+this.type;
+    throw "calculateLocalInertia() not implemented for shape type "+this.type;
 };
 
 /**
@@ -58,21 +72,23 @@ CANNON.Shape.prototype.calculateLocalInertia = function(mass,target){
  * @brief Calculates inertia in a specified frame for this shape.
  * @return CANNON.Vec3
  */
+var Shape_calculateTransformedInertia_localInertia = new CANNON.Vec3();
+var Shape_calculateTransformedInertia_worldInertia = new CANNON.Vec3();
 CANNON.Shape.prototype.calculateTransformedInertia = function(mass,quat,target){
-  if(target==undefined)
-    target = new CANNON.Vec3();
+    target = target || new CANNON.Vec3();
 
-  // Compute inertia in the world frame
-  quat.normalize();
-  var localInertia = this.calculateLocalInertia(mass);
+    // Compute inertia in the world frame
+    //quat.normalize();
+    var localInertia = Shape_calculateTransformedInertia_localInertia;
+    var worldInertia = Shape_calculateTransformedInertia_worldInertia;
+    this.calculateLocalInertia(mass,localInertia);
 
-  // @todo Is this rotation OK? Check!
-  var worldInertia = quat.vmult(localInertia);
-  target.x = Math.abs(worldInertia.x);
-  target.y = Math.abs(worldInertia.y);
-  target.z = Math.abs(worldInertia.z);
-  return target;
-  //throw "calculateInertia() not implemented for shape type "+this.type;
+    // @todo Is this rotation OK? Check!
+    quat.vmult(localInertia,worldInertia);
+    target.x = Math.abs(worldInertia.x);
+    target.y = Math.abs(worldInertia.y);
+    target.z = Math.abs(worldInertia.z);
+    return target;
 };
 
 // Calculates the local aabb and sets the result to .aabbmax and .aabbmin
@@ -86,10 +102,10 @@ CANNON.Shape.calculateLocalAABB = function(){
  * @brief The available shape types.
  */
 CANNON.Shape.types = {
-  SPHERE:1,
-  PLANE:2,
-  BOX:4,
-  COMPOUND:8,
-  CONVEXPOLYHEDRON:16
+    SPHERE:1,
+    PLANE:2,
+    BOX:4,
+    COMPOUND:8,
+    CONVEXPOLYHEDRON:16
 };
 

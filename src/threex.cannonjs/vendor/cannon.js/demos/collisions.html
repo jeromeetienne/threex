@@ -1,9 +1,9 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>cannon.js - collisions demo</title>
     <meta charset="utf-8">
-    <style>* {margin:0;padding:0}</style>
+    <link rel="stylesheet" href="style.css" type="text/css"/>
   </head>
   <body>
     <script src="../build/cannon.js"></script>
@@ -12,16 +12,13 @@
     <script src="../libs/Three.js"></script>
     <script src="../libs/Detector.js"></script>
     <script src="../libs/Stats.js"></script>
+    <script src="../libs/smoothie.js"></script>
     <script>
 
       /**
        * For debugging different kinds of pair collisions
        */
-      var demo = new CANNON.Demo({
-        stepFrequency:180,
-        k:5000,
-        d:10
-      });
+      var demo = new CANNON.Demo();
       
       demo.addScene("Sphere / sphere",function(){
           var world = setupWorld(demo);
@@ -130,7 +127,9 @@
         var world = demo.getWorld();
         world.gravity.set(0,0,0); // no gravity
         world.broadphase = new CANNON.NaiveBroadphase();
-        world.solver.iterations = 2;
+        world.solver.iterations = 5;
+        world.defaultContactMaterial.contactEquationStiffness = 1e6;
+        world.defaultContactMaterial.contactEquationRegularizationTime = 10;
         return world;
       }
       

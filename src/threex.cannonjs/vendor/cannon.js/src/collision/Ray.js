@@ -1,5 +1,3 @@
-/*global CANNON:true */
-
 /**
  * @class CANNON.Ray
  * @author Originally written by mr.doob / http://mrdoob.com/ for Three.js. Cannon.js-ified by schteppe.
@@ -41,7 +39,7 @@ CANNON.Ray = function(origin, direction){
 
     var vector = new CANNON.Vec3();
     var normal = new CANNON.Vec3();
-    var intersectPoint = new CANNON.Vec3()
+    var intersectPoint = new CANNON.Vec3();
 
     /**
      * @method intersectBody
@@ -61,10 +59,11 @@ CANNON.Ray = function(origin, direction){
                                        body.quaternion,
                                        body.position,
                                        body);
-        } else
+        } else {
             console.warn("Ray intersection is this far only implemented for ConvexPolyhedron and Box shapes.");
+        }
     };
-    
+
     /**
      * @method intersectShape
      * @memberof CANNON.Ray
@@ -82,7 +81,7 @@ CANNON.Ray = function(origin, direction){
             // Checking boundingSphere
 
             var distance = distanceFromIntersection( this.origin, this.direction, position );
-            if ( distance > shape.boundingSphereRadius() ) {
+            if ( distance > shape.getBoundingSphereRadius() ) {
                 return intersects;
             }
 
@@ -90,7 +89,7 @@ CANNON.Ray = function(origin, direction){
             var dot, scalar, faces = shape.faces, vertices = shape.vertices, normals = shape.faceNormals;
 
 
-            for ( fi = 0; fi < faces.length; fi++ ) {
+            for (var fi = 0; fi < faces.length; fi++ ) {
 
                 var face = faces[ fi ];
                 var faceNormal = normals[ fi ];
@@ -113,15 +112,19 @@ CANNON.Ray = function(origin, direction){
 
                 // If this dot product is negative, we have something interesting
                 dot = this.direction.dot(normal);
-                
+
                 // bail if ray and plane are parallel
-                if ( Math.abs( dot ) < precision ) continue;
+                if ( Math.abs( dot ) < precision ){
+                    continue;
+                }
 
                 // calc distance to plane
                 scalar = normal.dot( vector ) / dot;
 
                 // if negative distance, then plane is behind ray
-                if ( scalar < 0 ) continue;
+                if ( scalar < 0 ){
+                    continue;
+                }
 
                 if (  dot < 0 ) {
 
@@ -142,18 +145,16 @@ CANNON.Ray = function(origin, direction){
                         q.vmult(c,c);
                         x.vadd(b,b);
                         x.vadd(c,c);
-                        
+
                         if ( pointInTriangle( intersectPoint, a, b, c ) ) {
 
                             intersect = {
-
                                 distance: this.origin.distanceTo( intersectPoint ),
                                 point: intersectPoint.copy(),
                                 face: face,
                                 body: body
-                            
                             };
-                            
+
                             intersects.push( intersect );
                             break;
                         }
@@ -162,7 +163,7 @@ CANNON.Ray = function(origin, direction){
             }
         }
         return intersects;
-    }
+    };
 
     /**
      * @method intersectBodies
@@ -195,7 +196,7 @@ CANNON.Ray = function(origin, direction){
         // intersect = direction*dot + origin
         direction.mult(dot,intersect);
         intersect.vadd(origin,intersect);
-        
+
         distance = position.distanceTo( intersect );
 
         return distance;

@@ -174,8 +174,20 @@
                 world = new CANNON.World();
                 world.quatNormalizeSkip = 0;
                 world.quatNormalizeFast = false;
-                world.solver.setSpookParams(300,10);
-                world.solver.iterations = 5;
+
+                var solver = new CANNON.GSSolver();
+
+                world.defaultContactMaterial.contactEquationStiffness = 1e9;
+                world.defaultContactMaterial.contactEquationRegularizationTime = 4;
+
+                solver.iterations = 7;
+                solver.tolerance = 0.1;
+                var split = true;
+                if(split)
+                    world.solver = new CANNON.SplitSolver(solver);
+                else
+                    world.solver = solver;
+
                 world.gravity.set(0,-20,0);
                 world.broadphase = new CANNON.NaiveBroadphase();
 
@@ -194,7 +206,7 @@
                 sphereShape = new CANNON.Sphere(radius);
                 sphereBody = new CANNON.RigidBody(mass,sphereShape,physicsMaterial);
                 sphereBody.position.set(0,5,0);
-                sphereBody.linearDamping = 0.05;
+                sphereBody.linearDamping = 0.9;
                 world.add(sphereBody);
 
                 // Create a plane
@@ -382,9 +394,9 @@
                                             shootDirection.z * shootVelo);
 
                     // Move the ball outside the player sphere
-                    x += shootDirection.x * (sphereShape.radius + ballShape.radius);
-                    y += shootDirection.y * (sphereShape.radius + ballShape.radius);
-                    z += shootDirection.z * (sphereShape.radius + ballShape.radius);
+                    x += shootDirection.x * (sphereShape.radius*1.02 + ballShape.radius);
+                    y += shootDirection.y * (sphereShape.radius*1.02 + ballShape.radius);
+                    z += shootDirection.z * (sphereShape.radius*1.02 + ballShape.radius);
                     ballBody.position.set(x,y,z);
                     ballMesh.position.set(x,y,z);
                     ballMesh.useQuaternion = true;

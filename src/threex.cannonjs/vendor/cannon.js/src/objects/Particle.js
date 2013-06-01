@@ -1,5 +1,3 @@
-/*global CANNON:true */
-
 /**
  * @class CANNON.Particle
  * @brief A body consisting of one point mass. Does not have orientation.
@@ -9,14 +7,14 @@
 CANNON.Particle = function(mass,material){
 
     // Check input
-    if(typeof(mass)!="number")
+    if(typeof(mass)!=="number"){
         throw new Error("Argument 1 (mass) must be a number.");
-    if(typeof(material)!="undefined" && !(material instanceof(CANNON.Material)))
+    }
+    if(typeof(material)!=="undefined" && !(material instanceof(CANNON.Material))){
         throw new Error("Argument 3 (material) must be an instance of CANNON.Material.");
+    }
 
     CANNON.Body.call(this,"particle");
-
-    var that = this;
 
     /**
     * @property CANNON.Vec3 position
@@ -89,28 +87,7 @@ CANNON.Particle = function(mass,material){
     this.allowSleep = true;
 
     // 0:awake, 1:sleepy, 2:sleeping
-    var sleepState = 0;
-
-    /**
-    * @method isAwake
-    * @memberof CANNON.Particle
-    * @return bool
-    */
-    this.isAwake = function(){ return sleepState == 0; }
-
-    /**
-    * @method isSleepy
-    * @memberof CANNON.Particle
-    * @return bool
-    */
-    this.isSleepy = function(){ return sleepState == 1; }
-
-    /**
-    * @method isSleeping
-    * @memberof CANNON.Particle
-    * @return bool
-    */
-    this.isSleeping = function(){ return sleepState == 2; }
+    this.sleepState = 0;
 
     /**
     * @property float sleepSpeedLimit
@@ -122,47 +99,86 @@ CANNON.Particle = function(mass,material){
     /**
     * @property float sleepTimeLimit
     * @memberof CANNON.Particle
-    * @brief If the body has been sleepy for this sleepTimeLimit milliseconds, it is considered sleeping.
+    * @brief If the body has been sleepy for this sleepTimeLimit seconds, it is considered sleeping.
     */
-    this.sleepTimeLimit = 1000;
-    var timeLastSleepy = new Date().getTime();
+    this.sleepTimeLimit = 1;
 
-    /**
-    * @method wakeUp
-    * @memberof CANNON.Particle
-    * @brief Wake the body up.
-    */
-    this.wakeUp = function(){
-        sleepState = 0;
-        that.dispatchEvent({type:"wakeup"});
-    };
+    this.timeLastSleepy = 0;
 
-    /**
-    * @method sleep
-    * @memberof CANNON.Particle
-    * @brief Force body sleep
-    */
-    this.sleep = function(){
-        sleepState = 2;
-    };
+};
 
-    /**
-    * @method sleepTick
-    * @memberof CANNON.Particle
-    * @brief Called every timestep to update internal sleep timer and change sleep state if needed.
-    */
-    this.sleepTick = function(){
-        if(that.allowSleep){
-          if(sleepState==0 && that.velocity.norm()<that.sleepSpeedLimit){
-              sleepState = 1; // Sleepy
-              timeLastSleepy = new Date().getTime();
-              that.dispatchEvent({type:"sleepy"});
-          } else if(sleepState==1 && that.velocity.norm()>that.sleepSpeedLimit){
-              that.wakeUp(); // Wake up
-          } else if(sleepState==1 && (new Date().getTime() - timeLastSleepy)>that.sleepTimeLimit){
-              sleepState = 2; // Sleeping
-              that.dispatchEvent({type:"sleep"});
-          }
+CANNON.Particle.prototype = new CANNON.Body();
+CANNON.Particle.prototype.constructor = CANNON.Particle;
+
+/**
+* @method isAwake
+* @memberof CANNON.Particle
+* @return bool
+*/
+CANNON.Particle.prototype.isAwake = function(){
+    return this.sleepState === 0;
+};
+
+/**
+* @method isSleepy
+* @memberof CANNON.Particle
+* @return bool
+*/
+CANNON.Particle.prototype.isSleepy = function(){
+    return this.sleepState === 1;
+};
+
+/**
+* @method isSleeping
+* @memberof CANNON.Particle
+* @return bool
+*/
+CANNON.Particle.prototype.isSleeping = function(){
+    return this.sleepState === 2;
+};
+
+/**
+* @method wakeUp
+* @memberof CANNON.Particle
+* @brief Wake the body up.
+*/
+CANNON.Particle.prototype.wakeUp = function(){
+    var s = this.sleepState;
+    this.sleepState = 0;
+    if(s === 2){
+        this.dispatchEvent({type:"wakeup"});
+    }
+};
+
+/**
+* @method sleep
+* @memberof CANNON.Particle
+* @brief Force body sleep
+*/
+CANNON.Particle.prototype.sleep = function(){
+    this.sleepState = 2;
+};
+
+/**
+* @method sleepTick
+* @memberof CANNON.Particle
+* @param float time The world time in seconds
+* @brief Called every timestep to update internal sleep timer and change sleep state if needed.
+*/
+CANNON.Particle.prototype.sleepTick = function(time){
+    if(this.allowSleep){
+        var sleepState = this.sleepState;
+        var speedSquared = this.velocity.norm2();
+        var speedLimitSquared = Math.pow(this.sleepSpeedLimit,2);
+        if(sleepState===0 && speedSquared < speedLimitSquared){
+            this.sleepState = 1; // Sleepy
+            this.timeLastSleepy = time;
+            this.dispatchEvent({type:"sleepy"});
+        } else if(sleepState===1 && speedSquared > speedLimitSquared){
+            this.wakeUp(); // Wake up
+        } else if(sleepState===1 && (time - this.timeLastSleepy ) > this.sleepTimeLimit){
+            this.sleepState = 2; // Sleeping
+            this.dispatchEvent({type:"sleep"});
         }
-    };
+    }
 };

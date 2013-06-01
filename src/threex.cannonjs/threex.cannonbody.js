@@ -22,17 +22,29 @@ THREEx.CannonBody	= function(opts){
 		var boundingBox	= mesh.geometry.boundingBox
 		var width 	= (boundingBox.max.x - boundingBox.min.x) * mesh.scale.x
 		var height 	= (boundingBox.max.y - boundingBox.min.y) * mesh.scale.y
-		var depth 	= (boundingBox.max.z - boundingBox.min.z) * mesh.scale.z
+		var depth 	= (boundingBox.max.z - boundingBox.min.z) * mesh.scale.z		
 		if( shape === null )	shape	= new CANNON.Box(new CANNON.Vec3(width/2, height/2, depth/2))
 		if( mass === null )	mass	= Math.pow(width*width + height*height + depth*depth, 1/3)
+	}else if( mesh.geometry instanceof THREE.PlaneGeometry ){
+		mesh.geometry.computeBoundingBox()
+		var boundingBox	= mesh.geometry.boundingBox
+		var width 	= (boundingBox.max.x - boundingBox.min.x) * mesh.scale.x
+		var height 	= (boundingBox.max.y - boundingBox.min.y) * mesh.scale.y
+		var depth 	= (boundingBox.max.z - boundingBox.min.z) * mesh.scale.z		
+		if( shape === null )	shape	= new CANNON.Plane()
+		if( mass === null )	mass	= Math.pow(width*width + height*height, 1/2)		
 	}else	console.assert(false)
 
 
 	var body	= new CANNON.RigidBody(mass, shape, material)
 	this.origin	= body
 
-	// TODO convert current rotation into quaternion ?
-
+	// sanity check - if the object use Euler, check it is 0 vectors
+	console.assert(mesh.useQuaternion === true || 
+		(  mesh.rotation.x === 0
+		&& mesh.rotation.y === 0
+		&& mesh.rotation.z === 0), 'mesh MUST use quaternion')
+	// use quaternion
 	mesh.useQuaternion	= true
 	mesh.userData.cannonBody= this
 
@@ -45,17 +57,13 @@ THREEx.CannonBody	= function(opts){
 	body.quaternion.z	= mesh.quaternion.z;
 	body.quaternion.w	= mesh.quaternion.w;
 
+
 	this.update	= function(delta, now){
 		// TODO should i copy the mesh local position or global position
 		// global seems more likely
-		mesh.position.x		= body.position.x;
-		mesh.position.y		= body.position.y;
-		mesh.position.z		= body.position.z;
 
-		mesh.quaternion.x	= body.quaternion.x;
-		mesh.quaternion.y	= body.quaternion.y;
-		mesh.quaternion.z	= body.quaternion.z;
-		mesh.quaternion.w	= body.quaternion.w;
+		mesh.position.copy( body.position );
+		mesh.quaternion.copy( body.quaternion );
 	}
 }
 
