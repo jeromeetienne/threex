@@ -120,3 +120,11 @@ stable
   * it consumes memory in cpu/gpu
   * it is doing another additional render of non-glowing object just to get the depth
   * possible to share depth map ? if so it would be possible to rerender only the glowing object and using the depth map from the first render.
+* it is possible to do the glow using [chroma-key](https://en.wikipedia.org/wiki/Chroma_key)
+  * the objects which will be glowing are rendered in a specific color e.g. 
+    [hotpink](http://en.wikipedia.org/wiki/Variations_of_pink#Hot_pink)
+    * any color which doesnt normally exist in the scene
+  * the whole scene is rendered for colors
+  * then the hotpink color is extracted from the rendered target
+  * and this is the glow mask that you gonna use
+  * you gonna blur it, only the hotpink
