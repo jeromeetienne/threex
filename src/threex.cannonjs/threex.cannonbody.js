@@ -26,13 +26,15 @@ THREEx.CannonBody	= function(opts){
 		if( shape === null )	shape	= new CANNON.Box(new CANNON.Vec3(width/2, height/2, depth/2))
 		if( mass === null )	mass	= Math.pow(width*width + height*height + depth*depth, 1/3)
 	}else if( mesh.geometry instanceof THREE.PlaneGeometry ){
-		mesh.geometry.computeBoundingBox()
-		var boundingBox	= mesh.geometry.boundingBox
-		var width 	= (boundingBox.max.x - boundingBox.min.x) * mesh.scale.x
-		var height 	= (boundingBox.max.y - boundingBox.min.y) * mesh.scale.y
-		var depth 	= (boundingBox.max.z - boundingBox.min.z) * mesh.scale.z		
 		if( shape === null )	shape	= new CANNON.Plane()
-		if( mass === null )	mass	= Math.pow(width*width + height*height, 1/2)		
+		if( mass === null ){
+			mesh.geometry.computeBoundingBox()
+			var boundingBox	= mesh.geometry.boundingBox
+			var width 	= (boundingBox.max.x - boundingBox.min.x) * mesh.scale.x
+			var height 	= (boundingBox.max.y - boundingBox.min.y) * mesh.scale.y
+			var depth 	= (boundingBox.max.z - boundingBox.min.z) * mesh.scale.z			
+			mass	= Math.pow(width*width + height*height, 1/2)		
+		}
 	}else	console.assert(false)
 
 
