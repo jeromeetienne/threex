@@ -5,17 +5,17 @@
 //
 // **Step 1**: Start updating renderer and camera
 //
-// ```var windowResize = THREEx.WindowResize(aRenderer, aCamera)```
+// ```var windowResize = new THREEx.WindowResize(aRenderer, aCamera)```
 //    
-// **Step 2**: Start updating renderer and camera
+// **Step 2**: stop updating renderer and camera
 //
-// ```windowResize.stop()```
+// ```windowResize.destroy()```
 // # Code
 
 //
 
 /** @namespace */
-var THREEx	= THREEx 		|| {};
+var THREEx	= THREEx || {}
 
 /**
  * Update renderer and camera when the window is resized
@@ -26,23 +26,23 @@ var THREEx	= THREEx 		|| {};
 THREEx.WindowResize	= function(renderer, camera){
 	var callback	= function(){
 		// notify the renderer of the size change
-		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.setSize( window.innerWidth, window.innerHeight )
 		// update the camera
-		camera.aspect	= window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
+		camera.aspect	= window.innerWidth / window.innerHeight
+		camera.updateProjectionMatrix()
 	}
 	// bind the resize event
-	window.addEventListener('resize', callback, false);
+	window.addEventListener('resize', callback, false)
 	// return .stop() the function to stop watching window resize
 	return {
-		do	: function(){
-			callback();
+		trigger	: function(){
+			callback()
 		},
 		/**
 		 * Stop watching window resize
 		*/
-		stop	: function(){
-			window.removeEventListener('resize', callback);
+		destroy	: function(){
+			window.removeEventListener('resize', callback)
 		}
-	};
+	}
 }
