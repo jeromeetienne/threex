@@ -26,7 +26,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 	
 function BlackSmoke(position, loop, container){
-	var texture	= THREE.ImageUtils.loadTexture('../src/threex.particles/images/cloud10.png')
+	var texture	= THREE.ImageUtils.loadTexture('../src/threex.particles/examples/images/newcloud.png')
 	var center	= new THREE.Vector3(0,-0.8, 0)
 	var maxAge	= 1.5;
 	var age2Friction= (function(){
