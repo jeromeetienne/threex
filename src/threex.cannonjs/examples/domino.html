@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+<!-- include three.js stuff -->
 <script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
+<!-- include threex.cannonjs -->
 <script src='../vendor/cannon.js/build/cannon.min.js'></script>
 <script src='../threex.cannonworld.js'></script>
 <script src='../threex.cannonbody.js'></script>
-
-<script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
 
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer({antialias: true})
@@ -17,7 +18,6 @@
 	camera.position.z = 7
 
 	var physicsWorld= new THREEx.CannonWorld().start()
-
 	physicsWorld.origin.defaultContactMaterial.friction = 0.005
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -119,21 +119,21 @@
 
 	//var geometry	= new THREE.SphereGeometry(0.2, 16, 16)
 
-	var rectLength	= 6, rectWidth = 6
-	var shape	= new THREE.Shape()
-	shape.moveTo( -rectLength/2, -rectWidth/2 )
-	shape.lineTo( -rectLength/2,  rectWidth/2 )
-	shape.lineTo(  rectLength/2,  rectWidth/2 )
-	shape.lineTo(  rectLength/2, -rectWidth/2 )
-	shape.lineTo( -rectLength/2, -rectWidth/2 )
-
-	// var radius	= 4;
+	// var rectLength	= 6, rectWidth = 6
 	// var shape	= new THREE.Shape()
-	// shape.moveTo( 0, radius )
-	// shape.quadraticCurveTo(  radius,  radius, radius, 0 )
-	// shape.quadraticCurveTo(  radius, -radius, 0, -radius )
-	// shape.quadraticCurveTo( -radius, -radius, -radius, 0 )
-	// shape.quadraticCurveTo( -radius,  radius, 0, radius )
+	// shape.moveTo( -rectLength/2, -rectWidth/2 )
+	// shape.lineTo( -rectLength/2,  rectWidth/2 )
+	// shape.lineTo(  rectLength/2,  rectWidth/2 )
+	// shape.lineTo(  rectLength/2, -rectWidth/2 )
+	// shape.lineTo( -rectLength/2, -rectWidth/2 )
+
+	var radius	= 4;
+	var shape	= new THREE.Shape()
+	shape.moveTo( 0, radius )
+	shape.quadraticCurveTo(  radius,  radius, radius, 0 )
+	shape.quadraticCurveTo(  radius, -radius, 0, -radius )
+	shape.quadraticCurveTo( -radius, -radius, -radius, 0 )
+	shape.quadraticCurveTo( -radius,  radius, 0, radius )
 	var points	= shape.getSpacedPoints(40, true)
 
 	// place domino

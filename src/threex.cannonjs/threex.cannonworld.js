@@ -2,11 +2,9 @@ var THREEx = THREEx || {}
 
 THREEx.CannonWorld	= function(){
 	// physics world init
-	var origin	= new CANNON.World()
-	this.origin	= origin
+	var world	= new CANNON.World()
+	this.origin	= world
 	
-	var world	= origin
-
         var solver = new CANNON.GSSolver();
 
         world.defaultContactMaterial.contactEquationStiffness = 1e9;
@@ -27,7 +25,7 @@ THREEx.CannonWorld	= function(){
 	this.start	= function(period){
 		period	= period !== undefined ? period : 1/60;
 		timerId	= setInterval(function(){
-			origin.step(period);		
+			world.step(period);		
 		}, period*1000)		
 		return this;
 	}.bind(this)
