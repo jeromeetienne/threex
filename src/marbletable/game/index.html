@@ -20,6 +20,7 @@
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 require([ '../../threex.glow/package.require.js'
+	, '../../threex.skymap/package.require.js'
 ], function(){
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -44,7 +45,10 @@ require([ '../../threex.glow/package.require.js'
 	var tileW	= 0.2;
 
 	var cache	= new Microcache();
-	
+
+	// add a skymap	
+	var mesh	= THREEx.createSkymap('mars')
+	scene.add( mesh );
 	
 	var winResize	= new THREEx.WindowResize(renderer, camera)
 
@@ -101,7 +105,8 @@ require([ '../../threex.glow/package.require.js'
 	var mesh	= new THREE.Mesh(geometry, material)
 
 	mesh.position.y	= 3
-	mesh.castShadow	= true
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
 	mesh.userData.domClasses	+= ' glowing'
 	scene.add( mesh )
 	window.ball	= mesh
