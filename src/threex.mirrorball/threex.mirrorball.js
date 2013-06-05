@@ -2,7 +2,7 @@ var THREEx	= THREEx || {};
 
 THREEx.MirrorBall	= function(textureW){
 	// handle parameter default
-	textureW	= textureW || 512;
+	textureW	= textureW || 1024;
 		
 	// create container
 	var object	= new THREE.Object3D()
