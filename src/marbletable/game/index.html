@@ -8,6 +8,8 @@
 <script src='../../threex.cannonjs/threex.cannonbody.js'></script>
 <!-- include threex.keyboardstate -->
 <script src="../../threex.keyboardstate/threex.keyboardstate.js"></script>
+<!-- include threex.windowresize -->
+<script src="../../threex.windowresize/threex.windowresize.js"></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
@@ -34,6 +36,9 @@
 
 	var cache	= new Microcache();
 	
+	
+	var winResize	= new THREEx.WindowResize(renderer, camera)
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
