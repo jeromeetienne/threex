@@ -9,33 +9,34 @@ THREEx.CannonBody	= function(opts){
 	var mass	= opts.mass !== undefined 	? opts.mass	: null;
 	var shape	= opts.shape !== undefined 	? opts.shape	: null;
 	var material	= opts.material !== undefined	? opts.material	: undefined;
+	var geometry	= opts.geometry || mesh.geometry
 
 	// 
-	if( mesh.geometry instanceof THREE.SphereGeometry ){
-		mesh.geometry.computeBoundingBox()
-		var boundingBox	= mesh.geometry.boundingBox
+	if( geometry instanceof THREE.SphereGeometry ){
+		geometry.computeBoundingBox()
+		var boundingBox	= geometry.boundingBox
 		var radius	= ((boundingBox.max.x - boundingBox.min.x)* mesh.scale.x) /2
 		if( shape === null )	shape	= new CANNON.Sphere(radius)
 		if( mass === null )	mass	= 4/3 * Math.PI * Math.pow(radius, 3)
-	}else if( mesh.geometry instanceof THREE.CubeGeometry ){
-		mesh.geometry.computeBoundingBox()
-		var boundingBox	= mesh.geometry.boundingBox
+	}else if( geometry instanceof THREE.CubeGeometry ){
+		geometry.computeBoundingBox()
+		var boundingBox	= geometry.boundingBox
 		var width 	= (boundingBox.max.x - boundingBox.min.x) * mesh.scale.x
 		var height 	= (boundingBox.max.y - boundingBox.min.y) * mesh.scale.y
 		var depth 	= (boundingBox.max.z - boundingBox.min.z) * mesh.scale.z		
 		if( shape === null )	shape	= new CANNON.Box(new CANNON.Vec3(width/2, height/2, depth/2))
 		if( mass === null )	mass	= Math.pow(width*width + height*height + depth*depth, 1/3)
-	}else if( mesh.geometry instanceof THREE.PlaneGeometry ){
+	}else if( geometry instanceof THREE.PlaneGeometry ){
 		if( shape === null )	shape	= new CANNON.Plane()
 		if( mass === null ){
-			mesh.geometry.computeBoundingBox()
-			var boundingBox	= mesh.geometry.boundingBox
+			geometry.computeBoundingBox()
+			var boundingBox	= geometry.boundingBox
 			var width 	= (boundingBox.max.x - boundingBox.min.x) * mesh.scale.x
 			var height 	= (boundingBox.max.y - boundingBox.min.y) * mesh.scale.y
 			var depth 	= (boundingBox.max.z - boundingBox.min.z) * mesh.scale.z			
 			mass	= Math.pow(width*width + height*height, 1/2)		
 		}
-	}else	console.assert(false)
+	}else	console.assert(false, 'unknown geometry type')
 
 
 	var body	= new CANNON.RigidBody(mass, shape, material)
