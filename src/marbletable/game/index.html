@@ -2,6 +2,8 @@
 <!-- include three.js stuff -->
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
+<!-- include require.js stuff -->
+<script src="../../../vendor/require.js/require.js"></script>
 <!-- include threex.cannonjs -->
 <script src='../../threex.cannonjs/vendor/cannon.js/build/cannon.min.js'></script>
 <script src='../../threex.cannonjs/threex.cannonworld.js'></script>
@@ -12,6 +14,8 @@
 <script src="../../threex.windowresize/threex.windowresize.js"></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+require([ '../../threex.glow/package.require.js'
+], function(){
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -94,7 +98,10 @@
 	var mesh	= new THREE.Mesh(geometry, material)
 	mesh.position.y	= 3
 	mesh.castShadow	= true
+	mesh.userData.domClasses	+= ' glowing'
+
 	scene.add( mesh )
+	window.ball	= mesh
 
 	mesh.useQuaternion	= true
 	var body	= new THREEx.CannonBody({
@@ -166,6 +173,13 @@
 		
 		gravityAxis.rotation.z	= -table.rotation.z
 		gravityAxis.rotation.x	= -table.rotation.x
+	})
+	
+	updateFcts.push(function(delta, now){
+		if( keyboard.pressed('space') ){
+			var ballBody	= ball.userData.cannonBody.origin;
+			ballBody.position.y	+= 10*delta;		
+		}
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -387,4 +401,5 @@
 			}
 		}
 	}
+})
 </script></body>
