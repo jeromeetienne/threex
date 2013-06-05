@@ -12,6 +12,11 @@
 <script src="../../threex.keyboardstate/threex.keyboardstate.js"></script>
 <!-- include threex.windowresize -->
 <script src="../../threex.windowresize/threex.windowresize.js"></script>
+<!-- include for threex.glowdatgui -->
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
+<script src="../../threex.glow/threex.glowdatgui.js"></script>
+<!-- include for threex.mirrorball -->
+<script src='../../threex.mirrorball/threex.mirrorball.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 require([ '../../threex.glow/package.require.js'
@@ -81,31 +86,29 @@ require([ '../../threex.glow/package.require.js'
 
 
 //////////////////////////////////////////////////////////////////////////////////
-//		dominos								//
+//		ball								//
 //////////////////////////////////////////////////////////////////////////////////
 
 ;(function(){
-	// build domino geometry and material
 	var radius	= 1.5 * tileW
 	var radius	= 3 * tileW
-	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
+	var geometry	= new THREE.SphereGeometry(1, 32, 32)
 	var material	= new THREE.MeshPhongMaterial({
 		map	: texture,
 		bumpMap	: texture,
 		bumpScale: 0.01
 	})
-
 	var mesh	= new THREE.Mesh(geometry, material)
+
 	mesh.position.y	= 3
 	mesh.castShadow	= true
 	mesh.userData.domClasses	+= ' glowing'
-
 	scene.add( mesh )
 	window.ball	= mesh
 
 	mesh.useQuaternion	= true
 	var body	= new THREEx.CannonBody({
-		mesh	: mesh
+		mesh	: mesh,
 	}).addTo(physicsWorld)
 	updateFcts.push(function(delta, now){
 		body.update(delta, now)
@@ -174,7 +177,6 @@ require([ '../../threex.glow/package.require.js'
 		gravityAxis.rotation.z	= -table.rotation.z
 		gravityAxis.rotation.x	= -table.rotation.x
 	})
-	
 	updateFcts.push(function(delta, now){
 		if( keyboard.pressed('space') ){
 			var ballBody	= ball.userData.cannonBody.origin;
@@ -183,27 +185,12 @@ require([ '../../threex.glow/package.require.js'
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		Camera Controls							//
-	//////////////////////////////////////////////////////////////////////////////////
-	// var mouse	= {x : 0, y : 0}
-	// document.addEventListener('mousemove', function(event){
-	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
-	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	// }, false)
-	// updateFcts.push(function(delta, now){
-	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-	// 	camera.position.y += (mouse.y*20 - camera.position.y) * (delta*3)
-	// 	camera.lookAt( scene.position )
-	// })
-
-
-	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////
 	updateFcts.push(function(){
 		renderer.render( scene, camera );		
 	})
-	
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loop runner							//
 	//////////////////////////////////////////////////////////////////////////////////
