@@ -40,6 +40,17 @@
 		}
 	})
 
+	// only on keydown
+	keyboard.domElement.addEventListener('keydown', function(event){
+		if( keyboard.eventMatches(event, 'w') )	mesh.scale.y	/= 2
+		if( keyboard.eventMatches(event, 's') )	mesh.scale.y	*= 2
+	})
+	// only on keyup
+	keyboard.domElement.addEventListener('keyup', function(event){
+		if( keyboard.eventMatches(event, 'a') )	mesh.scale.x	*= 2
+		if( keyboard.eventMatches(event, 'd') )	mesh.scale.x	/= 2
+	})
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////

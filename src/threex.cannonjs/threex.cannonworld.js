@@ -10,7 +10,7 @@ THREEx.CannonWorld	= function(){
         world.defaultContactMaterial.contactEquationStiffness = 1e9;
         world.defaultContactMaterial.contactEquationRegularizationTime = 10;
 
-	solver.iterations	= 10;
+	solver.iterations	= 30;
 	solver.tolerance	= 0.01;
 	world.solver		= new CANNON.SplitSolver(solver);
 
