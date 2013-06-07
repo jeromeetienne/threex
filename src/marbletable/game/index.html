@@ -20,7 +20,7 @@
 
 
 <!-- include for threex.mirrorball -->
-<script src='js/initsounds.js'></script>
+<script src='../../webaudiox/webaudiox.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 require([ '../../threex.glow/package.require.js'
@@ -125,37 +125,26 @@ console.log('ball', mesh)
 //////////////////////////////////////////////////////////////////////////////////
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
+	var webAudiox	= new WebAudiox()
+	var sounds	= {}
 
 	// init eatPill sound
 	sounds.playEatPill	= function(){
 		if( !sounds.eatPillBuffer )	return
-		var source	= sounds.context.createBufferSource()
+		var source	= webAudiox.context.createBufferSource()
 		source.buffer	= sounds.eatPillBuffer
-		source.connect(sounds.masterOut)
+		source.connect(webAudiox.masterOut)
 		source.start(0)
 	}
-	sounds.loadBuffer('sounds/eatpill.mp3', function(buffer){
+	webAudiox.loadBuffer('sounds/eatpill.mp3', function(buffer){
 		sounds.eatPillBuffer	= buffer;
 	})
 
-
-	// init kick sound
-	sounds.playKick	= function(){
-		if( !sounds.kickBuffer )	return
-		var source	= sounds.context.createBufferSource()
-		source.buffer	= sounds.kickBuffer
-		source.connect(sounds.masterOut)
-		source.start(0)
-	}
-	sounds.loadBuffer('sounds/kick.wav', function(buffer){
-		sounds.kickBuffer	= buffer;
-	})
-
-	sounds.loadBuffer('sounds/roll.mp3', function(buffer){
-		var source	= sounds.context.createBufferSource();
+	webAudiox.loadBuffer('sounds/roll.mp3', function(buffer){
+		var source	= webAudiox.context.createBufferSource();
 		source.buffer	= buffer;
 		source.loop	= true
-		source.connect(sounds.masterOut);
+		source.connect(webAudiox.masterOut);
 		source.start(0);
 
 		updateFcts.push(function(delta, now){
