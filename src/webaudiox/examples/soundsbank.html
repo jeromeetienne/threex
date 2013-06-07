@@ -4,7 +4,14 @@
 	var webAudiox	= new WebAudiox()
 	var sounds	= {}
 
-	// init eatPill sound
+	//////////////////////////////////////////////////////////////////////////////////
+	//		with a play function						//
+	//////////////////////////////////////////////////////////////////////////////////
+	// load the sound
+	webAudiox.loadBuffer('sounds/eatpill.mp3', function(buffer){
+		sounds.eatPillBuffer	= buffer;
+	})
+	// setup a play function
 	sounds.playEatPill	= function(){
 		if( !sounds.eatPillBuffer )	return
 		var source	= webAudiox.context.createBufferSource()
@@ -12,10 +19,12 @@
 		source.connect(webAudiox.masterOut)
 		source.start(0)
 	}
-	webAudiox.loadBuffer('sounds/eatpill.mp3', function(buffer){
-		sounds.eatPillBuffer	= buffer;
-	})
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		to play immediatly						//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// load a sound and play it immediatly
 	webAudiox.loadBuffer('sounds/techno.mp3', function(buffer){
 		var source	= webAudiox.context.createBufferSource();
 		source.buffer	= buffer;

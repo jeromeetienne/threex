@@ -4,6 +4,9 @@ it is a webaudio api ala vendor.js.
 no libs only snippets for you to copy, and fine tune to your own needs.
 
 ## TODO
+* fix the naming issue
+  * one WebAudioX.ContextX
+  * one WebAudioX.AbsoluteNormalizer
 * port all the three.js localisation
   * webaudiox.three.js
   * put a panner

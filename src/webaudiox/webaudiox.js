@@ -5,7 +5,8 @@ function WebAudiox(){
 	var _this	= this
 	// init context
 	var AudioContext	= window.AudioContext || window.webkitAudioContext;
-	var context		= new AudioContext()
+	var context	= new AudioContext()
+	this.context	= context
 	
 	// init masterOut
 	var masterOut	= context.destination
@@ -35,22 +36,21 @@ function WebAudiox(){
 			return volumeNode.gain.value; 
 		},
                 set : function(value){
+
                 	volumeNode.gain.value	= value;
 		}
 	});
-	
-	
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	this.masterOut	= masterOut;
-	this.context	= context
 	this.loadBuffer	= loadBuffer
+	this.amplitude	= amplitude
 	this.onLoadFcts	= []
+	return;	
 
-	return;
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loadBuffer Helper						//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -113,4 +113,26 @@ function WebAudiox(){
 		}
 	}
 	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	function amplitude(analyser, width, offset){
+		// handle paramerter
+		width		= width !== undefined ? width	: 2;
+		offset		= offset !== undefined ? offset	: 0;
+		// inint variable
+		var freqByte	= new Uint8Array(analyser.frequencyBinCount);
+		// get the frequency data
+		analyser.getByteFrequencyData(freqByte);
+		// compute the sum
+		var sum	= 0;
+		for(var i = offset; i < offset+width; i++){
+			sum	+= freqByte[i];
+		}
+		// complute the amplitude
+		var amplitude	= sum / (width*256-1);
+		// return ampliture
+		return amplitude;
+	}
 }
