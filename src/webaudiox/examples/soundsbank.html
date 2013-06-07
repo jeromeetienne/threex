@@ -1,50 +1,26 @@
 <!doctype html>
+<script src='../webaudiox.js'></script>
 <body><script>
-
-
+	var webAudiox	= new WebAudiox()
 	var sounds	= {}
-	document.body.addEventListener('keydown', function(){
-		sounds.eatpill	&& sounds.eatpill()
+
+	// init eatPill sound
+	sounds.playEatPill	= function(){
+		if( !sounds.eatPillBuffer )	return
+		var source	= webAudiox.context.createBufferSource()
+		source.buffer	= sounds.eatPillBuffer
+		source.connect(webAudiox.masterOut)
+		source.start(0)
+	}
+	webAudiox.loadBuffer('sounds/eatpill.mp3', function(buffer){
+		sounds.eatPillBuffer	= buffer;
 	})
-	
-	
 
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		init sounds							//
-	//////////////////////////////////////////////////////////////////////////////////
-	;(function(){
-		// Fix up prefixing
-		window.AudioContext = window.AudioContext || window.webkitAudioContext;
-		// init context
-		var context	= new AudioContext()
-		
-		// init each sound
-		loadSound('sounds/eatpill.mp3', function(buffer){
-			// setup a play function
-			sounds.eatpill	= function(){
-				var source	= context.createBufferSource();
-				source.buffer	= buffer;
-				source.connect(context.destination);
-				source.start(0);
-			}
-		})
-
-
-		return;
-
-		function loadSound(url, onLoad, onError){
-			var request	= new XMLHttpRequest()
-			request.open('GET', url, true)
-			request.responseType	= 'arraybuffer'
-			request.onload	= function(){
-				context.decodeAudioData(request.response, function(buffer){
-					onLoad && onLoad(buffer)
-				}, function(){
-					onError && onError()
-				})
-			}
-			request.send()
-		}	
-	})()
+	webAudiox.loadBuffer('sounds/techno.mp3', function(buffer){
+		var source	= webAudiox.context.createBufferSource();
+		source.buffer	= buffer;
+		source.loop	= true
+		source.connect(webAudiox.masterOut);
+		source.start(0);
+	});
 </script></body>

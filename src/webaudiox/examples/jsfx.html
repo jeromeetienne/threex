@@ -1,0 +1,33 @@
+<!doctype html>
+<script src='../webaudiox.js'></script>
+<script src='../webaudiox.jsfx.js'></script>
+<!-- include the .js files for jsfx.js -->
+<script src="vendor/jsfx/audio.js"></script>
+<script src="vendor/jsfx/jsfx.js"></script>
+<script src="vendor/jsfx/jsfxlib.js"></script>
+
+<body><script>
+	var webAudiox	= new WebAudiox()
+	var sounds	= {}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// init a sound with jsfx
+	sounds.playNoise	= function(){
+		if( !sounds.noiseBuffer )	return
+		var source	= webAudiox.context.createBufferSource()
+		source.buffer	= sounds.noiseBuffer
+		source.connect(webAudiox.masterOut)
+		source.start(0)
+	}
+	var lib		= ["square",0.0000,0.4000,0.0000,0.3200,0.0000,0.2780,20.0000,496.0000,2400.0000,0.4640,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0235,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000]
+	sounds.noiseBuffer	= webAudiox.bufferFromJsfx(lib)
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	sounds.playNoise()
+</script></body>
