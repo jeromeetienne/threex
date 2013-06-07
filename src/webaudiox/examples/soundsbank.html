@@ -1,22 +1,22 @@
 <!doctype html>
-<script src='../webaudiox.js'></script>
+<script src='../webaudiox.contextx.js'></script>
 <body><script>
-	var webAudiox	= new WebAudiox()
+	var contextx	= new WebAudiox.Contextx()
 	var sounds	= {}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		with a play function						//
 	//////////////////////////////////////////////////////////////////////////////////
 	// load the sound
-	webAudiox.loadBuffer('sounds/eatpill.mp3', function(buffer){
+	contextx.loadBuffer('sounds/eatpill.mp3', function(buffer){
 		sounds.eatPillBuffer	= buffer;
 	})
 	// setup a play function
 	sounds.playEatPill	= function(){
 		if( !sounds.eatPillBuffer )	return
-		var source	= webAudiox.context.createBufferSource()
+		var source	= contextx.context.createBufferSource()
 		source.buffer	= sounds.eatPillBuffer
-		source.connect(webAudiox.masterOut)
+		source.connect(contextx.masterOut)
 		source.start(0)
 	}
 
@@ -25,11 +25,11 @@
 	//////////////////////////////////////////////////////////////////////////////////
 
 	// load a sound and play it immediatly
-	webAudiox.loadBuffer('sounds/techno.mp3', function(buffer){
-		var source	= webAudiox.context.createBufferSource();
+	contextx.loadBuffer('sounds/techno.mp3', function(buffer){
+		var source	= contextx.context.createBufferSource();
 		source.buffer	= buffer;
 		source.loop	= true
-		source.connect(webAudiox.masterOut);
+		source.connect(contextx.masterOut);
 		source.start(0);
 	});
 </script></body>

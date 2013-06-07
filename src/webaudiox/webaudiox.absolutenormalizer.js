@@ -1,3 +1,5 @@
+var WebAudiox	= WebAudiox	|| {}
+
 WebAudiox.AbsoluteNormalizer	= function(){
 	var maxThreshold	= -Infinity;
 	var minThreshold	= +Infinity;

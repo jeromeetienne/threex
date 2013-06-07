@@ -1,3 +1,5 @@
+var WebAudiox	= WebAudiox	|| {}
+
 WebAudiox.AdaptativeNormalizer	= function(factorForMin, factorForMax){
 	var minThreshold	= 0;
 	var maxThreshold	= 1;

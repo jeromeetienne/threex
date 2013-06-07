@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../webaudiox.contextx.js'></script>
+<script src='../webaudiox.three.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -10,6 +12,48 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
 
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		to play immediatly						//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var contextx	= new WebAudiox.Contextx()
+	contextx.volume	= 1
+
+	// load a sound and play it immediatly
+	contextx.loadBuffer('sounds/techno.mp3', function(buffer){
+		var masterOut	= contextx.masterOut;
+
+		// init AudioPannerNode
+		var panner	= contextx.context.createPanner()
+		panner.coneOuterGain	= 0.1
+		panner.coneOuterAngle	= Math.PI *180/Math.PI
+		panner.coneInnerAngle	= 0 *180/Math.PI
+		panner.connect(masterOut)
+		masterOut	= panner
+		// put a PannerObject3DUpdater
+		var pannerUpdater	= new WebAudiox.PannerObject3DUpdater(panner, mesh)
+		updateFcts.push(function(delta, now){
+			pannerUpdater.update(delta, now)
+		})
+
+		// init AudioBufferSourceNode
+		var source	= contextx.context.createBufferSource();
+		source.buffer	= buffer
+		source.loop	= true
+		source.connect(masterOut)
+		masterOut	= source
+		
+		// start the sound now
+		source.start(0);
+	});
+	
+	// put a ListenerObject3DUpdater
+	var listenerUpdater	= new WebAudiox.ListenerObject3DUpdater(contextx.context, camera)
+	updateFcts.push(function(delta, now){
+		listenerUpdater.update(delta, now)
+	})
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
@@ -19,9 +63,15 @@
 	scene.add( mesh );
 	
 	updateFcts.push(function(delta, now){
-		mesh.rotation.x += 1 * delta;
-		mesh.rotation.y += 0.01;		
+		var angle	= 2 * now * Math.PI*2
+		mesh.position.x = Math.cos(angle)*1;
+		mesh.position.z = Math.sin(angle)*10;
 	})
+
+	// updateFcts.push(function(delta, now){
+	// 	mesh.rotation.x += 3 * delta;
+	// 	mesh.rotation.y += 2 * delta;		
+	// })
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
@@ -32,9 +82,9 @@
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
 	}, false)
 	updateFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
-		camera.lookAt( scene.position )
+		// camera.position.x += (mouse.x*50 - camera.position.x) * (delta*3)
+		// camera.position.y += (mouse.y*50 - camera.position.y) * (delta*3)
+		// camera.lookAt( scene.position )
 	})
 
 

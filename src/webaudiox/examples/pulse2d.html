@@ -1,24 +1,24 @@
 <!doctype html>
-<script src='../webaudiox.js'></script>
-<script src='../webaudiox.absolutenormalizer.js'></script>
-<script src='../webaudiox.adaptativenormalizer.js'></script>
+<script src='../contextx.contextx.js'></script>
+<script src='../contextx.absolutenormalizer.js'></script>
+<script src='../contextx.adaptativenormalizer.js'></script>
 <body><script>
-	var webAudiox	= new WebAudio.ContextX()
+	var contextx	= new webaudiox.Contextx()
 
-	webAudiox.volume	= 0
+//	contextx.volume	= 0.1
 
-	var analyser	= webAudiox.context.createAnalyser()
-	analyser.connect(webAudiox.masterOut);
-	webAudiox.masterOut	= analyser;
+	var analyser	= contextx.context.createAnalyser()
+	analyser.connect(contextx.masterOut);
+	contextx.masterOut	= analyser;
 
 
 
 	// load a sound and play it immediatly
-	webAudiox.loadBuffer('sounds/perfume.mp3', function(buffer){
-		var source	= webAudiox.context.createBufferSource();
+	contextx.loadBuffer('sounds/perfume.mp3', function(buffer){
+		var source	= contextx.context.createBufferSource();
 		source.buffer	= buffer;
 		source.loop	= true
-		source.connect(webAudiox.masterOut);
+		source.connect(contextx.masterOut);
 		source.start(0);		
 	});
 	
@@ -31,9 +31,9 @@
 		
 	setInterval(update, 1000/60);
 	
-	var normalizer	= new WebAudiox.AdaptativeNormalizer()
+	var normalizer	= new contextx.AdaptativeNormalizer()
 	function update(){
-		var scale	= webAudiox.amplitude(analyser)
+		var scale	= contextx.amplitude(analyser)
 		scale		= normalizer.update(scale)
 		
 		// clear the canvas
