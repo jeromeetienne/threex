@@ -20,7 +20,7 @@
 
 
 <!-- include for threex.mirrorball -->
-<script src='../../webaudiox/webaudiox.js'></script>
+<script src='vendor/webaudiox/build/webaudiox.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 require([ '../../threex.glow/package.require.js'
@@ -119,32 +119,61 @@ console.log('ball', mesh)
 	updateFcts.push(function(delta, now){
 		body.update(delta, now)
 	})
+	
+	// make a sound on collision
+	body.origin.addEventListener("collide",function(event){
+		if( !sounds )	return;
+		var speed	= body.origin.velocity.norm();
+		var volume	= speed/5;
+		sounds.playKick(volume);
+	});
+
 	return mesh
 })()
 
 //////////////////////////////////////////////////////////////////////////////////
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
-	var webAudiox	= new WebAudiox()
+	var contextx	= new WebAudiox.Contextx()
 	var sounds	= {}
 
 	// init eatPill sound
 	sounds.playEatPill	= function(){
 		if( !sounds.eatPillBuffer )	return
-		var source	= webAudiox.context.createBufferSource()
+		var source	= contextx.context.createBufferSource()
 		source.buffer	= sounds.eatPillBuffer
-		source.connect(webAudiox.masterOut)
+		source.connect(contextx.masterOut)
 		source.start(0)
 	}
-	webAudiox.loadBuffer('sounds/eatpill.mp3', function(buffer){
+	WebAudiox.loadBuffer(contextx.context, 'sounds/eatpill.mp3', function(buffer){
 		sounds.eatPillBuffer	= buffer;
 	})
 
-	webAudiox.loadBuffer('sounds/roll.mp3', function(buffer){
-		var source	= webAudiox.context.createBufferSource();
+	// init kick sound
+	sounds.playKick	= function(volume){
+		if( !sounds.kickBuffer )	return
+		var destination	= contextx.masterOut
+
+		var volumeGain	= contextx.context.createGain()
+		volumeGain.connect(destination)
+		volumeGain.gain.value	= volume
+		destination	= volumeGain
+
+		var source	= contextx.context.createBufferSource()
+		source.buffer	= sounds.kickBuffer
+		source.connect(destination)
+		source.start(0)		
+	}
+	WebAudiox.loadBuffer(contextx.context, 'sounds/kick.wav', function(buffer){
+		sounds.kickBuffer	= buffer;
+	})
+
+	// --
+	WebAudiox.loadBuffer(contextx.context, 'sounds/roll.mp3', function(buffer){
+		var source	= contextx.context.createBufferSource();
 		source.buffer	= buffer;
 		source.loop	= true
-		source.connect(webAudiox.masterOut);
+		source.connect(contextx.masterOut);
 		source.start(0);
 
 		updateFcts.push(function(delta, now){
