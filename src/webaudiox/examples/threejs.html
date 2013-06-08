@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../../../vendor/three.js/examples/js/ImprovedNoise.js'></script>
+
+<script src='../webaudiox.analyseraverage.js'></script>
 <script src='../webaudiox.contextx.js'></script>
 <script src='../webaudiox.three.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
@@ -19,6 +22,10 @@
 
 	var contextx	= new WebAudiox.Contextx()
 	contextx.volume	= 1
+
+	var analyser	= contextx.context.createAnalyser()
+	analyser.connect(contextx.masterOut);
+	contextx.masterOut	= analyser;
 
 	// load a sound and play it immediatly
 	contextx.loadBuffer('sounds/techno.mp3', function(buffer){
@@ -57,22 +64,37 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
-	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
-	var material	= new THREE.MeshNormalMaterial();
-	var mesh	= new THREE.Mesh( geometry, material );
-	scene.add( mesh );
-	
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
+	var material	= new THREE.MeshBasicMaterial()
+	var mesh	= new THREE.Mesh( geometry, material )
+	scene.add( mesh )
+
 	updateFcts.push(function(delta, now){
-		var angle	= 2 * now * Math.PI*2
+		var angle	= 0.2 * now * Math.PI*2
 		mesh.position.x = Math.cos(angle)*1
-		mesh.position.z = Math.sin(angle)*10
+		mesh.position.z = Math.sin(angle)*1
 	})
 
-	// updateFcts.push(function(delta, now){
-	// 	mesh.rotation.x += 3 * delta;
-	// 	mesh.rotation.y += 2 * delta;		
-	// })
-	
+	updateFcts.push(function(delta, now){
+		mesh.rotation.x += 3 * delta;
+		mesh.rotation.y += 2 * delta;		
+	})
+
+	// put color hue on perlin
+	var perlin 	= new ImprovedNoise();	
+
+	updateFcts.push(function(delta, now){
+
+		var lightness	= WebAudiox.analyserAverage(analyser)
+		lightness	*= 2;
+		lightness	= Math.min(lightness, 1)
+
+		var noiseAge	= 0.1*now		
+		var hue		= perlin.noise(noiseAge, 0, 0) + 0.5
+
+		material.color.setHSL(hue, 1, lightness)
+	})
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
