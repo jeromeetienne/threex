@@ -13,7 +13,10 @@
 	
 
 	// emit 3 puff every seconds
-	var smokePuff	= new SmokePuff();
+	var smokePuff	= new SmokePuff(ctx.scene);
+	ctx.hook(function(delta, now){
+		smokePuff.update(delta, now)
+	})
 	setInterval(function(){
 		var position	= new THREE.Vector3(0,-1,-2)
 		smokePuff.emit(position);
@@ -26,9 +29,10 @@
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 	
-function SmokePuff(){
+function SmokePuff(container){
 	// load the texture
 	var texture	= THREE.ImageUtils.loadTexture('images/cloud10.png')
+	var updateFcts	= []
 	this.emit	= function(position){
 		// randomize the initial position
 		position	= position.clone()
@@ -45,7 +49,7 @@ function SmokePuff(){
 		var sprite	= new THREE.Sprite(material)
 		sprite.rotation	= Math.random() * Math.PI*2
 		sprite.position.copy(position)
-		ctx.add(sprite)
+		container.add(sprite)
 
 		var maxAge	= 1 + Math.random()*0.4
 		// set velocity
@@ -59,11 +63,11 @@ function SmokePuff(){
 		material.opacity= age2Opacity(0)
 		
 		var birthDate	= Date.now()/1000
-		var callback	= ctx.hook(function(delta, now){
+		updateFcts.push(function callback(delta, now){
 			var age	= Date.now()/1000 - birthDate
 			if( age >= maxAge ){
 				sprite.parent.remove(sprite)
-				ctx.unhook(callback)
+				updateFcts.splice(updateFcts.indexOf(callback),1)
 				return;	
 			}
 			// handle friction
@@ -74,6 +78,11 @@ function SmokePuff(){
 			sprite.scale.multiplyScalar( 1.0075 )
 			// handle opacity
 			material.opacity= age2Opacity(age)
+		})
+	}
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
 		})
 	}
 	function createTweenMidi(maxAge, attackTime, releaseTime){
