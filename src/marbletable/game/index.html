@@ -30,6 +30,7 @@
 
 <script src='js/lightinginit.js'></script>
 <script src='js/impactballemitter.js'></script>
+<script src='js/soundsinit.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 require([ '../../threex.glow/package.require.js'
@@ -66,6 +67,9 @@ require([ '../../threex.glow/package.require.js'
 	var winResize	= new THREEx.WindowResize(renderer, camera)
 
 	initLighting(renderer, scene)
+	updateFcts.push(function(delta, now){
+		sounds.update(delta. now)
+	})
 
 //////////////////////////////////////////////////////////////////////////////////
 //		ball								//
@@ -92,7 +96,18 @@ var ball	= (function(){
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)
 	})
+	
+	// ugly way to fix a missing 'onLoad()'
+	// 
+	setTimeout(function timeoutCb(){
+		if( !sounds.rollBuffer ){
+			setTimeout(timeoutCb, 100)
+			return;
+		}
+		sounds.playRoll(mesh)
+	}, 100)
 
+	
 	var impactEmitter	= new ImpactBallEmitter(scene)
 	updateFcts.push(function(delta, now){
 		impactEmitter.update(delta, now)
@@ -104,122 +119,34 @@ var ball	= (function(){
 		var speed	= bodyx.origin.velocity.norm();
 		var volume	= speed/5;
 		sounds.playKick(volume);
+
+	console.log('speed', speed, event)
 		
-		impactEmitter.emit(mesh.position)
-		impactEmitter.emit(mesh.position)
+		var nEmit	= 0
+		if( speed < 1.5 )	nEmit = 1;
+		else if( speed < 4.5 )	nEmit = 2;
+		else if( speed < 6.5 )	nEmit = 4;
+		else			nEmit = 8;
+		for(var i = 0; i < nEmit; i++){
+			impactEmitter.emit(mesh.position)		
+		}
+
 	});
 
 	return mesh
 })()
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//		webaudiox							//
-	//////////////////////////////////////////////////////////////////////////////////
-	var contextx	= new WebAudiox.Contextx()
-	contextx.volume	= 1
+	function spawnPlayer(){
+		console.log('spawnPlayer')
 
-	var sounds	= {}
+		sounds.playSpawn();
 
-	sounds.updateFcts	= [];
-	sounds.update	= function(delta, now){
-		sounds.updateFcts.forEach(function(updateFct){
-			updateFct(delta, now)
-		})
+		var body	= ball.userData.cannonBody.origin
+		body.position.set(+22*tileW, 2, -13*tileW)
+		body.velocity.set(0,0,0)
+		body.angularVelocity.set(0,0,0)
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	// init eatPill sound
-	sounds.playEatPill	= function(){
-		if( !sounds.eatPillBuffer )	return
-		var source	= contextx.context.createBufferSource()
-		source.buffer	= sounds.eatPillBuffer
-		source.connect(contextx.masterOut)
-		source.start(0)
-	}
-	WebAudiox.loadBuffer(contextx.context, 'sounds/eatpill.mp3', function(buffer){
-		sounds.eatPillBuffer	= buffer;
-	})
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	// init kick sound
-	sounds.playKick	= function(volume){
-		if( !sounds.kickBuffer )	return
-		var destination	= contextx.masterOut
-
-		var volumeGain	= contextx.context.createGain()
-		volumeGain.connect(destination)
-		volumeGain.gain.value	= volume
-		destination	= volumeGain
-
-		var source	= contextx.context.createBufferSource()
-		source.buffer	= sounds.kickBuffer
-		source.connect(destination)
-		source.start(0)		
-	}
-	WebAudiox.loadBuffer(contextx.context, 'sounds/kick.wav', function(buffer){
-		sounds.kickBuffer	= buffer;
-	})
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-
-	
-	// --
-	WebAudiox.loadBuffer(contextx.context, 'sounds/roll.mp3', function(buffer){
-		var source	= contextx.context.createBufferSource();
-		source.buffer	= buffer;
-		source.loop	= true
-		source.connect(contextx.masterOut);
-		source.start(0);
-
-		sounds.updateFcts.push(function(delta, now){
-			// compute body speed
-			var body	= ball.userData.cannonBody.origin
-			var speed	= body.velocity.norm();
-			// set playbackRate depending on speed
-			source.playbackRate.value	= 0.0001 + speed * 0.9;
-			// if the ball dont touch the ground, gain is 0
-			var onGround		= body.position.y >= 0.25 && body.position.y <= 0.3;
-			source.gain.value	= onGround ? 1 : 0;
-		})
-	});
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	// init a sound with jsfx
-	sounds.playSpawn	= function(){
-		if( !sounds.noiseBuffer )	return
-		var source	= contextx.context.createBufferSource()
-		source.buffer	= sounds.noiseBuffer
-		source.connect(contextx.masterOut)
-		source.start(0)
-	}
-	var lib		= ["square",0.0000,0.4000,0.0000,0.3200,0.0000,0.2780,20.0000,496.0000,2400.0000,0.4640,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0235,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000]
-	sounds.noiseBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-
-	updateFcts.push(function(delta, now){
-		sounds.update(delta. now)
-	})
-	
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		init keyboard								//
@@ -272,6 +199,12 @@ var ball	= (function(){
 		// ballBody.applyImpulse(impulse, worldPoint);
 		var cforce	= new CANNON.Vec3(force.x, force.y, force.z)
 		ballBody.applyForce(cforce, worldPoint);
+	})
+
+	// jump on space
+	keyboard.domElement.addEventListener('keydown', function(event){
+		if( keyboard.eventMatches(event, 'escape') === false )	return
+		spawnPlayer(ball)
 	})
 
 	// jump on space

@@ -1,7 +1,7 @@
 
 function ImpactBallEmitter(container){
 	// load the texture
-	var texture	= THREE.ImageUtils.loadTexture('../../threex.particles/examples/images/cloud10.png')
+	var texture	= THREE.ImageUtils.loadTexture('../../threex.particles/examples/images/blue_particle.jpg')
 	var updateFcts	= []
 	this.emit	= function(position){
 		// randomize the initial position
@@ -11,7 +11,9 @@ function ImpactBallEmitter(container){
 		position.z	+= (Math.random()-0.5)*0.3
 		// init sprite material
 		var material	= new THREE.SpriteMaterial({
-			map			: texture,
+			//color			: 0xAA4488,
+			transparent		: true,
+			blending		: THREE.AdditiveBlending,			map			: texture,
 			useScreenCoordinates	: false,
 			//color			: 0x666666
 		})
@@ -20,13 +22,15 @@ function ImpactBallEmitter(container){
 		sprite.rotation	= Math.random() * Math.PI*2
 		sprite.position.copy(position)
 		container.add(sprite)
+		
+		sprite.scale.set(1,1,1).multiplyScalar( 0.5 )
 
 		var maxAge	= 1 + Math.random()*0.4
 		// set velocity
-		var velocity	= new THREE.Vector3(0, 1, 0)
-		velocity.x	+= (Math.random()-0.5)*0.5
-		velocity.y	+= (Math.random()-0.5)*0.1
-		velocity.z	+= (Math.random()-0.5)*0.5
+		var velocity	= new THREE.Vector3(0, 0, 0)
+		velocity.x	= (Math.random()-0.5)
+		velocity.y	= (Math.random()-0.5)+0.5
+		velocity.z	= (Math.random()-0.5)
 		velocity.setLength(3 + (Math.random()-0.5)*0.5)
 		// init opacity
 		var age2Opacity	= createTweenMidi(maxAge, 0.05*maxAge, 0.4*maxAge)
@@ -45,9 +49,11 @@ function ImpactBallEmitter(container){
 			// move by velocity
 			sprite.position.add( velocity.clone().multiplyScalar(delta) )
 			// make it grow
-			sprite.scale.multiplyScalar( 1.0075 )
+			sprite.scale.multiplyScalar( 1.02 )
 			// handle opacity
-			material.opacity= age2Opacity(age)
+			material.opacity= age2Opacity(age)*0.5
+			
+			//material.color.setHSL((0.1*age*Math.PI*2)%1,1,0.5)
 		})
 	}
 	this.update	= function(delta, now){
