@@ -32,7 +32,28 @@
 <script src='js/impactballemitter.js'></script>
 <script src='js/soundsinit.js'></script>
 
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+
+<body><style>
+#timer {
+	position	: absolute;
+	top		: 0px;
+	right		: 0;
+	z-index		: 1;
+
+	font-family	: arial, verdana, sans-serif;
+	font-size	: 300%;
+	font-weight	: bolder;
+
+	color		: #000;
+	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
+
+	padding-left	: 10px;
+	padding-right	: 10px;
+}
+</style>
+<div id="timer">Ready ?</div>
+<script>
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
 ], function(){
@@ -70,6 +91,36 @@ require([ '../../threex.glow/package.require.js'
 	updateFcts.push(function(delta, now){
 		sounds.update(delta. now)
 	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// display timer
+	var timerBegin	= Date.now();
+	var timerEnd	= null;
+	updateFcts.push(function(){
+		if( timerEnd === null ){
+			var deltaTime	= Date.now() - timerBegin
+		}else{
+			var deltaTime	= timerEnd - timerBegin			
+		}
+		var nMilliSecs	= Math.round(deltaTime) % 1000;
+		var nSeconds	= Math.round(deltaTime / 1000) % 60;
+		var nMinutes	= Math.round(deltaTime / (60*1000))
+		
+		var stringPadder= function(value, width, padChar){
+			var maxPadded	= Array(width+1).join(padChar) + value;
+			return maxPadded.substr(maxPadded.length-width);
+		}
+		var element	= document.querySelector('#timer');
+		element.innerText= stringPadder(nMinutes, 2, '0')
+					+ ':'
+					+ stringPadder(nSeconds, 2, '0')
+					+ ':'
+					+ stringPadder(nMilliSecs, 3, '0');
+	})
+
 
 //////////////////////////////////////////////////////////////////////////////////
 //		ball								//
@@ -120,8 +171,6 @@ var ball	= (function(){
 		var volume	= speed/5;
 		sounds.playKick(volume);
 
-	console.log('speed', speed, event)
-		
 		var nEmit	= 0
 		if( speed < 1.5 )	nEmit = 1;
 		else if( speed < 4.5 )	nEmit = 2;
@@ -139,14 +188,37 @@ var ball	= (function(){
 	function spawnPlayer(){
 		console.log('spawnPlayer')
 
+		timerBegin	= Date.now();
+		timerEnd	= null;
+
+		disablePlayerControls	= false
+
 		sounds.playSpawn();
 
 		var body	= ball.userData.cannonBody.origin
 		body.position.set(+22*tileW, 2, -13*tileW)
 		body.velocity.set(0,0,0)
 		body.angularVelocity.set(0,0,0)
+		
 	}
+	function killPlayer(){
+		console.log('killPlayer')
+		sounds.playDie()
+		timerEnd	= Date.now();
 
+		var body	= ball.userData.cannonBody.origin
+		body.velocity.set(0,0,0)
+		body.angularVelocity.set(0,0,0)
+
+		var worldPoint	= new CANNON.Vec3(ball.position.x, ball.position.y, ball.position.z)
+		var impulse	= new CANNON.Vec3(0,1.1,0)
+		body.applyImpulse(impulse, worldPoint);
+
+		disablePlayerControls	= true
+		setTimeout(function(){
+			spawnPlayer()
+		}, 0.8*1000)
+	}
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		init keyboard								//
@@ -193,12 +265,12 @@ var ball	= (function(){
 		var ballPosition= new THREE.Vector3().getPositionFromMatrix( ball.matrixWorld )
 
 		// do an impulse to the ball
-		var ballBody	= ball.userData.cannonBody.origin
+		var body	= ball.userData.cannonBody.origin
 		var worldPoint	= new CANNON.Vec3(ballPosition.x, ballPosition.y, ballPosition.z)
-		// var impulse	= new CANNON.Vec3(force.x*delta, force.y*delta, force.z*delta)
-		// ballBody.applyImpulse(impulse, worldPoint);
-		var cforce	= new CANNON.Vec3(force.x, force.y, force.z)
-		ballBody.applyForce(cforce, worldPoint);
+		var impulse	= new CANNON.Vec3(force.x*delta, force.y*delta, force.z*delta)
+		body.applyImpulse(impulse, worldPoint);
+		// var cforce	= new CANNON.Vec3(force.x, force.y, force.z)
+		// body.applyForce(cforce, worldPoint);
 	})
 
 	// jump on space
@@ -225,11 +297,11 @@ var ball	= (function(){
 		var ballPosition= new THREE.Vector3().getPositionFromMatrix( ball.matrixWorld )
 
 		// do an impulse to the ball
-		var ballBody	= ball.userData.cannonBody.origin
+		var body	= ball.userData.cannonBody.origin
 		var worldPoint	= new CANNON.Vec3(ballPosition.x, ballPosition.y, ballPosition.z)
 		var impulse	= new CANNON.Vec3()
 		impulse.y	= 1/2
-		ballBody.applyImpulse(impulse, worldPoint);		
+		body.applyImpulse(impulse, worldPoint);
 	})
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -424,7 +496,7 @@ var ball	= (function(){
 		var radius	= 1.5 * tileW
 		var geometry	= new THREE.SphereGeometry(radius, 32, 16)
 		var material	= new THREE.MeshPhongMaterial({
-			color		: 0xaaaaaa,
+			color		: new THREE.Color().setHSL(Math.random(),1,0.5),
 			map		: texture,
 			bumpMap		: texture,
 			bumpScale	: 0.01,
@@ -452,6 +524,10 @@ var ball	= (function(){
 		updateFcts.push(function(delta, now){
 			body.update(delta, now)
 		});
+		
+		body.origin.addEventListener("collide",function(event){
+			killPlayer()
+		})
 	}
 })
 </script></body>

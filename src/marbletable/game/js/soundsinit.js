@@ -88,13 +88,25 @@ WebAudiox.loadBuffer(contextx.context, 'sounds/roll.mp3', function(buffer){
 
 // init a sound with jsfx
 sounds.playSpawn	= function(){
-	if( !sounds.noiseBuffer )	return
+	if( !sounds.spawnBuffer )	return
 	var source	= contextx.context.createBufferSource()
-	source.buffer	= sounds.noiseBuffer
+	source.buffer	= sounds.spawnBuffer
 	source.connect(contextx.masterOut)
 	source.start(0)
 }
 var lib		= ["square",0.0000,0.4000,0.0000,0.3200,0.0000,0.2780,20.0000,496.0000,2400.0000,0.4640,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0235,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000]
-sounds.noiseBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
+sounds.spawnBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
 
 
+
+
+// init a sound with jsfx
+sounds.playDie	= function(){
+	if( !sounds.dieBuffer )	return
+	var source	= contextx.context.createBufferSource()
+	source.buffer	= sounds.dieBuffer
+	source.connect(contextx.masterOut)
+	source.start(0)
+}
+var lib		= ["square",0.0000,0.4000,0.0000,0.0240,0.0000,0.2680,20.0000,560.0000,2400.0000,-0.5220,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.2295,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.2130,0.0000]
+sounds.dieBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)

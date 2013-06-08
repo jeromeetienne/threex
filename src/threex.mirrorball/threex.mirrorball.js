@@ -19,8 +19,10 @@ THREEx.MirrorBall	= function(textureW){
 	var material	= new THREE.MeshBasicMaterial()
 	material.envMap	= camera.renderTarget
 	material.color.set('gold')
+
 	var sphere	= new THREE.Mesh(geometry, material)
 	this.sphere	= sphere
+
 	object.add(sphere)
 }
 
