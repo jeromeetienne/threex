@@ -23,6 +23,10 @@
 
 <!-- include for threex.mirrorball -->
 <script src='vendor/webaudiox/build/webaudiox.js'></script>
+<!-- include the .js files for jsfx.js -->
+<script src="vendor/webaudiox/examples/vendor/jsfx/audio.js"></script>
+<script src="vendor/webaudiox/examples/vendor/jsfx/jsfx.js"></script>
+<script src="vendor/webaudiox/examples/vendor/jsfx/jsfxlib.js"></script>
 
 <script src='js/lightinginit.js'></script>
 <script src='js/impactballemitter.js'></script>
@@ -88,7 +92,7 @@ var ball	= (function(){
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)
 	})
-	
+
 	var impactEmitter	= new ImpactBallEmitter(scene)
 	updateFcts.push(function(delta, now){
 		impactEmitter.update(delta, now)
@@ -112,8 +116,21 @@ var ball	= (function(){
 	//		webaudiox							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var contextx	= new WebAudiox.Contextx()
+	contextx.volume	= 1
+
 	var sounds	= {}
-	contextx.volume	= 0
+
+	sounds.updateFcts	= [];
+	sounds.update	= function(delta, now){
+		sounds.updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	// init eatPill sound
 	sounds.playEatPill	= function(){
 		if( !sounds.eatPillBuffer )	return
@@ -126,6 +143,10 @@ var ball	= (function(){
 		sounds.eatPillBuffer	= buffer;
 	})
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	// init kick sound
 	sounds.playKick	= function(volume){
 		if( !sounds.kickBuffer )	return
@@ -144,7 +165,18 @@ var ball	= (function(){
 	WebAudiox.loadBuffer(contextx.context, 'sounds/kick.wav', function(buffer){
 		sounds.kickBuffer	= buffer;
 	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	
 	// --
 	WebAudiox.loadBuffer(contextx.context, 'sounds/roll.mp3', function(buffer){
 		var source	= contextx.context.createBufferSource();
@@ -153,7 +185,7 @@ var ball	= (function(){
 		source.connect(contextx.masterOut);
 		source.start(0);
 
-		updateFcts.push(function(delta, now){
+		sounds.updateFcts.push(function(delta, now){
 			// compute body speed
 			var body	= ball.userData.cannonBody.origin
 			var speed	= body.velocity.norm();
@@ -165,6 +197,30 @@ var ball	= (function(){
 		})
 	});
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// init a sound with jsfx
+	sounds.playSpawn	= function(){
+		if( !sounds.noiseBuffer )	return
+		var source	= contextx.context.createBufferSource()
+		source.buffer	= sounds.noiseBuffer
+		source.connect(contextx.masterOut)
+		source.start(0)
+	}
+	var lib		= ["square",0.0000,0.4000,0.0000,0.3200,0.0000,0.2780,20.0000,496.0000,2400.0000,0.4640,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0235,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000]
+	sounds.noiseBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	updateFcts.push(function(delta, now){
+		sounds.update(delta. now)
+	})
+	
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		init keyboard								//
 	//////////////////////////////////////////////////////////////////////////////////
