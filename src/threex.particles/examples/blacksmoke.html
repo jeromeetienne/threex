@@ -7,10 +7,12 @@
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
+	var updateFcts	= [];
 	var scene	= new THREE.Scene();
-	var loop	= new THREEx.Loop().start();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.z = 3;
+
+	var loop	= new THREEx.Loop().start();
 	
 	var geometry	= new THREE.TorusGeometry( 0.35, 0.15 );
 	var material	= new THREE.MeshNormalMaterial();

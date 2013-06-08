@@ -26,7 +26,7 @@
 		mesh.position.y	= Math.sin(angle*1.3) * 1
 	})
 	
-	new WhiteSmokeTrail(mesh.position, loop, scene)
+	new blueTrailEmitter(mesh.position, loop, scene)
 
 	loop.hook(function(delta, now){
 		renderer.render( scene, camera );
@@ -36,7 +36,7 @@
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 	
-function WhiteSmokeTrail(position, loop, container){
+function blueTrailEmitter(position, loop, container){
 	var texture	= THREE.ImageUtils.loadTexture('images/blue_particle.jpg')
 	var maxAge	= 1;
 	var tweenOpacity= createTweenMidi(maxAge, 0.33*maxAge, 0.33*maxAge);
