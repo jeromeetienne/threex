@@ -29,7 +29,7 @@
 <script src="vendor/webaudiox/examples/vendor/jsfx/jsfx.js"></script>
 <script src="vendor/webaudiox/examples/vendor/jsfx/jsfxlib.js"></script>
 
-<script src='js/lightinginit.js'></script>
+<script src='js/initlighting.js'></script>
 <script src='js/gametimer.js'></script>
 <script src='js/impactballemitter.js'></script>
 <script src='js/soundsinit.js'></script>
@@ -214,7 +214,7 @@ var ball	= (function(){
 
 		disablePlayerControls	= true
 		setTimeout(function(){
-			yeller.dispatchEvent('spawnEvent')
+			yeller.dispatchEvent('spawnPlayer')
 		}, 0.8*1000)
 	})
 
@@ -303,7 +303,7 @@ var ball	= (function(){
 	// jump on space
 	keyboard.domElement.addEventListener('keydown', function(event){
 		if( keyboard.eventMatches(event, 'escape') === false )	return
-		yeller.dispatchEvent('spawnPlayer')
+		yeller.dispatchEvent('killPlayer')
 	})
 
 	// jump on space
@@ -553,7 +553,7 @@ var ball	= (function(){
 		});
 		
 		body.origin.addEventListener("collide",function(event){
-			killPlayer()
+			yeller.dispatchEvent('killPlayer')
 		})
 	}
 })
