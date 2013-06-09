@@ -32,7 +32,7 @@
 <script src='js/initlighting.js'></script>
 <script src='js/gametimer.js'></script>
 <script src='js/impactballemitter.js'></script>
-<script src='js/soundsinit.js'></script>
+<script src='js/initsounds.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 
@@ -73,32 +73,41 @@ require([ '../../threex.glow/package.require.js'
 
 	var physicsWorld= new THREEx.CannonWorld().start()
 
-	var tileW	= 0.2;
-
-	var cache	= new Microcache();
-
-	window.yeller	= MicroeventMixin({});
-	
 	// setup winResize
 	var winResize	= new THREEx.WindowResize(renderer, camera)
 
-	// init lighting
-	initLighting(renderer, scene)
-	
 	// init keyboard		
 	var keyboard	= new THREEx.KeyboardState(renderer.domElement);
 	renderer.domElement.setAttribute("tabIndex", "0");
 	renderer.domElement.focus();
 
 
-	// add a skymap	
-	var mesh	= THREEx.createSkymap('skybox')
-	scene.add( mesh );
+
+	var cache	= new Microcache();
+
+	var tileW	= 0.2;
+
+
+	window.yeller	= MicroeventMixin({});
+	window.GAME	= {}
+	
+	window.sounds	= initSounds();
+	
+
+	// init lighting
+	initLighting(renderer, scene)
+	
 
 	// upadte sounds
 	updateFcts.push(function(delta, now){
 		sounds.update(delta. now)
 	})
+
+
+	// add a skymap	
+	var mesh	= THREEx.createSkymap('skybox')
+	scene.add( mesh );
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -113,14 +122,16 @@ require([ '../../threex.glow/package.require.js'
 //////////////////////////////////////////////////////////////////////////////////
 //		ball								//
 //////////////////////////////////////////////////////////////////////////////////
-
-	// fetch the texture
-	var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
-	texture.wrapS	= texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 4, 4 );
-	texture.anisotropy	= 16
 	
 var ball	= (function(){
+	var texture	= cache.getSet('texture.rocks', function(){
+		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
+		texture.wrapS	= texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set( 4, 4 );
+		texture.anisotropy	= 16
+		return texture
+	})
+
 	var radius	= 1.5 * tileW
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
 	var material	= new THREE.MeshPhongMaterial({
