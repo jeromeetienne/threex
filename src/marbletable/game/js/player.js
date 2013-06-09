@@ -1,9 +1,10 @@
 var Player	= function(){
-	var texture	= cache.getSet('texture.rocks', function(){
+	var texture	= cache.getSet('texture.player.rocks', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
-		texture.wrapS	= texture.wrapT = THREE.RepeatWrapping;
-		texture.repeat.set( 4, 4 );
-		texture.anisotropy	= 16
+		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
+		//var texture	= THREE.ImageUtils.loadTexture('images/venusmap.jpg');
+		var texture	= THREE.ImageUtils.loadTexture('images/neptunemap.jpg');
+		//var texture	= THREE.ImageUtils.loadTexture('images/jupitermap.jpg');
 		return texture
 	})
 	// handle updateFcts for sounds
@@ -19,7 +20,7 @@ var Player	= function(){
 	var material	= new THREE.MeshPhongMaterial({
 		map	: texture,
 		bumpMap	: texture,
-		bumpScale: 0.01
+		bumpScale: 0.05
 	})
 	var mesh	= new THREE.Mesh(geometry, material)
 	this.mesh	= mesh

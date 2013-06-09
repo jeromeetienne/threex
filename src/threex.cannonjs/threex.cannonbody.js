@@ -41,6 +41,8 @@ THREEx.CannonBody	= function(opts){
 
 	var body	= new CANNON.RigidBody(mass, shape, material)
 	this.origin	= body
+	
+	this.mesh	= mesh
 
 	// sanity check - if the object use Euler, check it is 0 vectors
 	console.assert(mesh.useQuaternion === true || 
@@ -68,6 +70,41 @@ THREEx.CannonBody	= function(opts){
 		mesh.position.copy( body.position );
 		mesh.quaternion.copy( body.quaternion );
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//		Helpers								//
+//////////////////////////////////////////////////////////////////////////////////
+
+THREEx.CannonBody.prototype.applyImpulse = function(force, deltaTime) {
+	var ball	= this.mesh
+	var impulse	= force.clone().multiplyScalar(deltaTime)
+	// apply the force to the center of the ball
+	ball.updateMatrixWorld();
+	// get world position
+	var ballPosition= new THREE.Vector3().getPositionFromMatrix( ball.matrixWorld )
+
+	// do an impulse to the ball
+	var body	= ball.userData.cannonBody.origin
+	var worldPoint	= new CANNON.Vec3(ballPosition.x, ballPosition.y, ballPosition.z)
+	var impulse	= new CANNON.Vec3(impulse.x, impulse.y, impulse.z)
+	body.applyImpulse(impulse, worldPoint);
+	// var cforce	= new CANNON.Vec3(force.x, force.y, force.z)
+	// body.applyForce(cforce, worldPoint);
+}
+
+THREEx.CannonBody.prototype.applyForce = function(force) {
+	var ball	= this.mesh
+	// apply the force to the center of the ball
+	ball.updateMatrixWorld();
+	// get world position
+	var ballPosition= new THREE.Vector3().getPositionFromMatrix( ball.matrixWorld )
+
+	// do an impulse to the ball
+	var body	= ball.userData.cannonBody.origin
+	var worldPoint	= new CANNON.Vec3(ballPosition.x, ballPosition.y, ballPosition.z)
+	var cforce	= new CANNON.Vec3(force.x, force.y, force.z)
+	body.applyForce(cforce, worldPoint);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
