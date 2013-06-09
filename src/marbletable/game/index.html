@@ -33,6 +33,7 @@
 <script src='js/gametimer.js'></script>
 <script src='js/impactballemitter.js'></script>
 <script src='js/initsounds.js'></script>
+<script src='js/player.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 
@@ -83,13 +84,15 @@ require([ '../../threex.glow/package.require.js'
 
 
 
-	var cache	= new Microcache();
+	window.scene	= scene
+	window.physicsWorld	= physicsWorld
 
-	var tileW	= 0.2;
-
-
+	window.cache	= new Microcache()
 	window.yeller	= MicroeventMixin({});
 	window.GAME	= {}
+
+	GAME.tileW	= 0.2
+	var tileW	= GAME.tileW;
 	
 	window.sounds	= initSounds();
 	
@@ -123,76 +126,12 @@ require([ '../../threex.glow/package.require.js'
 //		ball								//
 //////////////////////////////////////////////////////////////////////////////////
 	
-var ball	= (function(){
-	var texture	= cache.getSet('texture.rocks', function(){
-		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
-		texture.wrapS	= texture.wrapT = THREE.RepeatWrapping;
-		texture.repeat.set( 4, 4 );
-		texture.anisotropy	= 16
-		return texture
-	})
 
-	var radius	= 1.5 * tileW
-	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
-	var material	= new THREE.MeshPhongMaterial({
-		map	: texture,
-		bumpMap	: texture,
-		bumpScale: 0.01
-	})
-	var mesh	= new THREE.Mesh(geometry, material)
-
-	mesh.position.y	= 3
-	mesh.receiveShadow	= true
-	mesh.castShadow		= true
-	scene.add( mesh )
-	mesh.useQuaternion	= true
-	var bodyx	= new THREEx.CannonBody({
-		mesh	: mesh,
-	}).addTo(physicsWorld)
-	var body	= bodyx.origin
+	var player	= new Player();
+	var ball	= player.mesh;
 	updateFcts.push(function(delta, now){
-		bodyx.update(delta, now)
+		player.update(delta, now)
 	})
-
-	body.angularDamping	= 0.98
-	body.linearDamping	= 0.5
-	
-	// ugly way to fix a missing 'onLoad()'
-	// 
-	setTimeout(function timeoutCb(){
-		if( !sounds.rollBuffer ){
-			setTimeout(timeoutCb, 100)
-			return;
-		}
-		sounds.playRoll(mesh)
-	}, 100)
-
-	
-	var impactEmitter	= new ImpactBallEmitter(scene)
-	updateFcts.push(function(delta, now){
-		impactEmitter.update(delta, now)
-	})
-	
-	// make a sound on collision
-	bodyx.origin.addEventListener("collide",function(event){
-		if( !sounds )	return;
-		var speed	= bodyx.origin.velocity.norm();
-		var volume	= speed/5;
-		sounds.playKick(volume);
-
-		var nEmit	= 0
-		if( speed < 1.5 )	nEmit = 1;
-		else if( speed < 4.5 )	nEmit = 2;
-		else if( speed < 6.5 )	nEmit = 4;
-		else			nEmit = 8;
-		for(var i = 0; i < nEmit; i++){
-			impactEmitter.emit(mesh.position)		
-		}
-
-	});
-
-	return mesh
-})()
 
 	yeller.addEventListener('spawnPlayer', function(){
 		console.log('spawnPlayer')
