@@ -29,6 +29,7 @@
 <script src="vendor/webaudiox/examples/vendor/jsfx/jsfxlib.js"></script>
 
 <script src='js/lightinginit.js'></script>
+<script src='js/gametimer.js'></script>
 <script src='js/impactballemitter.js'></script>
 <script src='js/soundsinit.js'></script>
 
@@ -71,23 +72,28 @@ require([ '../../threex.glow/package.require.js'
 
 	var physicsWorld= new THREEx.CannonWorld().start()
 
-	// fetch the texture
-	var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
-	texture.wrapS	= texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 4, 4 );
-	texture.anisotropy	= 16
-	
 	var tileW	= 0.2;
 
 	var cache	= new Microcache();
 
+	
+	// setup winResize
+	var winResize	= new THREEx.WindowResize(renderer, camera)
+
+	// init lighting
+	initLighting(renderer, scene)
+	
+	// init keyboard		
+	var keyboard	= new THREEx.KeyboardState(renderer.domElement);
+	renderer.domElement.setAttribute("tabIndex", "0");
+	renderer.domElement.focus();
+
+
 	// add a skymap	
 	var mesh	= THREEx.createSkymap('skybox')
 	scene.add( mesh );
-	
-	var winResize	= new THREEx.WindowResize(renderer, camera)
 
-	initLighting(renderer, scene)
+	// upadte sounds
 	updateFcts.push(function(delta, now){
 		sounds.update(delta. now)
 	})
@@ -95,37 +101,23 @@ require([ '../../threex.glow/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-	
-	// display timer
-	var timerBegin	= Date.now();
-	var timerEnd	= null;
-	updateFcts.push(function(){
-		if( timerEnd === null ){
-			var deltaTime	= Date.now() - timerBegin
-		}else{
-			var deltaTime	= timerEnd - timerBegin			
-		}
-		var nMilliSecs	= Math.round(deltaTime) % 1000;
-		var nSeconds	= Math.round(deltaTime / 1000) % 60;
-		var nMinutes	= Math.round(deltaTime / (60*1000))
-		
-		var stringPadder= function(value, width, padChar){
-			var maxPadded	= Array(width+1).join(padChar) + value;
-			return maxPadded.substr(maxPadded.length-width);
-		}
-		var element	= document.querySelector('#timer');
-		element.innerText= stringPadder(nMinutes, 2, '0')
-					+ ':'
-					+ stringPadder(nSeconds, 2, '0')
-					+ ':'
-					+ stringPadder(nMilliSecs, 3, '0');
-	})
 
+
+	var gameTimer	= new GameTimer()
+	updateFcts.push(function(delta, now){
+		gameTimer.update(delta. now)
+	})
 
 //////////////////////////////////////////////////////////////////////////////////
 //		ball								//
 //////////////////////////////////////////////////////////////////////////////////
 
+	// fetch the texture
+	var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
+	texture.wrapS	= texture.wrapT = THREE.RepeatWrapping;
+	texture.repeat.set( 4, 4 );
+	texture.anisotropy	= 16
+	
 var ball	= (function(){
 	var radius	= 1.5 * tileW
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
@@ -144,9 +136,13 @@ var ball	= (function(){
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: mesh,
 	}).addTo(physicsWorld)
+	var body	= bodyx.origin
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)
 	})
+
+	body.angularDamping	= 0.98
+	body.linearDamping	= 0.5
 	
 	// ugly way to fix a missing 'onLoad()'
 	// 
@@ -188,8 +184,8 @@ var ball	= (function(){
 	function spawnPlayer(){
 		console.log('spawnPlayer')
 
-		timerBegin	= Date.now();
-		timerEnd	= null;
+		gameTimer.timerBegin	= Date.now();
+		gameTimer.timerEnd	= null;
 
 		disablePlayerControls	= false
 
@@ -204,7 +200,7 @@ var ball	= (function(){
 	function killPlayer(){
 		console.log('killPlayer')
 		sounds.playDie()
-		timerEnd	= Date.now();
+		gameTimer.timerEnd	= Date.now();
 
 		var body	= ball.userData.cannonBody.origin
 		body.velocity.set(0,0,0)
@@ -219,15 +215,44 @@ var ball	= (function(){
 			spawnPlayer()
 		}, 0.8*1000)
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		init keyboard								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	var keyboard	= new THREEx.KeyboardState(renderer.domElement);
-	renderer.domElement.setAttribute("tabIndex", "0");
-	renderer.domElement.focus();
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		camera controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+			
+	// THREEx.TrackerControls	= function(tracked, source, target){
+	// 	this.source	= source
+	// 	this.target	= target
+	// 	var sourcePos	= new THREE.Vector3()
+	// 	var targetPos	= new THREE.Vector3()
+	// 	this.update	= function(delta, now){
+	// 		// compute world position for source
+	// 		this.source.updateMatrixWorld();
+	// 		sourcePos.getPositionFromMatrix( this.source.matrixWorld )
+	// 		// compute world position for target
+	// 		this.target.updateMatrixWorld();
+	// 		targetPos.getPositionFromMatrix( this.target.matrixWorld )
+	// 		// make tracked to fit those contrainst
+	// 		tracked.position.copy(sourcePos)
+	// 		tracked.lookAt(targetPos)
+	// 	}
+	// }
+
+	// var cameraHolder	= new THREE.Object3D
+	// scene.add(cameraHolder)
+
+	// updateFcts.push(function(delta, now){
+	// 	cameraHolder.position.copy(ball.position)
+	// 	cameraHolder.position.x	+= 0
+	// 	cameraHolder.position.y	+= 3
+	// 	cameraHolder.position.z	+= 3		
+	// })
+	
+	// var controls	= new THREEx.TrackerControls(camera, cameraHolder, ball)
+	// updateFcts.push(function(delta, now){
+	// 	controls.update(delta, now)
+	// })
+	
 	//////////////////////////////////////////////////////////////////////////
 	//		User Controls						//
 	//////////////////////////////////////////////////////////////////////////
