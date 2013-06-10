@@ -5,7 +5,7 @@ var PlayerControls	= function(ball){
 		if( this.disable )	return
 		
 		// prevent controls if the ball isnt on the ground
-		if( ball.position.y > ball.geometry.radius )	return
+//		if( ball.position.y > ball.geometry.radius )	return
 
 		var force	= new THREE.Vector3()
 		if( keyboard.pressed('right') ){
@@ -28,7 +28,7 @@ var PlayerControls	= function(ball){
 
 		// rotate the force according to camera position from ball position
 		// - thus arrow are relative to what the user see
-		var deltaPos	= ballPos.clone().sub(cameraPos)	
+		var deltaPos	= ballPos.clone().sub(cameraPos)
 		var forceAngle	= - Math.PI/2 - Math.atan2(deltaPos.z, deltaPos.x)
 		var matrix	= new THREE.Matrix4().makeRotationY( forceAngle )
 		force.applyMatrix4( matrix )
@@ -47,14 +47,15 @@ var PlayerControls	= function(ball){
 	keyboard.domElement.addEventListener('keydown', function(event){
 		// if disablePlayerControls is true, return now
 		if( this.disable )	return;		
-		// prevent controls if the ball isnt on the ground
-		if( ball.position.y > ball.geometry.radius*2 )	return;			
 
 		if( keyboard.eventMatches(event, 'space') === false )	return
+
+		var body	= ball.userData.cannonBody.origin
+		if( Math.abs(body.velocity.y) > 0.1 )	return;			
 
 		sounds.playEatPill()
 
 		var cannonBody	= ball.userData.cannonBody
-		cannonBody.applyImpulse(new THREE.Vector3(0, 1/2, 0), 1)
+		cannonBody.applyImpulse(new THREE.Vector3(0, 1, 0), 1)
 	})
 }

@@ -5,7 +5,7 @@ var initSounds	= function(){
 	//		webaudiox							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var contextx	= new WebAudiox.Contextx()
-	contextx.volume	= 0
+	contextx.volume	= 1
 
 	sounds.contextx	= contextx
 

@@ -1,10 +1,12 @@
 var Player	= function(){
 	var texture	= cache.getSet('texture.player.rocks', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
+		var texture	= THREE.ImageUtils.loadTexture('images/wood.jpg');
 		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/venusmap.jpg');
-		var texture	= THREE.ImageUtils.loadTexture('images/neptunemap.jpg');
+		//var texture	= THREE.ImageUtils.loadTexture('images/neptunemap.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/jupitermap.jpg');
+		//var texture	= THREE.ImageUtils.loadTexture('images/tile01.jpg');
 		return texture
 	})
 	// handle updateFcts for sounds
@@ -16,11 +18,13 @@ var Player	= function(){
 	}
 
 	var radius	= 1.5 * GAME.tileW
+	
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
 	var material	= new THREE.MeshPhongMaterial({
-		map	: texture,
-		bumpMap	: texture,
-		bumpScale: 0.05
+		// map	: texture,
+		// bumpMap	: texture,
+		// bumpScale: 0.001,
+		//color	: 'silver',
 	})
 	var mesh	= new THREE.Mesh(geometry, material)
 	this.mesh	= mesh
@@ -33,14 +37,30 @@ var Player	= function(){
 	mesh.useQuaternion	= true
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: mesh,
+		material: pMaterialPlayer,
 	}).addTo(physicsWorld)
-
-	var body	= bodyx.origin
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)
 	})
 
-	body.angularDamping	= 0.98
+if( true ){
+	// create the camera
+	var cubeCamera	= new THREE.CubeCamera( 0.001, 1000, 512 );
+	scene.add( cubeCamera )
+	updateFcts.push(function(delta, now){
+		cubeCamera.position.copy(mesh.position)
+		mesh.visible	= false
+		cubeCamera.updateCubeMap(renderer, scene);
+		mesh.visible	= true
+	})
+	mesh.material.envMap	= cubeCamera.renderTarget
+	mesh.material.reflectivity =0.5
+}
+
+
+	var body	= bodyx.origin
+
+	body.angularDamping	= 0.5
 	body.linearDamping	= 0.5
 	
 	// ugly way to fix a missing 'onLoad()'
@@ -53,14 +73,14 @@ var Player	= function(){
 		sounds.playRoll(mesh)
 	}, 100)
 
-	
+	// TODO put that at the global game level
 	var impactEmitter	= new ImpactBallEmitter(scene)
 	updateFcts.push(function(delta, now){
 		impactEmitter.update(delta, now)
 	})
 	
 	// make a sound on collision
-	bodyx.origin.addEventListener("collide",function(event){
+	body.addEventListener("collide",function(event){
 		if( !sounds )	return;
 		var speed	= body.velocity.norm();
 		var volume	= speed/5;

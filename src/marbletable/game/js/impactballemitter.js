@@ -16,6 +16,7 @@ function ImpactBallEmitter(container){
 			blending		: THREE.AdditiveBlending,			map			: texture,
 			useScreenCoordinates	: false,
 			//color			: 0x666666
+			color		: new THREE.Color().setHSL(Math.random(),1,0.5),
 		})
 		// init sprite
 		var sprite	= new THREE.Sprite(material)

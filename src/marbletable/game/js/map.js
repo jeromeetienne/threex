@@ -116,7 +116,8 @@ var Map	= function(){
 		// init physics
 		var body	= new THREEx.CannonBody({
 			mesh	: mesh,
-			mass	: 0
+			mass	: 0,
+			material: pMaterialWall,
 		}).addTo(physicsWorld)
 		updateFcts.push(function(delta, now){
 			body.update(delta, now)
@@ -157,7 +158,8 @@ var Map	= function(){
 		// init physics
 		var body	= new THREEx.CannonBody({
 			mesh	: mesh,
-			mass	: 0
+			mass	: 0,
+			material: pMaterialGround,
 		}).addTo(physicsWorld)
 		updateFcts.push(function(delta, now){
 			body.update(delta, now)
