@@ -15,7 +15,7 @@
 	//		create the mirror ball						//
 	//////////////////////////////////////////////////////////////////////////////////
 	var mirrorBall	= new THREEx.MirrorBall(512)
-	scene.add(mirrorBall.object)
+	scene.add(mirrorBall.object3d)
 	updateFcts.push(function(delta, now){
 		mirrorBall.update(renderer, scene)
 	})
