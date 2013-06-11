@@ -18,6 +18,8 @@
 <!-- include for threex.mirrorball -->
 <script src='../../threex.mirrorball/threex.mirrorball.js'></script>
 
+<!-- include for threex.poolball -->
+<script src='../../threex.poolball/threex.poolball.js'></script>
 
 <script src='vendor/microcache.js'></script>
 <script src='vendor/microevent.js'></script>
@@ -41,7 +43,9 @@
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 
-<body><style>
+<body>
+<!-- include Timer html -->	
+<style>
 #timer {
 	position	: absolute;
 	top		: 0px;
@@ -60,6 +64,7 @@
 }
 </style>
 <div id="timer">Ready ?</div>
+
 <script>
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
@@ -117,7 +122,7 @@ require([ '../../threex.glow/package.require.js'
 		pMaterialPlayer,
 		pMaterialWall,
 		0.00,	// friction coefficient
-		1	// restitution
+		1.2	// restitution
 	));
 	// We must add the contact materials to the world
 	physicsWorld.origin.addContactMaterial(new CANNON.ContactMaterial(

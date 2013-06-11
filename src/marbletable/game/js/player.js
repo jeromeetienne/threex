@@ -3,10 +3,13 @@ var Player	= function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
 		var texture	= THREE.ImageUtils.loadTexture('images/wood.jpg');
 		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
+		var texture	= THREE.ImageUtils.loadTexture('images/water.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/venusmap.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/neptunemap.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/jupitermap.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/tile01.jpg');
+		var texture	= THREEx.createPoolBall.ballTexture('9', true, "#FDD017", 1024);
+
 		return texture
 	})
 	// handle updateFcts for sounds
@@ -18,13 +21,13 @@ var Player	= function(){
 	}
 
 	var radius	= 1.5 * GAME.tileW
-	
+
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
 	var material	= new THREE.MeshPhongMaterial({
-		// map	: texture,
-		// bumpMap	: texture,
-		// bumpScale: 0.001,
-		//color	: 'silver',
+		map	: texture,
+		bumpMap	: texture,
+		bumpScale: 0.02,
+		//color	: 'cyan',
 	})
 	var mesh	= new THREE.Mesh(geometry, material)
 	this.mesh	= mesh
@@ -54,7 +57,7 @@ if( true ){
 		mesh.visible	= true
 	})
 	mesh.material.envMap	= cubeCamera.renderTarget
-	mesh.material.reflectivity =0.5
+	mesh.material.reflectivity =0.2
 }
 
 

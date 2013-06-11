@@ -8,6 +8,8 @@ function initLighting(renderer, scene){
 	scene.add( light )
 
 	var light	= new THREE.DirectionalLight( 0xcccccc, 1 )
+	scene.add( light )
+
 	light.position.set(5,5,5)
 	light.target.position.set( 0, 0, 0 )
 

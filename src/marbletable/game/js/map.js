@@ -128,6 +128,7 @@ var Map	= function(){
 		var texture	= cache.getSet('texture.plywood.ground', function(){
 			var texture	= THREE.ImageUtils.loadTexture('images/plywood.jpg')
 			var texture	= THREE.ImageUtils.loadTexture('images/tile01.jpg')
+			var texture	= THREE.ImageUtils.loadTexture('images/square-outline.png')
 			return texture
 		})
 		var width	= Math.abs(x2 - x1)
@@ -139,11 +140,14 @@ var Map	= function(){
 			map		: texture,
 			bumpMap		: texture,
 			bumpScale	: 0.1,
+			color		: 'silver'
 		})
 		texture.wrapS	= THREE.RepeatWrapping;
 		texture.wrapT	= THREE.RepeatWrapping;
-		texture.repeat.x= 4
-		texture.repeat.y= 4
+		texture.repeat.x= 35
+		texture.repeat.y= 20
+		// texture.repeat.x= 4
+		// texture.repeat.y= 4
 
 		var mesh	= new THREE.Mesh(geometry, material)
 		table.add( mesh )
@@ -201,6 +205,7 @@ var Map	= function(){
 		});
 		
 		body.origin.addEventListener("collide",function(event){
+			if( event.with.material.name !== 'pMaterialPlayer' )	return;
 			yeller.dispatchEvent('killPlayer')
 		})
 	}	
