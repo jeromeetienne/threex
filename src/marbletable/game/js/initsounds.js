@@ -5,7 +5,7 @@ var initSounds	= function(){
 	//		webaudiox							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var contextx	= new WebAudiox.Contextx()
-	contextx.volume	= 0
+	contextx.volume	= 0.5
 
 	sounds.contextx	= contextx
 
@@ -16,6 +16,24 @@ var initSounds	= function(){
 			updateFct(delta, now)
 		})
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// init eatPill sound
+	sounds.playSoundTrack	= function(){
+		if( !sounds.soundTrack )	return
+		var source	= contextx.context.createBufferSource()
+		source.buffer	= sounds.soundTrack
+		source.loop	= true
+		source.connect(contextx.masterOut)
+		source.start(0)
+	}
+	WebAudiox.loadBuffer(contextx.context, 'sounds/marbles.mp3', function(buffer){
+		sounds.soundTrack	= buffer;
+		sounds.playSoundTrack()
+	})
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//

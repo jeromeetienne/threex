@@ -9,7 +9,7 @@ marble labyrinth with realistic physics
   * if not at this distance, force it at this distance while keeping the angle
   * Math.Atan2(deltaZ, deltaX) to get the angle
 * idea levels
-  * pools ball - bring them back from tQuery
+  * DONE pools ball - bring them back from tQuery
 
 ## ChangeLogs
 

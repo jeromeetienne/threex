@@ -1,11 +1,12 @@
 var THREEx	= THREEx	|| {}
+
 /**
  * smoothly keep controlled object3d at the source looking at the target object3d
  * @param  {THREE.Object3D} controlled the object being controlled
  * @param  {THREE.Object3D} source  the object being the theorical position of the controlled object
  * @param  {THREE.Object3D} target  the object being the direction to lookAt for the controlled object
  */
-THREEx.SmoothControls	= function(controlled, source, target){
+THREEx.LingeringControls	= function(controlled, source, target){
 	this.sourceDamping	= 3
 	this.targetDamping	= 3
 	var sourcePos	= null
