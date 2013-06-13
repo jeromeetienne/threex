@@ -16,27 +16,53 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var curve	= new THREE.ClosedSplineCurve3([
-		new THREE.Vector3(-0.5,-0.5, 0),
-		new THREE.Vector3(-0.5, 0.5, 0),
-		new THREE.Vector3( 0.5, 0.5, 0),
-		new THREE.Vector3( 0.5,-0.5, 0),
+		new THREE.Vector3(-1.5,-0.5, 0),
+		new THREE.Vector3(-1.5, 0.5, 0),
+		new THREE.Vector3( 1.5, 0.5, 0),
+		new THREE.Vector3( 1.5,-0.5, 0),
 	]);
 
 	// add an helper
 	scene.add(new THREEx.CurveHelper(curve, 50))	
 
 
+	var extrudeSettings = {
+		// amount		: 200,
+		// bevelEnabled	: true,
+		// bevelSegments	: 2,
+		// steps		: 150
+	}
+	extrudeSettings.extrudePath = curve;
+	
+	var geometry	= new THREE.TubeGeometry(extrudeSettings.extrudePath, 30, 0.2, 3, false, true);
+	var material	= new THREE.MeshBasicMaterial({
+		wireframe: true
+	})
+	var mesh	= new THREE.Mesh(geometry, material)
+	if ( geometry.debug ) mesh.add( geometry.debug );
+	
+	scene.add(mesh)
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		move an object along the curve at constant speed		//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var cursor	= new THREE.AxisHelper(0.2)
+	var cursor	= new THREE.AxisHelper(0.5)
+
+
 	scene.add( cursor );
 	updateFcts.push(function(delta, now){
 		var progress	= (0.2 * now) % 1;
 		var point	= curve.getPointAt(progress)
 		cursor.position.copy(point)
+		
+		var target	= curve.getPointAt((progress+0.02)%1)
+		cursor.lookAt(target)
 	})
+
+	// cursor.add(camera)
+	// camera.position.set(0,0,0)
+	// camera.rotation.y	= Math.PI
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
