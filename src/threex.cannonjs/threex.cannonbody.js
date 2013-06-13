@@ -89,8 +89,6 @@ THREEx.CannonBody.prototype.applyImpulse = function(force, deltaTime) {
 	var worldPoint	= new CANNON.Vec3(ballPosition.x, ballPosition.y, ballPosition.z)
 	var impulse	= new CANNON.Vec3(impulse.x, impulse.y, impulse.z)
 	body.applyImpulse(impulse, worldPoint);
-	// var cforce	= new CANNON.Vec3(force.x, force.y, force.z)
-	// body.applyForce(cforce, worldPoint);
 }
 
 THREEx.CannonBody.prototype.applyForce = function(force) {
