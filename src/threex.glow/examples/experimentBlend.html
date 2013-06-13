@@ -10,11 +10,82 @@
 <script src="../../../vendor/three.js/examples/js/shaders/HorizontalBlurShader.js"></script>
 <script src="../../../vendor/three.js/examples/js/shaders/VerticalBlurShader.js"></script>
 <script src="../threex.glow.js"></script>
+<script src="./BlendShader2.js"></script>
 <!-- include for threex.glowdatgui -->
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../threex.glowdatgui.js"></script>
 <!-- includes for the examples to blend the output of threex.glow -->
 <script src="../../../vendor/three.js/examples/js/shaders/BlendShader.js"></script>
+
+<script>
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Blend two textures
+ */
+
+THREE.BlendShader2 = {
+
+	uniforms: {
+
+		'tDiffuse1': { type: 't', value: null },
+		'tDiffuse2': { type: 't', value: null },
+		"srcColor":  { type: "v3", value: new THREE.Vector3(1,1,1 ) },
+
+	},
+
+	vertexShader: [
+
+		'varying vec2 vUv;',
+
+		'void main() {',
+
+			'vUv = uv;',
+			'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+
+		'}'
+
+	].join('\n'),
+
+	fragmentShader: [
+
+		'uniform sampler2D tDiffuse1;',
+		'uniform sampler2D tDiffuse2;',
+
+		'// Colour (tint) applied to source texture ',
+		'uniform vec4 srcColor; ',
+		'// Colour (tint) applied to destination texture. ',
+		'uniform vec4 dstColor; ',
+
+		'varying vec2 vUv;',
+		'#define SCREEN',
+		'vec3 blend (vec3 src, vec3 dst) {',
+			'#ifdef ADD ',
+			'	return src + dst; ',
+			'#endif',
+			'#ifdef SCREEN',
+				'return (src + dst) - (src * dst);',
+			'#endif',
+		'}',
+
+		'void main() {',
+			'// Get samples from both layers',
+			'vec4 dst = texture2D(tDiffuse1, vUv);',
+			'vec4 src = texture2D(tDiffuse2, vUv) * vec4(0.5,0.5,0.5,0.5);',
+
+			'// Apply blend operation',
+			'vec3 colour = clamp(blend(src.xyz, dst.xyz), 0.0, 1.0);',
+
+			'// Set fragment',
+			'gl_FragColor.xyz = colour;',
+			'gl_FragColor.w = 1.0;',
+		'}'
+
+	].join('\n')
+
+};
+
+</script>
 <!-- Start the code itself -->
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
 	// init renderer
@@ -93,6 +164,11 @@
 	effect.uniforms['tDiffuse2' ].value	= glow.renderTarget
 	effect.uniforms['mixRatio' ].value	= 0.5
 	effect.uniforms['opacity' ].value	= 2
+
+	var effect	= new THREE.ShaderPass( THREE.BlendShader2, 'tDiffuse1')
+	effect.uniforms['tDiffuse2' ].value	= glow.renderTarget
+	effect.uniforms['tDiffuse2' ].value	= glow.renderTarget
+	composer.addPass( effect )
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
 	updateFcts.push(function(delta, now){
