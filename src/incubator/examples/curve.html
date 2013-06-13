@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.CircleGeometry(0.2,32);
+	var material	= new THREE.MeshBasicMaterial({wireframe:true});
+	var cursor	= new THREE.Mesh( geometry, material );
+	scene.add( cursor );
+	
+	var curve	= new THREE.ClosedSplineCurve3([
+		new THREE.Vector3(-0.5,-0.5, 0),
+		new THREE.Vector3(-0.5, 0.5, 0),
+		new THREE.Vector3( 0.5, 0.5, 0),
+		new THREE.Vector3( 0.5,-0.5, 0),
+	]);
+	console.dir(curve)
+	
+	updateFcts.push(function(delta, now){
+		var progress	= (0.2 * now) % 1;
+		var point	= curve.getPointAt(progress)
+		cursor.position.copy(point)		
+	})
+
+	var THREEx	= THREEx	|| {}
+	/**
+	 * display the main point of the curve
+	 * @param  {[type]} curve [description]
+	 * @return {[type]}       [description]
+	 */
+	THREEx.CurveHelper	= function(curve, nSteps){
+		// build geometry
+		var geometry	= new THREE.Geometry();
+		for(var i = 0; i < nSteps; i++){
+			var vector3	= curve.getPointAt(i/nSteps)
+			geometry.vertices.push(vector3)
+		}
+		// handle the closed case
+		var isClosed	= false
+		isClosed	|= curve instanceof THREE.ClosedSplineCurve3
+		if( isClosed ){
+			var vector3	= curve.getPointAt(0)
+			geometry.vertices.push(vector3)			
+		}
+		// build the mesh
+		var material	= new THREE.LineBasicMaterial();	
+		var line	= new THREE.Line(geometry, material);
+		// return the just built mesh
+		return line;
+	}
+	scene.add(new THREEx.CurveHelper(curve, 100))	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// updateFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
