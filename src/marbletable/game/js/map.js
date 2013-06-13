@@ -20,29 +20,29 @@ var Map	= function(){
 	addWallGridLine( 25, 14, 25,-14)
 	addWallGridLine( 25,-15,-25,-15)
 
-	addWallGridLine( 19,-14, 19, -6)
-	addWallGridLine( 24,  4, 11,  4)
-	addWallGridLine( 10,  4, 10, -5)
-	addWallGridLine(  9, -5,-12, -5)
-	addWallGridLine(-13, -7,-13, -1)
-	addWallGridLine(-20, -3,-17, -3)
-	addWallGridLine(-21,  4,-21,  7)
-	addWallGridLine(-16,  7,-16, 10)
+	// addWallGridLine( 19,-14, 19, -6)
+	// addWallGridLine( 24,  4, 11,  4)
+	// addWallGridLine( 10,  4, 10, -5)
+	// addWallGridLine(  9, -5,-12, -5)
+	// addWallGridLine(-13, -7,-13, -1)
+	// addWallGridLine(-20, -3,-17, -3)
+	// addWallGridLine(-21,  4,-21,  7)
+	// addWallGridLine(-16,  7,-16, 10)
 
-	addWallGridLine( -6, 14, -6,  3)
-	addWallGridLine( -5,  3, -1,  3)
-	addWallGridLine(  0,  3,  0,  8)
-	addWallGridLine(  6, 11,  9, 11)
+	// addWallGridLine( -6, 14, -6,  3)
+	// addWallGridLine( -5,  3, -1,  3)
+	// addWallGridLine(  0,  3,  0,  8)
+	// addWallGridLine(  6, 11,  9, 11)
 	
-	addHole( 16,-12)
-	addHole( 13,  1)
-	addHole(-11, -7)
-	addHole(-22,-12)
-	addHole(-13,  1)
-	addHole(-22, 12)
-	addHole(- 9, 12)
-	addHole(  2,  8)
-	addHole( 13,  9)
+	// addHole( 16,-12)
+	// addHole( 13,  1)
+	// addHole(-11, -7)
+	// addHole(-22,-12)
+	// addHole(-13,  1)
+	// addHole(-22, 12)
+	// addHole(- 9, 12)
+	// addHole(  2,  8)
+	// addHole( 13,  9)
 
 	return;
 
@@ -136,11 +136,10 @@ var Map	= function(){
 		var depth	= Math.abs(z2 - z1)
 		var geometry	= new THREE.CubeGeometry(width, height, depth)
 		var material	= new THREE.MeshPhongMaterial({
-			color		: 0xffffff,
+			color		: 'hotpink',
 			map		: texture,
-			bumpMap		: texture,
-			bumpScale	: 0.1,
-			color		: 'silver'
+			// bumpMap		: texture,
+			// bumpScale	: 0.1,
 		})
 		texture.wrapS	= THREE.RepeatWrapping;
 		texture.wrapT	= THREE.RepeatWrapping;

@@ -24,6 +24,7 @@
 <script src='vendor/microcache.js'></script>
 <script src='vendor/microevent.js'></script>
 
+<script src="vendor/Tween.js"></script>
 <!-- include for threex.mirrorball -->
 <script src='vendor/webaudiox/build/webaudiox.js'></script>
 <!-- include the .js files for jsfx.js -->
@@ -33,13 +34,18 @@
 
 <script src='js/initlighting.js'></script>
 <script src='js/gametimer.js'></script>
-<script src='js/impactballemitter.js'></script>
-<script src='js/initsounds.js'></script>
+<script src='js/gamescore.js'></script>
+<script src='js/emitterbluetrail.js'></script>
+<script src='js/emitterimpactball.js'></script>
+<script src='js/emitterspeedtrail.js'></script>
+<script src='js/soundsbank.js'></script>
 <script src='js/player.js'></script>
 <script src='js/enemy.js'></script>
+<script src='js/bouncerbot.js'></script>
 <script src='js/playercontrols.js'></script>
 <script src='js/map.js'></script>
 <script src='js/threex.smoothcontrols.js'></script>
+<script src='js/threex.lingeringcontrols.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 
@@ -53,7 +59,7 @@
 	z-index		: 1;
 
 	font-family	: arial, verdana, sans-serif;
-	font-size	: 300%;
+	font-size	: 500%;
 	font-weight	: bolder;
 
 	color		: #000;
@@ -65,6 +71,25 @@
 </style>
 <div id="timer">Ready ?</div>
 
+<!-- include Timer html -->	
+<style>
+#score {
+	position	: absolute;
+	top		: 0px;
+	left		: 0;
+
+	font-family	: arial, verdana, sans-serif;
+	font-size	: 500%;
+	font-weight	: bolder;
+
+	color		: #000;
+	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
+
+	padding-left	: 10px;
+	padding-right	: 10px;
+}
+</style>
+<div id="score">0</div>
 <script>
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
@@ -93,10 +118,11 @@ require([ '../../threex.glow/package.require.js'
 	renderer.domElement.focus();
 
 
-
 	window.scene	= scene
 	window.renderer	= renderer
 	window.camera	= camera
+	
+	
 	window.physicsWorld	= physicsWorld
 
 
@@ -138,17 +164,34 @@ require([ '../../threex.glow/package.require.js'
 	window.GAME	= {}
 
 	GAME.tileW	= 0.2
-	var tileW	= GAME.tileW;
+
+
+	GAME.emitterImpactBall	= new EmitterImpactBall(scene)
+	updateFcts.push(function(delta, now){
+		GAME.emitterImpactBall.update(delta, now)
+	})
+	GAME.emitterSpeedTrail	= new EmitterSpeedTrail(scene)
+	updateFcts.push(function(delta, now){
+		GAME.emitterSpeedTrail.update(delta, now)
+	})
+	GAME.emitterBlueTrail	= new EmitterBlueTrail(scene)
+	updateFcts.push(function(delta, now){
+		GAME.emitterBlueTrail.update(delta, now)
+	})
 	
 	// upadte sounds
-	window.sounds	= initSounds();
+	window.sounds	= new SoundsBank();
 	updateFcts.push(function(delta, now){
 		sounds.update(delta, now)
 	})
 
 	// init lighting
 	initLighting(renderer, scene)
-	
+
+
+	updateFcts.push(function(delta, now){
+		TWEEN.update()	
+	})	
 
 	// add a skymap	
 	var mesh	= THREEx.createSkymap('skybox')
@@ -160,30 +203,42 @@ require([ '../../threex.glow/package.require.js'
 		gameTimer.update(delta, now)
 	})
 	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var gameScore	= new GameScore()
+		
+
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		ball								//
 	//////////////////////////////////////////////////////////////////////////////////
 	var player	= new Player();
-	var ball	= player.mesh;
 	GAME.ball	= player.mesh
 	updateFcts.push(function(delta, now){
 		player.update(delta, now)
 	})
 
-	
+	var bouncerBot	= new BouncerBot
+	updateFcts.push(function(delta, now){
+		bouncerBot.update(delta, now)
+	})
+	var body	= bouncerBot.object3d.userData.cannonBody.origin
+	body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
+
 	//////////////////////////////////////////////////////////////////////////
 	//		User Controls						//
 	//////////////////////////////////////////////////////////////////////////
 	
-	var playerControls	= new PlayerControls(ball)
+	var playerControls	= new PlayerControls(GAME.ball)
 	updateFcts.push(function(delta, now){
 		playerControls.update(delta, now)
 	})
 
 	// if the ball is below the table, kill it
 	updateFcts.push(function(delta, now){
-		var position	= ball.userData.cannonBody.origin.position;
+		var position	= GAME.ball.userData.cannonBody.origin.position
 		if( position.y < -2 )	yeller.dispatchEvent('spawnPlayer')
 	})
 
@@ -195,26 +250,26 @@ require([ '../../threex.glow/package.require.js'
 
 		playerControls.disable	= false
 
-		sounds.playSpawn();
+		sounds.playSpawn()
 
-		var body	= ball.userData.cannonBody.origin
-		body.position.set(+22*tileW, 2, -13*tileW)
+		var body	= GAME.ball.userData.cannonBody.origin
+		body.position.set(+22*GAME.tileW, 2, -13*GAME.tileW)
 		body.velocity.set(0,0,0)
 		body.angularVelocity.set(0,0,0)
 	})
-			
+
 	yeller.addEventListener('killPlayer', function(){
 		console.log('killPlayer')
 		sounds.playDie()
-		gameTimer.timerEnd	= Date.now();
+		gameTimer.timerEnd	= Date.now()
 
-		var body	= ball.userData.cannonBody.origin
+		var body	= GAME.ball.userData.cannonBody.origin
 		body.velocity.set(0,0,0)
 		body.angularVelocity.set(0,0,0)
 
-		var worldPoint	= new CANNON.Vec3(ball.position.x, ball.position.y, ball.position.z)
+		var worldPoint	= new CANNON.Vec3(GAME.ball.position.x, GAME.ball.position.y, GAME.ball.position.z)
 		var impulse	= new CANNON.Vec3(0,1.1,0)
-		body.applyImpulse(impulse, worldPoint);
+		body.applyImpulse(impulse, worldPoint)
 
 		playerControls.disable	= true
 		setTimeout(function(){
@@ -222,11 +277,11 @@ require([ '../../threex.glow/package.require.js'
 		}, 0.8*1000)
 	})
 
-	var enemy	= new Enemy()
-	enemy.object3d.userData.cannonBody.origin.position.set(+10*tileW, 2, 0*tileW)
-	updateFcts.push(function(delta, now){
-		enemy.update(delta, now)
-	})
+	// var enemy	= new Enemy()
+	// enemy.object3d.userData.cannonBody.origin.position.set(+10*GAME.tileW, 2, 0*GAME.tileW)
+	// updateFcts.push(function(delta, now){
+	// 	enemy.update(delta, now)
+	// })
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		camera controls							//
@@ -235,16 +290,18 @@ require([ '../../threex.glow/package.require.js'
 	var cameraHolder	= new THREE.Object3D
 	scene.add(cameraHolder)
 
-	var deltaCamera		= new THREE.Vector3(0,3,5)
+	var deltaCamera		= new THREE.Vector3(5,3,0)
 	updateFcts.push(function(delta, now){
-		cameraHolder.position.copy(ball.position)
+		cameraHolder.position.copy(GAME.ball.position)
 		cameraHolder.position.add(deltaCamera)
 	})
-	
-	var controls	= new THREEx.SmoothControls(camera, cameraHolder, ball)
-	updateFcts.push(function(delta, now){
-		controls.update(delta, now)
-	})
+
+	;(function(){
+		var controls	= new THREEx.SmoothControls(camera, cameraHolder, GAME.ball)
+		updateFcts.push(function(delta, now){
+			controls.update(delta, now)
+		})
+	})()
 
 	var deltaCameras	= [
 		new THREE.Vector3( 0, 3, 5),
@@ -269,12 +326,10 @@ require([ '../../threex.glow/package.require.js'
 		cameraIdx	= (cameraIdx+deltaCameras.length)%deltaCameras.length
 		deltaCamera	= deltaCameras[cameraIdx]
 	})
-	
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-
 
 	var map		= new Map()
 	scene.add(map.object3d)

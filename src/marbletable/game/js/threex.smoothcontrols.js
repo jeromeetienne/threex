@@ -6,8 +6,8 @@ var THREEx	= THREEx	|| {}
  * @param  {THREE.Object3D} target  the object being the direction to lookAt for the controlled object
  */
 THREEx.SmoothControls	= function(controlled, source, target){
-	this.sourceDamping	= 3
-	this.targetDamping	= 3
+	this.sourceDamping	= 0.1
+	this.targetDamping	= 0.1
 	var sourcePos	= null
 	var targetPos	= null
 	var _vector3	= new THREE.Vector3()
@@ -16,12 +16,12 @@ THREEx.SmoothControls	= function(controlled, source, target){
 		source.updateMatrixWorld();
 		_vector3.getPositionFromMatrix( source.matrixWorld )
 		sourcePos	= sourcePos || _vector3.clone()
-		sourcePos.lerp(_vector3, this.sourceDamping*delta)
+		sourcePos.lerp(_vector3, this.sourceDamping)
 		// compute world position for target
 		target.updateMatrixWorld();
 		_vector3.getPositionFromMatrix( target.matrixWorld )
-		targetPos	= targetPos || _vector3.clone()				
-		targetPos.lerp(_vector3, this.targetDamping*delta)
+		targetPos	= targetPos || _vector3.clone()
+		targetPos.lerp(_vector3, this.targetDamping)
 		// position controlled at sourcePos looking at targetPos
 		controlled.position.copy(sourcePos)	
 		controlled.lookAt(targetPos)			

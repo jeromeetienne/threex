@@ -47,6 +47,7 @@ var Player	= function(){
 	})
 
 if( true ){
+// to get a mirror ball
 	// create the camera
 	var cubeCamera	= new THREE.CubeCamera( 0.001, 1000, 512 );
 	scene.add( cubeCamera )
@@ -57,14 +58,13 @@ if( true ){
 		mesh.visible	= true
 	})
 	mesh.material.envMap	= cubeCamera.renderTarget
-	mesh.material.reflectivity =0.2
+	mesh.material.reflectivity	= 0.2
 }
-
 
 	var body	= bodyx.origin
 
-	body.angularDamping	= 0.5
-	body.linearDamping	= 0.5
+	body.angularDamping	= 0.9
+//	body.linearDamping	= 0.5
 	
 	// ugly way to fix a missing 'onLoad()'
 	// 
@@ -76,10 +76,11 @@ if( true ){
 		sounds.playRoll(mesh)
 	}, 100)
 
-	// TODO put that at the global game level
-	var impactEmitter	= new ImpactBallEmitter(scene)
 	updateFcts.push(function(delta, now){
-		impactEmitter.update(delta, now)
+		var speed	= body.velocity.norm();
+		if( speed < 4.5 )	return
+		//GAME.emitterSpeedTrail.emitThrottle(mesh.position, 1/(10 * delta))
+		GAME.emitterBlueTrail.emit(mesh.position)
 	})
 	
 	// make a sound on collision
@@ -95,7 +96,7 @@ if( true ){
 		else if( speed < 6.5 )	nEmit = 4;
 		else			nEmit = 8;
 		for(var i = 0; i < nEmit; i++){
-			impactEmitter.emit(mesh.position)		
+			GAME.emitterImpactBall.emit(mesh.position)		
 		}
 	})
 }

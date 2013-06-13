@@ -1,5 +1,4 @@
-// TODO make that a class
-var initSounds	= function(){
+var SoundsBank	= function(){
 	var sounds	= {}
 	//////////////////////////////////////////////////////////////////////////////////
 	//		webaudiox							//
@@ -123,11 +122,10 @@ var initSounds	= function(){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-	
 
 	// init a sound with jsfx
 	sounds.playDie	= function(){
-		if( !sounds.dieBuffer )	return
+		if( !sounds.bounceBuffer )	return
 		var source	= contextx.context.createBufferSource()
 		source.buffer	= sounds.dieBuffer
 		source.connect(contextx.masterOut)
@@ -135,6 +133,22 @@ var initSounds	= function(){
 	}
 	var lib		= ["square",0.0000,0.4000,0.0000,0.0240,0.0000,0.2680,20.0000,560.0000,2400.0000,-0.5220,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.2295,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.2130,0.0000]
 	sounds.dieBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// init a sound with jsfx
+	sounds.playBounce	= function(){
+		if( !sounds.bounceBuffer )	return
+		var source	= contextx.context.createBufferSource()
+		source.buffer	= sounds.bounceBuffer
+		source.connect(contextx.masterOut)
+		source.start(0)
+	}
+	var lib		= ["saw",0.0000,0.4000,0.0000,0.2040,0.0000,0.2740,20.0000,528.0000,2400.0000,0.1220,0.0000,0.5620,24.8208,0.0003,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000];
+	sounds.bounceBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
