@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='./threex.curvehelper.js'></script>
+<body style='margin: 0px; background-color: #000; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// build wayPoints
+	var wayPoints	= [];
+	for(var i = 0;i < 100; i++){
+		var position	= new THREE.Vector3()
+		position.x	= 2 * (Math.random()-0.5)
+		position.y	= 2 * (Math.random()-0.5)
+		position.z	= 2 * (Math.random()-0.5)
+		wayPoints.push( position );
+	}
+
+	// build geometry
+	var geometry	= new THREE.Geometry(); 
+	var curve	= new THREE.ClosedSplineCurve3( wayPoints )
+	var nSteps	= wayPoints.length * 20
+	for( i = 0; i < nSteps; i++){
+	 	var progress	= i/nSteps;
+		geometry.vertices.push( curve.getPointAt(progress) )
+		geometry.colors.push( new THREE.Color().setHSL( (progress*6)%1, 1.0, 0.5 ) )
+	}
+	// close the curve
+	geometry.vertices.push( geometry.vertices[0] )
+	geometry.colors.push( geometry.colors[0] )
+	// build material
+	var material	= new THREE.LineBasicMaterial({
+		opacity		: 0.6,
+		linewidth	: 1,
+		vertexColors	: THREE.VertexColors,
+	});
+	var line	= new THREE.Line(geometry, material, THREE.LineStrip);
+	scene.add(line)
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

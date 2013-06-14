@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='./threex.curvehelper.js'></script>
+<body style='margin: 0px; background-color: #000; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var displaceMin	= 0.1
+	function drawLightning(vertices, point1, point2,displace){
+		if( displace < displaceMin ){
+			if( vertices.length === 0 )	vertices.push(point1)
+			vertices.push(point2)
+		} else {
+			var middle	= point1.clone().add(point2).multiplyScalar(0.5)
+			middle.x	+= (Math.random()-.5)*displace;
+			middle.y	+= (Math.random()-.5)*displace;
+			drawLightning(vertices, point1, middle,displace/2);
+			drawLightning(vertices, middle, point2,displace/2);
+		}
+	}
+
+	// build geometry
+	var positionBeg	= new THREE.Vector3(-2,0,0)
+	var positionEnd	= new THREE.Vector3( 2,0,0)
+	var geometry	= new THREE.Geometry(); 
+	updateFcts.push(function(delta, now){
+		geometry.vertices	= []
+		drawLightning(geometry.vertices, positionBeg, positionEnd, 1.5)
+		geometry.verticesNeedUpdate = true;
+	})
+
+	var material	= new THREE.LineBasicMaterial();
+	var line	= new THREE.Line(geometry, material, THREE.LineStrip);
+	scene.add(line)
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
