@@ -38,7 +38,7 @@
 		drawLightning(geometry.vertices, positionBeg, positionEnd, 1.5)
 		geometry.verticesNeedUpdate = true;
 	})
-
+	// build the rest of the lines
 	var material	= new THREE.LineBasicMaterial();
 	var line	= new THREE.Line(geometry, material, THREE.LineStrip);
 	scene.add(line)
