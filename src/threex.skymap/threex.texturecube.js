@@ -66,10 +66,10 @@ THREEx.TextureCube.initWellKnownUrls	= function(baseUrl){
 	wellKnownUrls['bridge2']		= THREEx.TextureCube.createUrls('Bridge2'		, '.jpg', rootUrl, 'pos', 'neg'),
 	wellKnownUrls['escher']			= THREEx.TextureCube.createUrls('Escher'		, '.jpg', rootUrl),
 	wellKnownUrls['park2']			= THREEx.TextureCube.createUrls('Park2'			, '.jpg', rootUrl, 'pos', 'neg'),
-	wellKnownUrls['park3Med']		= THREEx.TextureCube.createUrls('Park3Med'		, '.jpg', rootUrl),
+	wellKnownUrls['park3med']		= THREEx.TextureCube.createUrls('Park3Med'		, '.jpg', rootUrl),
 	wellKnownUrls['pisa']			= THREEx.TextureCube.createUrls('pisa'			, '.png', rootUrl),
 	wellKnownUrls['skybox']			= THREEx.TextureCube.createUrls('skybox'		, '.jpg', rootUrl),
-	wellKnownUrls['swedishRoyalCastle']	= THREEx.TextureCube.createUrls('SwedishRoyalCastle'	, '.jpg', rootUrl),
+	wellKnownUrls['swedishroyalcastle']	= THREEx.TextureCube.createUrls('SwedishRoyalCastle'	, '.jpg', rootUrl),
 
 	wellKnownUrls['mars']			= THREEx.TextureCube.createUrls('mars'			, '.jpg', rootUrl)
 
