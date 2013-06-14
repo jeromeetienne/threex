@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<script src='./threex.curvehelper.js'></script>
+<script src="../../../vendor/require.js/require.js"></script>
+
 <body style='margin: 0px; background-color: #000; overflow: hidden;'><script>
+require([ '../../threex.effectcomposer/package.require.js'
+], function(){
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -10,38 +13,61 @@
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var displaceMin	= 0.1
+	var displaceMin	= 0.05
+	// from http://krazydad.com/bestiary/bestiary_lightning.html
 	function drawLightning(vertices, point1, point2,displace){
 		if( displace < displaceMin ){
 			if( vertices.length === 0 )	vertices.push(point1)
 			vertices.push(point2)
 		} else {
 			var middle	= point1.clone().add(point2).multiplyScalar(0.5)
-			middle.x	+= (Math.random()-.5)*displace;
-			middle.y	+= (Math.random()-.5)*displace;
-			drawLightning(vertices, point1, middle,displace/2);
-			drawLightning(vertices, middle, point2,displace/2);
+			middle.x	+= (Math.random()-0.5)*displace;
+			middle.y	+= (Math.random()-0.5)*displace;
+			drawLightning(vertices, point1, middle, displace/2);
+			drawLightning(vertices, middle, point2, displace/2);
 		}
 	}
 
-	// build geometry
-	var positionBeg	= new THREE.Vector3(-2,0,0)
-	var positionEnd	= new THREE.Vector3( 2,0,0)
-	var geometry	= new THREE.Geometry(); 
-	updateFcts.push(function(delta, now){
-		geometry.vertices	= []
-		drawLightning(geometry.vertices, positionBeg, positionEnd, 1.5)
-		geometry.verticesNeedUpdate = true;
-	})
-	// build the rest of the lines
-	var material	= new THREE.LineBasicMaterial();
-	var line	= new THREE.Line(geometry, material, THREE.LineStrip);
-	scene.add(line)
+for(var i = 0; i < 10; i++){
+	(function(){
+		// build geometry
+		var positionBeg	= new THREE.Vector3(-2,0,0)
+		var positionEnd	= new THREE.Vector3( 2,0,0)
+		var geometry	= new THREE.Geometry(); 
+
+		var lastTime	= null
+		var period	= -1;
+		updateFcts.push(function(delta, now){
+			// rate limiter
+			lastTime	= lastTime !== null ? lastTime : now
+			if( now - lastTime < period )	return;
+			lastTime	= now 
+			period	= 0.2 + Math.random() * 0.2
+			// update vertices		
+			geometry.vertices	= []
+			drawLightning(geometry.vertices, positionBeg, positionEnd, 1.5)
+			geometry.verticesNeedUpdate = true;
+
+			material.color.setHSL(Math.random(), 1.0, 0.5)
+		})
+		// build the rest of the lines
+		var material	= new THREE.LineBasicMaterial({
+			linewidth	: 5,
+			//color		: 'cyan',
+			blending	: THREE.MultiplyBlending,
+			//transparent	: true,
+		});
+		
+		var line	= new THREE.Line(geometry, material, THREE.LineStrip);
+		scene.add(line)
+	})()
+}
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -54,15 +80,23 @@
 		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
 		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
 		camera.lookAt( scene.position )
-	})
-
+	})		
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////
-	updateFcts.push(function(){
-		renderer.render( scene, camera );		
+	var composer	= new THREEx.EffectComposer(renderer)
+		.renderPass(scene, camera)
+		.motionBlur(0.8)
+		.bloom(5)
+		.bleachbypass(0.99)
+		.copy()
+		.finish()
+	updateFcts.push(function(delta, now){
+		composer.update(delta);
 	})
+	
+
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loop runner							//
@@ -80,4 +114,5 @@
 			updateFn(deltaMsec/1000, nowMsec/1000)
 		})
 	})
+})
 </script></body>
