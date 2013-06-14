@@ -26,15 +26,7 @@
 	scene.add(new THREEx.CurveHelper(curve, 50))	
 
 
-	var extrudeSettings = {
-		// amount		: 200,
-		// bevelEnabled	: true,
-		// bevelSegments	: 2,
-		// steps		: 150
-	}
-	extrudeSettings.extrudePath = curve;
-	
-	var geometry	= new THREE.TubeGeometry(extrudeSettings.extrudePath, 30, 0.2, 3, false, true);
+	var geometry	= new THREE.TubeGeometry(curve, 30, 0.2, 50, false, true);
 	var material	= new THREE.MeshBasicMaterial({
 		wireframe: true
 	})
@@ -48,16 +40,11 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var cursor	= new THREE.AxisHelper(0.5)
-
-
 	scene.add( cursor );
 	updateFcts.push(function(delta, now){
 		var progress	= (0.2 * now) % 1;
 		var point	= curve.getPointAt(progress)
 		cursor.position.copy(point)
-		
-		var target	= curve.getPointAt((progress+0.02)%1)
-		cursor.lookAt(target)
 	})
 
 	// cursor.add(camera)
@@ -67,16 +54,16 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
-	var mouse	= {x : 0, y : 0}
-	document.addEventListener('mousemove', function(event){
-		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
-		mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	}, false)
-	updateFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
-		camera.lookAt( scene.position )
-	})
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// updateFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
 
 
 	//////////////////////////////////////////////////////////////////////////////////
