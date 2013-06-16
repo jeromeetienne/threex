@@ -128,20 +128,21 @@ require([ '../../threex.skymap/package.require.js'
 
 	var texture	= THREE.ImageUtils.loadTexture('../../marbletable/game/images/water.jpg')
 	texture.wrapS	= texture.wrapT	= THREE.RepeatWrapping;
-	texture.repeat.set(0.2, 0.2);
+	texture.repeat.set(2,2);
 
 	var geometry	= new THREE.IcosahedronGeometry( 1, 4 )
+	var geometry	= new THREE.SphereGeometry( 1, 32*4, 32*2 )
 
 	// put some noise in the geometry
 	geometry.vertices.forEach(function(vertex){
 		var length	= vertex.length()
-		length		+= (Math.random()-0.5)*0.005
+		length		+= (Math.random()-0.5)*0.003
 		vertex.setLength( length )
 	})
 	geometry.computeFaceNormals()
 
 	var material	= new THREE.MeshPhongMaterial({
-		//map		: texture,
+		map		: texture,
 		envMap		: textureCube,
 		reflectivity	: 3.5,
 		//combine		: THREE.MultiplyOperation,
@@ -156,8 +157,8 @@ require([ '../../threex.skymap/package.require.js'
 		specular	: 'white',
 		emissive	: '#222',
 		shininess	: 50,
-		//metal		: true,
-		perPixel	: false,
+		metal		: true,
+		//perPixel	: false,
 		//opacity		: 0.2,
 	});
 	

@@ -12,13 +12,13 @@ require([ '../../threex.effectcomposer/package.require.js'
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
-	camera.position.z = 3;
+	camera.position.z = 5;
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var displaceMin	= 0.05
+	var displaceMin	= 0.01
 	// from http://krazydad.com/bestiary/bestiary_lightning.html
 	function drawLightning(vertices, point1, point2,displace){
 		if( displace < displaceMin ){
@@ -33,11 +33,11 @@ require([ '../../threex.effectcomposer/package.require.js'
 		}
 	}
 
-for(var i = 0; i < 10; i++){
+	var positionBeg	= new THREE.Vector3(-2,0,0)
+	var positionEnd	= new THREE.Vector3( 2,0,0)
+for(var i = 0; i < 1; i++){
 	(function(){
 		// build geometry
-		var positionBeg	= new THREE.Vector3(-2,0,0)
-		var positionEnd	= new THREE.Vector3( 2,0,0)
 		var geometry	= new THREE.Geometry(); 
 
 		var lastTime	= null
@@ -47,19 +47,19 @@ for(var i = 0; i < 10; i++){
 			lastTime	= lastTime !== null ? lastTime : now
 			if( now - lastTime < period )	return;
 			lastTime	= now 
-			period	= 0.2 + Math.random() * 0.2
+			period	= 0.3 + Math.random() * 0.2
 			// update vertices		
 			geometry.vertices	= []
-			drawLightning(geometry.vertices, positionBeg, positionEnd, 1.5)
+			drawLightning(geometry.vertices, positionBeg, positionEnd, 2)
 			geometry.verticesNeedUpdate = true;
 
 			material.color.setHSL(Math.random(), 1.0, 0.5)
 		})
 		// build the rest of the lines
 		var material	= new THREE.LineBasicMaterial({
-			linewidth	: 5,
-			//color		: 'cyan',
-			blending	: THREE.MultiplyBlending,
+			linewidth	: 8,
+			color		: 'cyan',
+			//blending	: THREE.MultiplyBlending,
 			//transparent	: true,
 		});
 		
@@ -67,6 +67,37 @@ for(var i = 0; i < 10; i++){
 		scene.add(line)
 	})()
 }
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		pilons								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	var piloneL	= new THREE.Object3D()
+	piloneL.position.copy(positionBeg.clone().add(new THREE.Vector3(-0.5, 0, 0)))
+	scene.add(piloneL)
+	var geometry	= new THREE.SphereGeometry(0.5, 32, 16)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh(geometry, material)
+	piloneL.add(mesh)
+	var geometry	= new THREE.CylinderGeometry(0.1, 0.1, 3)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh(geometry, material)
+	mesh.position.y	= (-3 / 2)
+	piloneL.add(mesh)
+	
+	var piloneR	= new THREE.Object3D()
+	piloneR.position.copy(positionEnd.clone().add(new THREE.Vector3(+0.5, 0, 0)))
+	scene.add(piloneR)
+	var geometry	= new THREE.SphereGeometry(0.5, 32, 16)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh(geometry, material)
+	piloneR.add(mesh)
+	var geometry	= new THREE.CylinderGeometry(0.1, 0.1, 3)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh(geometry, material)
+	mesh.position.y	= (-3 / 2)
+	piloneR.add(mesh)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
