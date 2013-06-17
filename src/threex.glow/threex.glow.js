@@ -50,8 +50,8 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	effect.uniforms[ 'v' ].value	= blurVLevel
 	composer.addPass( effect )
 
-	// mark the last pass as ```renderToScreen```
-	composer.passes[composer.passes.length-1].renderToScreen	= true;
+	// // mark the last pass as ```renderToScreen```
+	// composer.passes[composer.passes.length-1].renderToScreen	= true;
 }
 
 THREEx.Glow.prototype.update = function(delta, now) {
