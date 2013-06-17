@@ -16,7 +16,6 @@ THREEx.GodRays	= function(renderer, camera, renderTarget){
 	var scene	= new THREE.Scene
 	this.scene	= scene
 
-
 	// create the composer
 	var composer	= new THREE.EffectComposer( renderer, renderTarget );
 	this.composer	= composer
@@ -31,15 +30,8 @@ THREEx.GodRays	= function(renderer, camera, renderTarget){
 
 	console.assert( THREE.HorizontalBlurShader )
 	console.assert( THREE.VerticalBlurShader )
+	console.assert( THREE.RadialBlurShader )
 
-	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-	effect.uniforms[ 'h' ].value	= blurHLevel 
-	composer.addPass( effect )
-	// add VerticalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-	effect.uniforms[ 'v' ].value	= blurVLevel
-	composer.addPass( effect )
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= blurHLevel 
@@ -52,19 +44,32 @@ THREEx.GodRays	= function(renderer, camera, renderTarget){
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREEx.RadialBlurShader )
 	composer.addPass( effect )
-
-	// TODO to remove
-	var effect	= new THREE.ShaderPass( THREE.CopyShader )
-	composer.addPass( effect )
-
-
-	// mark the last pass as ```renderToScreen```
-	composer.passes[composer.passes.length-1].renderToScreen	= true;
 };
+
+
+THREEx.GodRays.prototype.updateSunPosition = function(object3d){
+	var projector	= new THREE.Projector()
+	var rBlurPass	= this.composer.passes[3]
+	
+	// apply the force to the center of the mesh
+	mesh.updateMatrixWorld()
+	// get world position
+	var sunScreenPos= new THREE.Vector3()
+	sunScreenPos.getPositionFromMatrix(mesh.matrixWorld)
+	projector.projectVector( sunScreenPos, camera );
+
+	// translation in coordinate from [-1, 1] to [0, 1]
+	sunScreenPos.x	= ( sunScreenPos.x + 1 ) / 2;
+	sunScreenPos.y	= ( sunScreenPos.y + 1 ) / 2;
+
+	// update shader 
+	rBlurPass.uniforms['fSunScreenX'].value	= sunScreenPos.x;
+	rBlurPass.uniforms['fSunScreenY'].value	= sunScreenPos.y;
+}
 
 THREEx.GodRays.prototype.update = function(delta, now) {
 	this.composer.render(delta);
-};
+}
 
 /**
  * copy the scene. This is a helper function. you can build you scene the way you want
