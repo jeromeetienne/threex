@@ -44,6 +44,23 @@ var BotEnemy	= function(){
 		bodyx.update(delta, now)
 	})
 
+	// count the number of body of this type - used to fix startPosition
+	var bodyCounter	= 0
+	scene.traverse(function(object3d){
+		var isBall	= / enemy /.test(object3d.name) ? true : false
+		if( !isBall )	return
+		bodyCounter++
+	})
+	// setup origin	
+	var origin	= new CANNON.Vec3()
+	origin.set(-20*GAME.tileW, 6*GAME.tileW, -10*GAME.tileW)
+	origin.z	*= Math.floor(bodyCounter % 2) === 1 ? 1 : -1
+	origin.x	+= (Math.random()-0.5)*GAME.tileW*10;
+	origin.y	+= bodyCounter * radius*2 * 1.5
+	origin.z	+= (Math.random()-0.5)*GAME.tileW*10;
+	// init origin
+	body.position.set(origin.x, origin.y, origin.z)
+
 	// body.angularDamping	= 0
 	// body.linearDamping	= 0
 	
@@ -61,12 +78,30 @@ var BotEnemy	= function(){
 		var direction	= GAME.ball.position.clone().sub(mesh.position);
 		direction.y	= 0
 		var force	= direction.setLength(0.6)
-		// var length	= direction.length()*1-2
-		// length	= Math.pow(length, 2)
-		// var force	= direction.setLength(length)
-		
-		var cannonBody	= mesh.userData.cannonBody
-		cannonBody.applyImpulse(force, delta)
-	});	
+		// apply it
+		bodyx.applyImpulse(force, delta)
+	});
+
+	// kill player if touching the goal
+	body.addEventListener("collide",function(event){
+		var collidedObj	= event.with.userData.object3d
+		var isGoal	= / goal /.test(collidedObj.name) ? true : false
+		if( !isGoal )	return
+		// reset all velocity
+		body.velocity.set(0,0,0)
+		body.angularVelocity.set(0,0,0)
+		// set player position
+		body.position.set(origin.x, origin.y, origin.z)
+		// emit a sound
+		sounds.playExplosion()
+		// emite particle
+		for(var i = 0; i < 10; i++){
+			GAME.emitterImpactBall.emit(mesh.position)
+		}
+		// increase score
+		yeller.dispatchEvent('increaseScore', 10)
+		// emit a score
+		GAME.emitterScore.emit(mesh.position, '10')
+	})
 
 }

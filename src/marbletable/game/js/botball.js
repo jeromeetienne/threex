@@ -39,25 +39,22 @@ var BotBall	= function(){
 	var body	= bodyx.origin
 
 	// count the number of body of this type - used to fix startPosition
-	var ballCounter	= 0
+	var bodyCounter	= 0
 	scene.traverse(function(object3d){
 		var isBall	= / ball /.test(object3d.name) ? true : false
 		if( !isBall )	return
-		ballCounter++
+		bodyCounter++
 	})
-
-
 	// setup origin	
 	var origin	= new CANNON.Vec3()
 	origin.set(-6*GAME.tileW, 6*GAME.tileW, -10*GAME.tileW)
-	origin.x	+= (Math.random()-0.5)*GAME.tileW*2;
-	origin.y	+= ballCounter * radius*2 * 1.5
-	origin.z	+= (Math.random()-0.5)*GAME.tileW*2;
+	origin.z	*= Math.floor(bodyCounter % 2) === 1 ? 1 : -1
+	origin.x	+= (Math.random()-0.5)*GAME.tileW*10;
+	origin.y	+= bodyCounter * radius*2 * 1.5
+	origin.z	+= (Math.random()-0.5)*GAME.tileW*5;
 	// init origin
 	body.position.set(origin.x, origin.y, origin.z)
 	
-	
-
 	// kill player if touching the goal
 	body.addEventListener("collide",function(event){
 		var collidedObj	= event.with.userData.object3d
@@ -66,14 +63,18 @@ var BotBall	= function(){
 		// reset all velocity
 		body.velocity.set(0,0,0)
 		body.angularVelocity.set(0,0,0)
-		// kill the player
+		// set player position
 		body.position.set(origin.x, origin.y, origin.z)
 		// emite particle
 		for(var i = 0; i < 10; i++){
 			GAME.emitterImpactBall.emit(mesh.position)
 		}
+		// emit a sound
+		sounds.playExplosion()
 		// increase score
 		yeller.dispatchEvent('increaseScore', 10)
+		// emit a score
+		GAME.emitterScore.emit(mesh.position, '10')
 	})
 	
 	return;

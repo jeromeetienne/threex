@@ -38,6 +38,7 @@
 <script src='js/emitterbluetrail.js'></script>
 <script src='js/emitterimpactball.js'></script>
 <script src='js/emitterspeedtrail.js'></script>
+<script src='js/emitterscore.js'></script>
 <script src='js/soundsbank.js'></script>
 <script src='js/player.js'></script>
 <script src='js/botenemy.js'></script>
@@ -46,34 +47,14 @@
 <script src='js/botgoal.js'></script>
 <script src='js/playercontrols.js'></script>
 <script src='js/map.js'></script>
-<script src='js/threex.smoothcontrols.js'></script>
+<script src='js/threex.smoothholdercontrols.js'></script>
 <script src='js/threex.lingeringcontrols.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 
 <body>
-<!-- include Timer html -->	
-<style>
-#timer {
-	position	: absolute;
-	top		: 0px;
-	right		: 0;
-	z-index		: 1;
 
-	font-family	: arial, verdana, sans-serif;
-	font-size	: 500%;
-	font-weight	: bolder;
-
-	color		: #000;
-	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
-
-	padding-left	: 10px;
-	padding-right	: 10px;
-}
-</style>
-<div id="timer">Ready ?</div>
-
-<!-- include Timer html -->	
+<!-- include Score html -->	
 <style>
 #score {
 	position	: absolute;
@@ -91,7 +72,45 @@
 	padding-right	: 10px;
 }
 </style>
-<div id="score">0</div>
+<div id="score"></div>
+<!-- include Score html -->	
+<style>
+#timer {
+	position	: absolute;
+	bottom		: 0px;
+	left		: 0;
+
+	font-family	: arial, verdana, sans-serif;
+	font-size	: 500%;
+	font-weight	: bolder;
+
+	color		: #000;
+	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
+
+	padding-left	: 10px;
+	padding-right	: 10px;
+}
+</style>
+<div id="timer"></div>
+<!-- include live html -->	
+<style>
+#livesCounter {
+	position	: absolute;
+	top		: 0px;
+	right		: 0;
+
+	font-family	: arial, verdana, sans-serif;
+	font-size	: 500%;
+	font-weight	: bolder;
+
+	color		: #000;
+	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
+
+	padding-left	: 10px;
+	padding-right	: 10px;
+}
+</style>
+<div id="livesCounter"></div>
 <script>
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
@@ -166,8 +185,15 @@ require([ '../../threex.glow/package.require.js'
 	window.GAME	= {}
 
 	GAME.tileW	= 0.2
+	
+	GAME.nLives	= 3;
+	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
 
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	GAME.emitterImpactBall	= new EmitterImpactBall(scene)
 	updateFcts.push(function(delta, now){
 		GAME.emitterImpactBall.update(delta, now)
@@ -180,6 +206,16 @@ require([ '../../threex.glow/package.require.js'
 	updateFcts.push(function(delta, now){
 		GAME.emitterBlueTrail.update(delta, now)
 	})
+	GAME.emitterScore	= new EmitterScore(scene)
+	updateFcts.push(function(delta, now){
+		GAME.emitterScore.update(delta, now)
+	})
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	
 	// upadte sounds
 	window.sounds	= new SoundsBank();
@@ -199,22 +235,25 @@ require([ '../../threex.glow/package.require.js'
 	var mesh	= THREEx.createSkymap('skybox')
 	scene.add( mesh );
 
-	// add gameTimer
-	var gameTimer	= new GameTimer()
-	updateFcts.push(function(delta, now){
-		gameTimer.update(delta, now)
-	})
+	// // add gameTimer
+	// var gameTimer	= new GameTimer()
+	// updateFcts.push(function(delta, now){
+	// 	gameTimer.update(delta, now)
+	// })
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var gameScore	= new GameScore()
+	// to init score display at 0
+	yeller.dispatchEvent('increaseScore', 0)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		ball								//
 	//////////////////////////////////////////////////////////////////////////////////
-	var player	= new Player();
+	var player	= new Player()
 	GAME.ball	= player.mesh
 	updateFcts.push(function(delta, now){
 		player.update(delta, now)
@@ -223,12 +262,16 @@ require([ '../../threex.glow/package.require.js'
 	// body.position.set(+22*GAME.tileW, 2, -13*GAME.tileW)
 	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
 
-	// var botBouncer	= new BotBouncer
-	// updateFcts.push(function(delta, now){
-	// 	botBouncer.update(delta, now)
-	// })
-	// var body	= botBouncer.object3d.userData.cannonBody.origin
-	// body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
+	for(var i = 0; i < 0; i++){
+		(function(){
+			var botBouncer	= new BotBouncer
+			updateFcts.push(function(delta, now){
+				botBouncer.update(delta, now)
+			})
+			var body	= botBouncer.object3d.userData.cannonBody.origin
+			body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
+		})()
+	}
 
 	var botGoal	= new BotGoal
 	updateFcts.push(function(delta, now){
@@ -237,14 +280,16 @@ require([ '../../threex.glow/package.require.js'
 	var body	= botGoal.object3d.userData.cannonBody.origin
 	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
 
-	// var botEnemy	= new BotEnemy()
-	// var body	= botEnemy.object3d.userData.cannonBody.origin
-	// body.position.set(+10*GAME.tileW, 2, 0*GAME.tileW)
-	// updateFcts.push(function(delta, now){
-	// 	botEnemy.update(delta, now)
-	// })
+	for(var i = 0; i < 0; i++){
+		(function(){
+			var botEnemy	= new BotEnemy()
+			updateFcts.push(function(delta, now){
+				botEnemy.update(delta, now)
+			})
+		})()
+	}
 
-	for(var i = 0; i < 2; i++){
+	for(var i = 0; i < 4; i++){
 		(function(){
 			var botBall	= new BotBall()
 			updateFcts.push(function(delta, now){
@@ -266,14 +311,11 @@ require([ '../../threex.glow/package.require.js'
 	updateFcts.push(function(delta, now){
 		var body	= GAME.ball.userData.cannonBody.origin
 		var position	= body.position
-		if( position.y < -2 )	yeller.dispatchEvent('spawnPlayer')
+		if( position.y < -2 )	yeller.dispatchEvent('killPlayer')
 	})
 
 	yeller.addEventListener('spawnPlayer', function(){
 		console.log('spawnPlayer')
-
-		gameTimer.timerBegin	= Date.now()
-		gameTimer.timerEnd	= null
 
 		playerControls.disable	= false
 
@@ -290,7 +332,7 @@ require([ '../../threex.glow/package.require.js'
 	yeller.addEventListener('killPlayer', function(){
 		console.log('killPlayer')
 		sounds.playDie()
-		gameTimer.timerEnd	= Date.now()
+		
 
 		var body	= GAME.ball.userData.cannonBody.origin
 		body.velocity.set(0,0,0)
@@ -302,6 +344,15 @@ require([ '../../threex.glow/package.require.js'
 
 		playerControls.disable	= true
 		setTimeout(function(){
+
+			;(function(){
+				if( GAME.nLives === 0 )	location.href='..'
+		 		console.assert(GAME.nLives >= 0)
+		 		GAME.nLives--;
+		 		var domElement	= document.querySelector('#livesCounter')
+		 		domElement.innerHTML	= GAME.nLives
+			})()
+
 			yeller.dispatchEvent('spawnPlayer')
 		}, 0.8*1000)
 	})
@@ -320,7 +371,7 @@ require([ '../../threex.glow/package.require.js'
 	})
 
 	;(function(){
-		var controls	= new THREEx.SmoothControls(camera, cameraHolder, GAME.ball)
+		var controls	= new THREEx.SmoothHolderControls(camera, cameraHolder, GAME.ball)
 		updateFcts.push(function(delta, now){
 			controls.update(delta, now)
 		})

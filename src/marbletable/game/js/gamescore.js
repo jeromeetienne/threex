@@ -5,7 +5,9 @@ var GameScore	= function(){
 	yeller.addEventListener('increaseScore', function(amount){
 		score	+= amount		
 		domElement.innerHTML	= stringPadder(score, 5, '0')
-	})	
+		
+		sounds.playScoreup()
+	})
 
 	yeller.dispatchEvent('increaseScore', 0)
 

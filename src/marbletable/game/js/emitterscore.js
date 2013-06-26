@@ -1,40 +1,35 @@
-function EmitterImpactBall(container){
+function EmitterScore(container){
 	// load the texture
-	var texture	= THREE.ImageUtils.loadTexture('../../threex.particles/examples/images/blue_particle.jpg')
 	var updateFcts	= []
-	this.emit	= function(position){
+	this.emit	= function(position, text){
+		// build the texture
+		var texture	= cache.getSet('texture.emitterScore_'+text, function(){
+			var canvas	= buildCanvas(text)
+			var texture	= new THREE.Texture(canvas);
+			texture.needsUpdate	= true;
+			return texture
+		})
 		// randomize the initial position
 		position	= position.clone()
-		position.x	+= (Math.random()-0.5)*0.3
-		position.y	+= (Math.random()-0.5)*0.1
-		position.z	+= (Math.random()-0.5)*0.3
 		// init sprite material
 		var material	= new THREE.SpriteMaterial({
-			//color			: 0xAA4488,
-			transparent		: true,
-			blending		: THREE.AdditiveBlending,
 			map			: texture,
 			useScreenCoordinates	: false,
-			//color			: 0x666666
-			color		: new THREE.Color().setHSL(Math.random(),1,0.5),
 		})
 		// init sprite
 		var sprite	= new THREE.Sprite(material)
-		sprite.rotation	= Math.random() * Math.PI*2
 		sprite.position.copy(position)
 		container.add(sprite)
 		
-		sprite.scale.set(1,1,1).multiplyScalar( 0.5 )
+		sprite.scale.set(1,1,1).multiplyScalar( 6 )
 
-		var maxAge	= 1 + Math.random()*0.4
+		var maxAge	= 2
 		// set velocity
-		var velocity	= new THREE.Vector3(0, 0, 0)
-		velocity.x	= (Math.random()-0.5)
-		velocity.y	= (Math.random()-0.5)+0.5
-		velocity.z	= (Math.random()-0.5)
-		velocity.setLength(3 + (Math.random()-0.5)*0.5)
+		var velocity	= new THREE.Vector3(0, 3, 0)
+		velocity.x	+= (Math.random()-0.5)*2
+		velocity.z	+= (Math.random()-0.5)*2
 		// init opacity
-		var age2Opacity	= createTweenMidi(maxAge, 0.05*maxAge, 0.4*maxAge)
+		var age2Opacity	= createTweenMidi(maxAge, 0.1*maxAge, 0.2*maxAge)
 		material.opacity= age2Opacity(0)
 		
 		var birthDate	= Date.now()/1000
@@ -49,10 +44,8 @@ function EmitterImpactBall(container){
 			velocity.multiplyScalar( 0.97 )
 			// move by velocity
 			sprite.position.add( velocity.clone().multiplyScalar(delta) )
-			// make it grow
-			sprite.scale.multiplyScalar( 1.02 )
 			// handle opacity
-			material.opacity= age2Opacity(age)*0.5
+			material.opacity= age2Opacity(age)*0.8
 		})
 	}
 	this.update	= function(delta, now){
@@ -70,5 +63,27 @@ function EmitterImpactBall(container){
 				return (maxAge - age) / releaseTime
 			}
 		}	
+	}
+	/**
+	 * Build a canvas for the nickname cartouche
+	 */
+	function buildCanvas(text){
+		// create the canvas
+		var canvas	= document.createElement("canvas");
+		var context	= canvas.getContext("2d");
+		canvas.width	= 256;
+		canvas.height	= 256;
+		// center the origin
+		context.translate( canvas.width/2, canvas.height/2 );
+		// measure text
+		var fontSize	= 36;
+		context.font	= "bolder "+fontSize+"px Verdana";
+		var fontH	= fontSize;
+		var fontW	= context.measureText(text).width;
+		// display the text
+		context.fillStyle = "rgba(1,0,0,1)";
+		context.fillText(text, -fontW/2, 0);
+		// return the canvas element
+		return canvas;
 	}
 }

@@ -53,8 +53,6 @@ var BotBouncer	= function(){
 		for(var i = 0; i < 10; i++){
 			GAME.emitterImpactBall.emit(mesh.position)
 		}
-		// increase score
-		yeller.dispatchEvent('increaseScore', 10)
 
 		// animation of mesh
 		var tweenForward= new TWEEN.Tween({

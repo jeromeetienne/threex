@@ -1,6 +1,8 @@
 var BotGoal	= function(){
-	var texture	= cache.getSet('texture.botball', function(){
+	var texture	= cache.getSet('texture.botgoal', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg')
+		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg')
+		var texture	= THREE.ImageUtils.loadTexture('images/water.jpg')
 		return texture
 	})
 	// handle updateFcts for sounds
@@ -11,7 +13,7 @@ var BotGoal	= function(){
 		})
 	}
 
-	var geometry	= new THREE.CubeGeometry(1*GAME.tileW, 3*GAME.tileW, 10*GAME.tileW)
+	var geometry	= new THREE.CubeGeometry(1*GAME.tileW, 3*GAME.tileW, 30*GAME.tileW)
 	var material	= new THREE.MeshPhongMaterial({
 		map		: texture,
 		bumpMap		: texture,

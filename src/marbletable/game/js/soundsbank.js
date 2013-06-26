@@ -4,7 +4,7 @@ var SoundsBank	= function(){
 	//		webaudiox							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var contextx	= new WebAudiox.Contextx()
-	contextx.volume	= 0.5
+	contextx.volume	= 0
 
 	sounds.contextx	= contextx
 
@@ -153,7 +153,36 @@ var SoundsBank	= function(){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
+
+	// init a sound with jsfx
+	sounds.playExplosion	= function(){
+		if( !sounds.explosionBuffer )	return
+		var source	= contextx.context.createBufferSource()
+		source.buffer	= sounds.explosionBuffer
+		source.connect(contextx.masterOut)
+		source.start(0)
+	}
+	var lib		= ["noise",0.0000,0.4000,0.0000,0.3660,0.5220,0.1660,20.0000,149.0000,2400.0000,0.2640,0.0000,0.0000,0.0100,0.0003,0.0000,-0.1840,0.8900,0.0000,0.0000,0.6024,-0.0640,-0.2760,1.0000,0.0000,0.0000,0.0000,0.0000]	
+	sounds.explosionBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
 	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// init a sound with jsfx
+	sounds.playScoreup	= function(){
+		if( !sounds.scoreupBuffer )	return
+		var source	= contextx.context.createBufferSource()
+		source.buffer	= sounds.scoreupBuffer
+		source.connect(contextx.masterOut)
+		source.start(0)
+	}
+	var lib		= ["saw",0.0000,0.4000,0.0000,0.2020,0.0000,0.4040,20.0000,443.0000,2400.0000,0.3240,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0000,0.0000,0.7456,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000]	
+	sounds.scoreupBuffer	= WebAudiox.getBufferFromJsfx(contextx.context, lib)
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
 	
 	return sounds;	
 }

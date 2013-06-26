@@ -9,7 +9,6 @@ var Player	= function(){
 		//var texture	= THREE.ImageUtils.loadTexture('images/jupitermap.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/tile01.jpg');
 		var texture	= THREEx.createPoolBall.ballTexture('9', true, "#FDD017", 1024);
-
 		return texture
 	})
 	// handle updateFcts for sounds
@@ -36,7 +35,7 @@ var Player	= function(){
 	mesh.receiveShadow	= true
 	mesh.castShadow		= true
 	scene.add( mesh )
-	
+
 	mesh.name	= 'player ' + (mesh.name || '')
 
 	mesh.useQuaternion	= true
@@ -66,10 +65,10 @@ if( true ){
 	var body	= bodyx.origin
 
 	body.angularDamping	= 0.9
-//	body.linearDamping	= 0.5
+	// body.linearDamping	= 0.5
 	
 	// ugly way to fix a missing 'onLoad()'
-	// 
+	// FIXME possible now with the new webaudiox soundbank
 	setTimeout(function timeoutCb(){
 		if( !sounds.rollBuffer ){
 			setTimeout(timeoutCb, 100)
@@ -110,5 +109,6 @@ if( true ){
 		if( !isGoal )	return
 		// kill the player
 		yeller.dispatchEvent('killPlayer')
+		GAME.emitterScore.emit(mesh.position, '!!')
 	})
 }
