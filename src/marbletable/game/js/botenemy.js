@@ -1,4 +1,4 @@
-var Enemy	= function(){
+var BotEnemy	= function(){
 	var texture	= cache.getSet('texture.enemy', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
 		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
@@ -25,6 +25,8 @@ var Enemy	= function(){
 	})
 	var mesh	= new THREE.Mesh(geometry, material)
 	this.object3d	= mesh
+
+	mesh.name	= (mesh.name || ' ') + 'enemy ';
 
 	mesh.position.y	= 3
 	mesh.receiveShadow	= true
@@ -53,6 +55,7 @@ var Enemy	= function(){
 		sounds.playKick(volume);
 	})
 
+	// always be attracked by player
 	updateFcts.push(function(delta, now){
 		// compute the force
 		var direction	= GAME.ball.position.clone().sub(mesh.position);

@@ -11,6 +11,9 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
 
+	var splineCamera= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	//var splineCamera= new THREE.AxisHelper(0.5)
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		build a curve							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -20,25 +23,25 @@
 		new THREE.Vector3(-1.5, 0.5, 0),
 		new THREE.Vector3( 1.5, 0.5, 0),
 		new THREE.Vector3( 1.5,-0.5, 0),
-	]);
+	])
 
 	// add an helper
-	scene.add(new THREEx.CurveHelper(curve, 50))	
+	scene.add( new THREEx.CurveHelper(curve, 50) )
 
-
-	var geometry	= new THREE.TubeGeometry(curve, 30, 0.2, 50, false, true);
+	var geometry	= new THREE.TubeGeometry(curve, 30, 0.2, 50, true, true);
+	var tube	= geometry
 	var material	= new THREE.MeshBasicMaterial({
 		wireframe: true
 	})
 	var mesh	= new THREE.Mesh(geometry, material)
-	if ( geometry.debug ) mesh.add( geometry.debug );
-	
+	if( geometry.debug )	mesh.add( geometry.debug );
+
 	scene.add(mesh)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		move an object along the curve at constant speed		//
 	//////////////////////////////////////////////////////////////////////////////////
-	
+
 	var cursor	= new THREE.AxisHelper(0.5)
 	scene.add( cursor );
 	updateFcts.push(function(delta, now){
@@ -46,6 +49,7 @@
 		var point	= curve.getPointAt(progress)
 		cursor.position.copy(point)
 	})
+
 
 	// cursor.add(camera)
 	// camera.position.set(0,0,0)
@@ -64,7 +68,6 @@
 	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
 	// 	camera.lookAt( scene.position )
 	// })
-
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//

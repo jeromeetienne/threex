@@ -1,4 +1,4 @@
-var BouncerBot	= function(){
+var BotBouncer	= function(){
 	var texture	= cache.getSet('texture.bouncer', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
 		// var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
@@ -49,10 +49,11 @@ var BouncerBot	= function(){
 		// play a sound
 		sounds.playBounce()
 
+		// emite particle
 		for(var i = 0; i < 10; i++){
 			GAME.emitterImpactBall.emit(mesh.position)
 		}
-
+		// increase score
 		yeller.dispatchEvent('increaseScore', 10)
 
 		// animation of mesh
@@ -70,20 +71,20 @@ var BouncerBot	= function(){
 		}, 500).onUpdate(function(){
 			mesh.scale.set(1,1,1).multiplyScalar(this.scale)
 		})
-		tweenForward.chain(tweenBack);
-		tweenForward.start();
+		tweenForward.chain(tweenBack)
+		tweenForward.start()
 
+		// zero velocity/angularVelocity for collidedBody
+		var collidedBody= event.with
+		collidedBody.velocity.set(0,0,0)
+		collidedBody.angularVelocity.set(0,0,0)
 
-		var body	= GAME.ball.userData.cannonBody.origin
-		body.velocity.set(0,0,0)
-		body.angularVelocity.set(0,0,0)
-
-		// apply force to ball
-		// TODO apply that to any body touching it... not only the ball
-		var direction	= GAME.ball.position.clone().sub(mesh.position);
+		// apply force to collidedMesh
+		var collidedMesh= event.with.userData.object3d
+		var direction	= collidedMesh.position.clone().sub(mesh.position);
 		direction.y	= 0
 		var force	= direction.setLength(50)
-		var cannonBody	= GAME.ball.userData.cannonBody
+		var cannonBody	= collidedMesh.userData.cannonBody
 		cannonBody.applyForce(force)
 	})
 }

@@ -40,8 +40,10 @@
 <script src='js/emitterspeedtrail.js'></script>
 <script src='js/soundsbank.js'></script>
 <script src='js/player.js'></script>
-<script src='js/enemy.js'></script>
-<script src='js/bouncerbot.js'></script>
+<script src='js/botenemy.js'></script>
+<script src='js/botball.js'></script>
+<script src='js/botbouncer.js'></script>
+<script src='js/botgoal.js'></script>
 <script src='js/playercontrols.js'></script>
 <script src='js/map.js'></script>
 <script src='js/threex.smoothcontrols.js'></script>
@@ -208,9 +210,7 @@ require([ '../../threex.glow/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var gameScore	= new GameScore()
-		
 
-	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		ball								//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -219,18 +219,44 @@ require([ '../../threex.glow/package.require.js'
 	updateFcts.push(function(delta, now){
 		player.update(delta, now)
 	})
+	var body	= GAME.ball.userData.cannonBody.origin
+	// body.position.set(+22*GAME.tileW, 2, -13*GAME.tileW)
+	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
 
-	var bouncerBot	= new BouncerBot
+	// var botBouncer	= new BotBouncer
+	// updateFcts.push(function(delta, now){
+	// 	botBouncer.update(delta, now)
+	// })
+	// var body	= botBouncer.object3d.userData.cannonBody.origin
+	// body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
+
+	var botGoal	= new BotGoal
 	updateFcts.push(function(delta, now){
-		bouncerBot.update(delta, now)
+		botGoal.update(delta, now)
 	})
-	var body	= bouncerBot.object3d.userData.cannonBody.origin
-	body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
+	var body	= botGoal.object3d.userData.cannonBody.origin
+	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
+
+	// var botEnemy	= new BotEnemy()
+	// var body	= botEnemy.object3d.userData.cannonBody.origin
+	// body.position.set(+10*GAME.tileW, 2, 0*GAME.tileW)
+	// updateFcts.push(function(delta, now){
+	// 	botEnemy.update(delta, now)
+	// })
+
+	for(var i = 0; i < 2; i++){
+		(function(){
+			var botBall	= new BotBall()
+			updateFcts.push(function(delta, now){
+				botBall.update(delta, now)
+			})
+		})()
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	//		User Controls						//
 	//////////////////////////////////////////////////////////////////////////
-	
+
 	var playerControls	= new PlayerControls(GAME.ball)
 	updateFcts.push(function(delta, now){
 		playerControls.update(delta, now)
@@ -238,7 +264,8 @@ require([ '../../threex.glow/package.require.js'
 
 	// if the ball is below the table, kill it
 	updateFcts.push(function(delta, now){
-		var position	= GAME.ball.userData.cannonBody.origin.position
+		var body	= GAME.ball.userData.cannonBody.origin
+		var position	= body.position
 		if( position.y < -2 )	yeller.dispatchEvent('spawnPlayer')
 	})
 
@@ -254,6 +281,8 @@ require([ '../../threex.glow/package.require.js'
 
 		var body	= GAME.ball.userData.cannonBody.origin
 		body.position.set(+22*GAME.tileW, 2, -13*GAME.tileW)
+		body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
+		
 		body.velocity.set(0,0,0)
 		body.angularVelocity.set(0,0,0)
 	})
@@ -277,16 +306,10 @@ require([ '../../threex.glow/package.require.js'
 		}, 0.8*1000)
 	})
 
-	// var enemy	= new Enemy()
-	// enemy.object3d.userData.cannonBody.origin.position.set(+10*GAME.tileW, 2, 0*GAME.tileW)
-	// updateFcts.push(function(delta, now){
-	// 	enemy.update(delta, now)
-	// })
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//		camera controls							//
 	//////////////////////////////////////////////////////////////////////////////////
-			
+
 	var cameraHolder	= new THREE.Object3D
 	scene.add(cameraHolder)
 

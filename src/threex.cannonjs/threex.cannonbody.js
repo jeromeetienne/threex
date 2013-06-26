@@ -42,6 +42,9 @@ THREEx.CannonBody	= function(opts){
 	var body	= new CANNON.RigidBody(mass, shape, material)
 	this.origin	= body
 	
+	body.userData	= body.userData	|| {}
+	body.userData.object3d	= mesh;
+	
 	this.mesh	= mesh
 
 	// sanity check - if the object use Euler, check it is 0 vectors
@@ -52,6 +55,7 @@ THREEx.CannonBody	= function(opts){
 	// use quaternion
 	mesh.useQuaternion	= true
 	mesh.userData.cannonBody= this
+
 
 	body.position.x		= mesh.position.x;
 	body.position.y		= mesh.position.y;

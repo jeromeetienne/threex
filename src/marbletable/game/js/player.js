@@ -36,6 +36,8 @@ var Player	= function(){
 	mesh.receiveShadow	= true
 	mesh.castShadow		= true
 	scene.add( mesh )
+	
+	mesh.name	= 'player ' + (mesh.name || '')
 
 	mesh.useQuaternion	= true
 	var bodyx	= new THREEx.CannonBody({
@@ -89,14 +91,24 @@ if( true ){
 		var speed	= body.velocity.norm();
 		var volume	= speed/5;
 		sounds.playKick(volume);
-
-		var nEmit	= 0
-		if( speed < 1.5 )	nEmit = 1;
-		else if( speed < 4.5 )	nEmit = 2;
-		else if( speed < 6.5 )	nEmit = 4;
-		else			nEmit = 8;
+	})
+	// particke of collision
+	body.addEventListener("collide",function(event){
+		var speed	= body.velocity.norm();
+		if( speed < 1.5 )	var nEmit = 1;
+		else if( speed < 4.5 )	var nEmit = 2;
+		else if( speed < 6.5 )	var nEmit = 4;
+		else			var nEmit = 8;
 		for(var i = 0; i < nEmit; i++){
 			GAME.emitterImpactBall.emit(mesh.position)		
 		}
+	})
+	// kill player if touching the goal
+	body.addEventListener("collide",function(event){
+		var collidedMesh= event.with.userData.object3d
+		var isGoal	= / goal /.test(collidedMesh.name) ? true : false
+		if( !isGoal )	return
+		// kill the player
+		yeller.dispatchEvent('killPlayer')
 	})
 }

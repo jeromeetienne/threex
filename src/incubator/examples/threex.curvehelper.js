@@ -17,21 +17,21 @@ THREEx.CurveHelper	= function(curve, nSteps){
 	isClosed	|= curve instanceof THREE.ClosedSplineCurve3
 	if( isClosed ){
 		var vector3	= curve.getPointAt(0)
-		geometry.vertices.push(vector3)			
+		geometry.vertices.push(vector3)
 	}
 	// build container
 	var container	= new THREE.Object3D()
 	// build the line
-	var material	= new THREE.LineBasicMaterial();	
-	var line	= new THREE.Line(geometry, material);
+	var material	= new THREE.LineBasicMaterial()
+	var line	= new THREE.Line(geometry, material)
 	container.add(line)
 	// build a particle for each points
 	var material	= new THREE.ParticleBasicMaterial({
-		size: 3, 
-		sizeAttenuation: false, 
-	});
-	var particles	= new THREE.ParticleSystem( geometry.clone(), material );
+		size		: 3, 
+		sizeAttenuation	: false, 
+	})
+	var particles	= new THREE.ParticleSystem( geometry.clone(), material )
 	container.add(particles)
 	// return the container
-	return container;
+	return container
 }

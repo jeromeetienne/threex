@@ -28,8 +28,8 @@ function initLighting(renderer, scene){
 	light.shadowBias	= 0.001
 	light.shadowDarkness	= 0.5
 
-	light.shadowMapWidth	= 1024
-	light.shadowMapHeight	= 1024
+	light.shadowMapWidth	= 1024*2
+	light.shadowMapHeight	= 1024*2
 
 	scene.add( light )
 	
