@@ -3,12 +3,12 @@ function EmitterScore(container){
 	var updateFcts	= []
 	this.emit	= function(position, text){
 		// build the texture
-		var texture	= cache.getSet('texture.emitterScore_'+text, function(){
+		// var texture	= cache.getSet('texture.emitterScore_'+text, function(){
 			var canvas	= buildCanvas(text)
 			var texture	= new THREE.Texture(canvas);
 			texture.needsUpdate	= true;
-			return texture
-		})
+		// 	return texture
+		// })
 		// randomize the initial position
 		position	= position.clone()
 		// init sprite material
@@ -69,19 +69,20 @@ function EmitterScore(container){
 	 */
 	function buildCanvas(text){
 		// create the canvas
-		var canvas	= document.createElement("canvas");
-		var context	= canvas.getContext("2d");
+		var canvas	= document.createElement('canvas');
+		var context	= canvas.getContext('2d');
 		canvas.width	= 256;
 		canvas.height	= 256;
 		// center the origin
 		context.translate( canvas.width/2, canvas.height/2 );
 		// measure text
 		var fontSize	= 36;
-		context.font	= "bolder "+fontSize+"px Verdana";
+		context.font	= 'bolder '+fontSize+'px Verdana';
 		var fontH	= fontSize;
 		var fontW	= context.measureText(text).width;
 		// display the text
-		context.fillStyle = "rgba(1,0,0,1)";
+		context.fillStyle	= 'rgba(255,0,0,255)';
+		context.fillStyle	= 'hsla('+(Math.random()*360)+', 100%, 50%, 1)';
 		context.fillText(text, -fontW/2, 0);
 		// return the canvas element
 		return canvas;
