@@ -36,4 +36,11 @@ THREEx.CannonWorld	= function(){
 		clearInterval(timerId)
 		timerId	= null;
 	}
+	/**
+	 * test if world is running or not
+	 * @return {booleant} true if the world is running, false otherwise
+	 */
+	this.isRunning	= function(){
+		return timerId !== null ? true : false
+	}
 }

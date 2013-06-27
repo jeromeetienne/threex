@@ -23,6 +23,7 @@
 
 <script src='vendor/microcache.js'></script>
 <script src='vendor/microevent.js'></script>
+<script src='vendor/gowiththeflow.js'></script>
 
 <script src="vendor/Tween.js"></script>
 <!-- include for threex.mirrorball -->
@@ -52,14 +53,10 @@
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 
-<body>
-
 <!-- include Score html -->	
 <style>
-#score {
+.osdFont {
 	position	: absolute;
-	top		: 0px;
-	left		: 0;
 
 	font-family	: arial, verdana, sans-serif;
 	font-size	: 500%;
@@ -67,12 +64,17 @@
 
 	color		: #000;
 	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
-
+}
+</style>
+<style>
+#score {
+	top		: 0px;
+	left		: 0;
 	padding-left	: 10px;
 	padding-right	: 10px;
 }
 </style>
-<div id="score"></div>
+<div id="score" class='osdFont'></div>
 <!-- include Score html -->	
 <style>
 #timer {
@@ -95,22 +97,23 @@
 <!-- include live html -->	
 <style>
 #livesCounter {
-	position	: absolute;
-	top		: 0px;
+	top		: 0;
 	right		: 0;
-
-	font-family	: arial, verdana, sans-serif;
-	font-size	: 500%;
-	font-weight	: bolder;
-
-	color		: #000;
-	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
-
-	padding-left	: 10px;
 	padding-right	: 10px;
 }
 </style>
-<div id="livesCounter"></div>
+<div id="livesCounter" class='osdFont'></div>
+<div id="gameStartOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Ready ?</div>
+<div id="gameLostOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Over</div>
+<!-- include killPlayer html -->	
+<style>
+#killPlayerOsd {
+	top		: 30%;
+	text-align	: center;
+	width		: 100%;
+}
+</style>
+<div id="killPlayerOsd" class='osdFont' style='display:none'>You die!</div>
 <script>
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
@@ -133,10 +136,10 @@ require([ '../../threex.glow/package.require.js'
 	var winResize	= new THREEx.WindowResize(renderer, camera)
 
 	// init keyboard		
-	var keyboard	= new THREEx.KeyboardState(renderer.domElement);
+	var keyboard	= new THREEx.KeyboardState(document.body);
 	window.keyboard	= keyboard
-	renderer.domElement.setAttribute("tabIndex", "0");
-	renderer.domElement.focus();
+	keyboard.domElement.setAttribute("tabIndex", "0");
+	keyboard.domElement.focus();
 
 
 	window.scene	= scene
@@ -186,7 +189,7 @@ require([ '../../threex.glow/package.require.js'
 
 	GAME.tileW	= 0.2
 	
-	GAME.nLives	= 30;
+	GAME.nLives	= 1;
 	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
 
 
@@ -259,7 +262,6 @@ require([ '../../threex.glow/package.require.js'
 		player.update(delta, now)
 	})
 	var body	= GAME.ball.userData.cannonBody.origin
-	// body.position.set(+22*GAME.tileW, 2, -13*GAME.tileW)
 	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
 
 	for(var i = 0; i < 0; i++){
@@ -314,15 +316,30 @@ require([ '../../threex.glow/package.require.js'
 		if( position.y < -2 )	yeller.dispatchEvent('killPlayer')
 	})
 
+	yeller.addEventListener('gameStart', function(){
+		Flow().seq(function(next){
+			document.querySelector('#gameStartOsd').style.display	= 'block'
+			playerControls.disable	= true
+			physicsWorld.stop()
+
+			setTimeout(function(){
+				next()
+			}, 1000)		
+		}).seq(function(next){
+			document.querySelector('#gameStartOsd').style.display	= 'none'
+			yeller.dispatchEvent('spawnPlayer')
+		})
+	})
+
 	yeller.addEventListener('spawnPlayer', function(){
 		console.log('spawnPlayer')
 
 		playerControls.disable	= false
+		if( physicsWorld.isRunning() === false )	physicsWorld.start()
 
 		sounds.playSpawn()
 
 		var body	= GAME.ball.userData.cannonBody.origin
-		body.position.set(+22*GAME.tileW, 2, -13*GAME.tileW)
 		body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
 		
 		body.velocity.set(0,0,0)
@@ -331,30 +348,65 @@ require([ '../../threex.glow/package.require.js'
 
 	yeller.addEventListener('killPlayer', function(){
 		console.log('killPlayer')
-		sounds.playDie()
-		
 
-		var body	= GAME.ball.userData.cannonBody.origin
-		body.velocity.set(0,0,0)
-		body.angularVelocity.set(0,0,0)
+		Flow().seq(function(next){
+			playerControls.disable	= true
 
-		var worldPoint	= new CANNON.Vec3(GAME.ball.position.x, GAME.ball.position.y, GAME.ball.position.z)
-		var impulse	= new CANNON.Vec3(0,1.1,0)
-		body.applyImpulse(impulse, worldPoint)
+			sounds.playDie()
+			
+			var body	= GAME.ball.userData.cannonBody.origin
+			body.velocity.set(0,0,0)
+			body.angularVelocity.set(0,0,0)
 
-		playerControls.disable	= true
-		setTimeout(function(){
+			var worldPoint	= new CANNON.Vec3(GAME.ball.position.x, GAME.ball.position.y, GAME.ball.position.z)
+			var impulse	= new CANNON.Vec3(0,1.1,0)
+			body.applyImpulse(impulse, worldPoint)
+			next()
+		}).seq(function(next){
+			if( GAME.nLives === 0 ){
+				yeller.dispatchEvent('gameLost')
+				return;
+			}
+			document.querySelector('#killPlayerOsd').style.display	= 'block'
+			setTimeout(function(){
+				next()
+			}, 1000*0.8)
+		}).seq(function(next){
+			physicsWorld.stop()
+			setTimeout(function(){
+				next()
+			}, 1000*0.5)
+		}).seq(function(next){
+			document.querySelector('#killPlayerOsd').style.display	= 'none';
 
-			;(function(){
-				if( GAME.nLives === 0 )	location.href='..'
-		 		console.assert(GAME.nLives >= 0)
-		 		GAME.nLives--;
-		 		var domElement	= document.querySelector('#livesCounter')
-		 		domElement.innerHTML	= GAME.nLives
-			})()
+			// number of lives
+	 		GAME.nLives--;
+	 		var domElement	= document.querySelector('#livesCounter')
+	 		domElement.innerHTML	= GAME.nLives
 
+	 		// spawn new player
 			yeller.dispatchEvent('spawnPlayer')
-		}, 0.8*1000)
+		})
+	})
+
+	yeller.addEventListener('gameLost', function(){
+
+		Flow().seq(function(next){
+			document.querySelector('#gameLostOsd').style.display	= 'block'
+			next()
+		}).seq(function(next){
+			setTimeout(function(){
+				next()
+			}, 1000*0.8)
+		}).seq(function(next){
+			physicsWorld.stop()
+			setTimeout(function(){
+				next()
+			}, 1000*2)
+		}).seq(function(next){
+			document.querySelector('#gameLostOsd').style.display	= 'none';
+			location.href	= '..'
+		})
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -410,6 +462,9 @@ require([ '../../threex.glow/package.require.js'
 	updateFcts.push(function(delta, now){
 		map.update(delta, now);		
 	})
+	
+	// spawn new player
+	yeller.dispatchEvent('gameStart')
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//

@@ -37,7 +37,7 @@ var BotBall	= function(){
 		bodyx.update(delta, now)
 	})
 	var body	= bodyx.origin
-
+console.log('body', body)
 	// count the number of body of this type - used to fix startPosition
 	var bodyCounter	= 0
 	scene.traverse(function(object3d){
@@ -55,16 +55,33 @@ var BotBall	= function(){
 	// init origin
 	body.position.set(origin.x, origin.y, origin.z)
 	
+	
+	// always be attracked by player
+	updateFcts.push(function(delta, now){
+		if( mesh.position.y > radius ){
+			return
+		}
+		// compute the force
+		var direction	= GAME.ball.position.clone().sub(mesh.position);
+		direction.y	= 0
+		var force	= direction.setLength(0.1)
+		// apply it
+		bodyx.applyImpulse(force, delta)
+	});
+	
 	// kill player if touching the goal
 	body.addEventListener("collide",function(event){
 		var collidedObj	= event.with.userData.object3d
 		var isGoal	= / goal /.test(collidedObj.name) ? true : false
 		if( !isGoal )	return
+		
 		// reset all velocity
 		body.velocity.set(0,0,0)
 		body.angularVelocity.set(0,0,0)
 		// set player position
-		body.position.set(origin.x, origin.y, origin.z)
+		body.position.set(origin.x, origin.y, origin.z)			
+
+
 		// emite particle
 		for(var i = 0; i < 10; i++){
 			GAME.emitterImpactBall.emit(mesh.position)

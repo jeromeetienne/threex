@@ -4,20 +4,28 @@ demo.poollabyrinth
 marble labyrinth with realistic physics
 
 ## TODOs
-* put a game lost sequence
+
+* when all balls are killed, you win the game and go to next level
 * have a game won sequence
+  * easy but require to win a game
+  * currently not possible
 * when you kill a ball, it doesnt come back
-* when all balls are killed, go to next level
-* ball are attracked by you a bit
+  * how to remove it temporarily ?
+    * up to
 * if a ball is hit, it is loaded a bit more
   * visualize the load by stars particles
   * the score when destroyed of the load
 * have multiple levels
+
+* ball are attracked by you a bit
+
 * have a shark ball, you got the texture, get the music, something 
   scary, louder and louder as it is coming close to you
   * put the listener in the ball ?
   * 'les dents de la mer' something like that
-* botgoal texture, black and white chessboard
+
+* DONE put a game lost sequence
+* DONE botgoal texture, black and white chessboard
 
 * idea levels
   * DONE pools ball - bring them back from tQuery
