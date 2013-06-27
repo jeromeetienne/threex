@@ -23,16 +23,17 @@ THREEx.CannonWorld	= function(){
 	 * @param  {Number} period the period to use for update. default to 1/60seconds
 	 */
 	this.start	= function(period){
+		if( this.isRunning() === true )	return
 		period	= period !== undefined ? period : 1/60;
 		timerId	= setInterval(function(){
 			world.step(period);		
 		}, period*1000)		
-		return this;
 	}.bind(this)
 	/**
 	 * stop updating
 	 */
 	this.stop	= function(){
+		if( this.isRunning() === false )	return
 		clearInterval(timerId)
 		timerId	= null;
 	}

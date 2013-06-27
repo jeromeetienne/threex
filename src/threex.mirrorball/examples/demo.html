@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<!-- include require.js stuff -->
+<script src="../../../vendor/require.js/require.js"></script>
+
+<script src='../threex.mirrorball.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+require([ '../../threex.skymap/package.require.js'
+], function(){
+
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 3;
+
+	var light	= new THREE.AmbientLight( 0x444444 )
+	scene.add( light )
+	var light	= new THREE.DirectionalLight( 0xcccccc, 1 )
+	scene.add( light )
+
+	// add a skymap	
+	var mesh	= THREEx.createSkymap('skybox')
+	scene.add( mesh );
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		create the mirror ball						//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mirrorBall	= new THREEx.MirrorBall(512)
+	scene.add(mirrorBall.object3d)
+	updateFcts.push(function(delta, now){
+		mirrorBall.update(renderer, scene)
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var container	= new THREE.Object3D
+	var geometry	= new THREE.TorusKnotGeometry(0.27, 0.1, 128, 32)
+	var material	= new THREE.MeshNormalMaterial();
+	var nObjects	= 8;
+	for(var i = 0; i < nObjects; i++){
+		var mesh	= new THREE.Mesh( geometry, material );
+		mesh.position.x	= Math.cos(i/nObjects * Math.PI*2)*2
+		mesh.position.z	= Math.sin(i/nObjects * Math.PI*2)*2
+		container.add( mesh );		
+	}
+	scene.add(container)
+	updateFcts.push(function(delta, now){
+		var angle	= 0.2 * now * Math.PI*2
+		container.rotation.y	= angle
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+});
+</script></body>

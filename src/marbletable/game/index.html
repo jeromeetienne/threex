@@ -335,7 +335,7 @@ require([ '../../threex.glow/package.require.js'
 		console.log('spawnPlayer')
 
 		playerControls.disable	= false
-		if( physicsWorld.isRunning() === false )	physicsWorld.start()
+		physicsWorld.start()
 
 		sounds.playSpawn()
 
