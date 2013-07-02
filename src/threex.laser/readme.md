@@ -11,5 +11,5 @@ TODO
   * on left side, laser to the right
   * on right side, laser to the left
   * in the middle a torus rotating in x and y
-* remove the lightsaber
+* DONE remove the lightsaber
   * rename that threex.laser

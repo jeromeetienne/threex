@@ -26,7 +26,7 @@ THREEx.LaserMeshCollision	= function(container){
 	var light	= new THREE.PointLight( 0x4444ff, 10 );
 	light.intensity	= 2
 	light.distance	= 4
-	light.position.x= -0.1
+	light.position.x= -0.05
 	this.light	= light
 	sprite.add(light)
 	
