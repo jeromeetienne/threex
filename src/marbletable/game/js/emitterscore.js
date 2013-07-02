@@ -3,12 +3,12 @@ function EmitterScore(container){
 	var updateFcts	= []
 	this.emit	= function(position, text){
 		// build the texture
-		// var texture	= cache.getSet('texture.emitterScore_'+text, function(){
+		var texture	= cache.getSet('texture.emitterScore_'+text, function(){
 			var canvas	= buildCanvas(text)
 			var texture	= new THREE.Texture(canvas);
 			texture.needsUpdate	= true;
-		// 	return texture
-		// })
+			return texture
+		})
 		// randomize the initial position
 		position	= position.clone()
 		// init sprite material

@@ -19,6 +19,43 @@ var Map	= function(){
 	addWallGridLine(-25, 15, 25, 15)
 	addWallGridLine( 25, 14, 25,-14)
 	addWallGridLine( 25,-15,-25,-15)
+	
+	for(var i = 0; i < 0; i++){
+		(function(){
+			var botBouncer	= new BotBouncer
+			updateFcts.push(function(delta, now){
+				botBouncer.update(delta, now)
+			})
+			var body	= botBouncer.object3d.userData.cannonBody.origin
+			body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
+		})()
+	}
+
+	var botGoal	= new BotGoal
+	updateFcts.push(function(delta, now){
+		botGoal.update(delta, now)
+	})
+	var body	= botGoal.object3d.userData.cannonBody.origin
+	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
+
+	for(var i = 0; i < 0; i++){
+		(function(){
+			var botEnemy	= new BotEnemy()
+			updateFcts.push(function(delta, now){
+				botEnemy.update(delta, now)
+			})
+		})()
+	}
+
+	for(var i = 0; i < 4; i++){
+		(function(){
+			var botBall	= new BotBall()
+			updateFcts.push(function(delta, now){
+				botBall.update(delta, now)
+			})
+		})()
+	}
+
 
 	// addWallGridLine( 19,-14, 19, -6)
 	// addWallGridLine( 24,  4, 11,  4)

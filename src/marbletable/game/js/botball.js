@@ -18,26 +18,26 @@ var BotBall	= function(){
 		bumpMap	: texture,
 		bumpScale: 0.05,
 	})
-	var mesh	= new THREE.Mesh(geometry, material)
-	this.object3d	= mesh
-	mesh.name	= (mesh.name || ' ') + 'ball ';
+	var object3d	= new THREE.Mesh(geometry, material)
+	this.object3d	= object3d
+	object3d.name	= (object3d.name || ' ') + 'ball ';
 
-	mesh.position.y		= 3
-	mesh.receiveShadow	= true
-	mesh.castShadow		= true
-	scene.add( mesh )
+	object3d.position.y	= 3
+	object3d.receiveShadow	= true
+	object3d.castShadow	= true
+	scene.add( object3d )
 
-	mesh.useQuaternion	= true
+	object3d.useQuaternion	= true
 
 	var bodyx	= new THREEx.CannonBody({
-		mesh	: mesh,
+		mesh	: object3d,
 		material: pMaterialEnemy,
 	}).addTo(physicsWorld)
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)
 	})
 	var body	= bodyx.origin
-console.log('body', body)
+
 	// count the number of body of this type - used to fix startPosition
 	var bodyCounter	= 0
 	scene.traverse(function(object3d){
@@ -55,44 +55,84 @@ console.log('body', body)
 	// init origin
 	body.position.set(origin.x, origin.y, origin.z)
 	
-	
 	// always be attracked by player
 	updateFcts.push(function(delta, now){
-		if( mesh.position.y > radius ){
+		if( object3d.position.y > radius ){
 			return
 		}
 		// compute the force
-		var direction	= GAME.ball.position.clone().sub(mesh.position);
+		var direction	= GAME.ball.position.clone().sub(object3d.position);
 		direction.y	= 0
 		var force	= direction.setLength(0.1)
 		// apply it
 		bodyx.applyImpulse(force, delta)
-	});
+	})
 	
 	// kill player if touching the goal
 	body.addEventListener("collide",function(event){
 		var collidedObj	= event.with.userData.object3d
 		var isGoal	= / goal /.test(collidedObj.name) ? true : false
 		if( !isGoal )	return
-		
+
+		// emitter particle
+		for(var i = 0; i < 10; i++){
+			GAME.emitterImpactBall.emit(object3d.position)
+		}
+		// emit a sound
+		sounds.playExplosion()
+
+		// scorePoints based on ballIntensity.intensity()
+		var scorePoints	= 10;
+		if( ballIntensity.intensity() < 0.3){
+			var scorePoints	= 100;
+		}else if( ballIntensity.intensity() < 0.6){
+			var scorePoints	= 200;
+		}else if( ballIntensity.intensity() < 0.85){
+			var scorePoints	= 600;
+		}else{
+			var scorePoints	= 1000;
+		}
+		// increase score
+		yeller.dispatchEvent('increaseScore', scorePoints)
+		// emit a score
+		GAME.emitterScore.emit(object3d.position, scorePoints)
+
+		this.destroy()
+		return;
+
+		// reset ball intensity
+		ballIntensity.intensity(0)
 		// reset all velocity
 		body.velocity.set(0,0,0)
 		body.angularVelocity.set(0,0,0)
 		// set player position
-		body.position.set(origin.x, origin.y, origin.z)			
+		body.position.set(origin.x, origin.y, origin.z)
+	}.bind(this))
 
-
-		// emite particle
-		for(var i = 0; i < 10; i++){
-			GAME.emitterImpactBall.emit(mesh.position)
-		}
-		// emit a sound
-		sounds.playExplosion()
-		// increase score
-		yeller.dispatchEvent('increaseScore', 10)
-		// emit a score
-		GAME.emitterScore.emit(mesh.position, '10')
+	this.destroy	= function(){
+		physicsWorld.bodiesToRemove.push(body)
+		scene.remove( object3d )
+		scene.remove( ballIntensity.object3d )
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var ballIntensity	= new JuiceIntensityBall();	
+	scene.add( ballIntensity.object3d )
+	updateFcts.push(function(delta, now){
+		ballIntensity.update(delta, now)
+	})
+	updateFcts.push(function(delta, now){
+		ballIntensity.object3d.position.copy(object3d.position)
 	})
 	
-	return;
+	// kill player if touching the goal
+	body.addEventListener("collide",function(event){
+		var collidedObj	= event.with.userData.object3d
+		var isPlayer	= / player /.test(collidedObj.name) ? true : false
+		if( !isPlayer )	return
+		ballIntensity.intensity( ballIntensity.intensity() + 0.1 )
+	})
 }

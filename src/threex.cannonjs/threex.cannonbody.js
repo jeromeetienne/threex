@@ -38,13 +38,12 @@ THREEx.CannonBody	= function(opts){
 		}
 	}else	console.assert(false, 'unknown geometry type')
 
-
 	var body	= new CANNON.RigidBody(mass, shape, material)
 	this.origin	= body
 	
 	body.userData	= body.userData	|| {}
-	body.userData.object3d	= mesh;
-	
+	body.userData.object3d	= mesh
+
 	this.mesh	= mesh
 
 	// sanity check - if the object use Euler, check it is 0 vectors
@@ -56,21 +55,18 @@ THREEx.CannonBody	= function(opts){
 	mesh.useQuaternion	= true
 	mesh.userData.cannonBody= this
 
+	body.position.x		= mesh.position.x
+	body.position.y		= mesh.position.y
+	body.position.z		= mesh.position.z
 
-	body.position.x		= mesh.position.x;
-	body.position.y		= mesh.position.y;
-	body.position.z		= mesh.position.z;
-
-	body.quaternion.x	= mesh.quaternion.x;
-	body.quaternion.y	= mesh.quaternion.y;
-	body.quaternion.z	= mesh.quaternion.z;
-	body.quaternion.w	= mesh.quaternion.w;
-
+	body.quaternion.x	= mesh.quaternion.x
+	body.quaternion.y	= mesh.quaternion.y
+	body.quaternion.z	= mesh.quaternion.z
+	body.quaternion.w	= mesh.quaternion.w
 
 	this.update	= function(delta, now){
 		// TODO should i copy the mesh local position or global position
 		// global seems more likely
-
 		mesh.position.copy( body.position );
 		mesh.quaternion.copy( body.quaternion );
 	}
@@ -114,12 +110,12 @@ THREEx.CannonBody.prototype.applyForce = function(force) {
 //////////////////////////////////////////////////////////////////////////////////
 
 
-THREEx.CannonBody.prototype.addTo = function(physicsWorld) {
-	physicsWorld.origin.add(this.origin)
+THREEx.CannonBody.prototype.addTo = function(world) {
+	world.origin.add(this.origin)
 	return this;
 };
 
-THREEx.CannonBody.prototype.removeFrom = function(physicsWorld) {
-	physicsWorld.origin.remove(this.origin)
+THREEx.CannonBody.prototype.removeFrom = function(world) {
+	world.origin.remove(this.origin)
 	return this;
 };

@@ -2,6 +2,7 @@
 <!-- include three.js stuff -->
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
+<script src='../../../vendor/three.js/examples/js/ImprovedNoise.js'></script>
 <!-- include require.js stuff -->
 <script src="../../../vendor/require.js/require.js"></script>
 <!-- include threex.cannonjs -->
@@ -20,6 +21,7 @@
 
 <!-- include for threex.poolball -->
 <script src='../../threex.poolball/threex.poolball.js'></script>
+
 
 <script src='vendor/microcache.js'></script>
 <script src='vendor/microevent.js'></script>
@@ -40,6 +42,7 @@
 <script src='js/emitterimpactball.js'></script>
 <script src='js/emitterspeedtrail.js'></script>
 <script src='js/emitterscore.js'></script>
+<script src='js/juiceintensityball.js'></script>
 <script src='js/soundsbank.js'></script>
 <script src='js/player.js'></script>
 <script src='js/botenemy.js'></script>
@@ -118,19 +121,20 @@
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
 ], function(){
-	var renderer	= new THREE.WebGLRenderer();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	document.body.appendChild( renderer.domElement );
+	var renderer	= new THREE.WebGLRenderer()
+	renderer.setSize( window.innerWidth, window.innerHeight )
+	document.body.appendChild( renderer.domElement )
 
-	var updateFcts	= [];
-	var scene	= new THREE.Scene();
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
-	camera.position.x = 0
-	camera.position.y = 5
-	camera.position.z = 6;
+	var updateFcts	= []
+	var scene	= new THREE.Scene()
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100)
+	camera.position.x	= 0
+	camera.position.y	= 5
+	camera.position.z	= 6
 	camera.lookAt( scene.position )
 
-	var physicsWorld= new THREEx.CannonWorld().start()
+	var physicsWorld= new THREEx.CannonWorld()
+	physicsWorld.start()
 
 	// setup winResize
 	var winResize	= new THREEx.WindowResize(renderer, camera)
@@ -145,17 +149,17 @@ require([ '../../threex.glow/package.require.js'
 	window.scene	= scene
 	window.renderer	= renderer
 	window.camera	= camera
-	
-	
+
+
 	window.physicsWorld	= physicsWorld
 
 
 	// Create a slippery material (friction coefficient = 0.0)
-	var pMaterialEnemy		= new CANNON.Material('pMaterialEnemy');
-	var pMaterialPlayer		= new CANNON.Material('pMaterialPlayer');
-	var pMaterialGround		= new CANNON.Material('pMaterialGround');
-	var pMaterialWall		= new CANNON.Material('pMaterialWall');
-	
+	var pMaterialEnemy	= new CANNON.Material('pMaterialEnemy')
+	var pMaterialPlayer	= new CANNON.Material('pMaterialPlayer')
+	var pMaterialGround	= new CANNON.Material('pMaterialGround')
+	var pMaterialWall	= new CANNON.Material('pMaterialWall')
+
 	window.pMaterialEnemy	= pMaterialEnemy
 	window.pMaterialPlayer	= pMaterialPlayer
 	window.pMaterialGround	= pMaterialGround
@@ -189,7 +193,7 @@ require([ '../../threex.glow/package.require.js'
 
 	GAME.tileW	= 0.2
 	
-	GAME.nLives	= 1;
+	GAME.nLives	= 3;
 	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
 
 
@@ -264,41 +268,6 @@ require([ '../../threex.glow/package.require.js'
 	var body	= GAME.ball.userData.cannonBody.origin
 	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
 
-	for(var i = 0; i < 0; i++){
-		(function(){
-			var botBouncer	= new BotBouncer
-			updateFcts.push(function(delta, now){
-				botBouncer.update(delta, now)
-			})
-			var body	= botBouncer.object3d.userData.cannonBody.origin
-			body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
-		})()
-	}
-
-	var botGoal	= new BotGoal
-	updateFcts.push(function(delta, now){
-		botGoal.update(delta, now)
-	})
-	var body	= botGoal.object3d.userData.cannonBody.origin
-	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
-
-	for(var i = 0; i < 0; i++){
-		(function(){
-			var botEnemy	= new BotEnemy()
-			updateFcts.push(function(delta, now){
-				botEnemy.update(delta, now)
-			})
-		})()
-	}
-
-	for(var i = 0; i < 4; i++){
-		(function(){
-			var botBall	= new BotBall()
-			updateFcts.push(function(delta, now){
-				botBall.update(delta, now)
-			})
-		})()
-	}
 
 	//////////////////////////////////////////////////////////////////////////
 	//		User Controls						//
@@ -335,7 +304,7 @@ require([ '../../threex.glow/package.require.js'
 		console.log('spawnPlayer')
 
 		playerControls.disable	= false
-		physicsWorld.start()
+		if( physicsWorld.isRunning() === false )	physicsWorld.start()
 
 		sounds.playSpawn()
 
@@ -359,7 +328,7 @@ require([ '../../threex.glow/package.require.js'
 			body.angularVelocity.set(0,0,0)
 
 			var worldPoint	= new CANNON.Vec3(GAME.ball.position.x, GAME.ball.position.y, GAME.ball.position.z)
-			var impulse	= new CANNON.Vec3(0,1.1,0)
+			var impulse	= new CANNON.Vec3( 0, 1.1, 0)
 			body.applyImpulse(impulse, worldPoint)
 			next()
 		}).seq(function(next){
@@ -375,7 +344,7 @@ require([ '../../threex.glow/package.require.js'
 			physicsWorld.stop()
 			setTimeout(function(){
 				next()
-			}, 1000*0.5)
+			}, 1000*0.6)
 		}).seq(function(next){
 			document.querySelector('#killPlayerOsd').style.display	= 'none';
 
@@ -390,7 +359,6 @@ require([ '../../threex.glow/package.require.js'
 	})
 
 	yeller.addEventListener('gameLost', function(){
-
 		Flow().seq(function(next){
 			document.querySelector('#gameLostOsd').style.display	= 'block'
 			next()

@@ -36,7 +36,7 @@ var Player	= function(){
 	mesh.castShadow		= true
 	scene.add( mesh )
 
-	mesh.name	= 'player ' + (mesh.name || '')
+	mesh.name	= (mesh.name || ' ') + 'player ';
 
 	mesh.useQuaternion	= true
 	var bodyx	= new THREEx.CannonBody({

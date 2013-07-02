@@ -5,18 +5,18 @@ marble labyrinth with realistic physics
 
 ## TODOs
 
-* put it in its own repo. usefull to publish the site
 * when all balls are killed, you win the game and go to next level
+
 * have a game won sequence
   * easy but require to win a game
   * currently not possible
+
 * when you kill a ball, it doesnt come back
   * how to remove it temporarily ?
     * up to when ?
     * need to reset it later
-* if a ball is hit, it is loaded a bit more
-  * visualize the load by stars particles
-  * the score when destroyed of the load
+  * NOTE: so dont remove it, let them hover on the map
+
 * have multiple levels
   * how to do multiple model
   * a pool table. you got all the balls already. respect the topology
@@ -27,6 +27,17 @@ marble labyrinth with realistic physics
   * put the listener in the ball ?
   * 'les dents de la mer' something like that
 
+* ball intensity concept
+  * it is a pure visual, updated by a level
+  * so .update() function, .intensity(value)
+  * how to make the first instance ? the visual of the intensity
+  * marble arena put 'rings of stars'
+  * it may be a number in a canvas... simple and the code is already there
+* put it in its own repo. usefull to publish the site
+
+* DONE if a ball is hit, it is loaded a bit more
+  * visualize the load by stars particles
+  * the score when destroyed of the load
 * DONE ball are attracked by you a bit
 * DONE put a game lost sequence
 * DONE botgoal texture, black and white chessboard
