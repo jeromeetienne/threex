@@ -9,7 +9,7 @@
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
-	camera.position.z = 5;
+	camera.position.z = 10;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
@@ -31,6 +31,7 @@
 
 	var container	= new THREE.Object3D()
 	container.scale.set(1,1,1).multiplyScalar(1)
+	container.position.x	= 0
 	scene.add(container)
 
 
@@ -41,23 +42,22 @@
 		map			: texture,
 		blending		: THREE.AdditiveBlending,
 		useScreenCoordinates	: false,
-		depthTest		: false,
-		depthWrite		: false,
-		transparent		: true,
+		// depthTest		: false,
+		// depthWrite		: false,
+		// transparent		: true,
 	})
 	// init sprite
 	var sprite	= new THREE.Sprite(material)
 	sprite.scale.set(1, 1, 1).multiplyScalar(1)
 	sprite.position.x	= 1
 	container.add(sprite)
-	
+		
 	// add a point light
-	var light	= new THREE.PointLight( 0x4444aa, 3 );
+	var light	= new THREE.PointLight( 0x4444ff, 10 );
 	light.intensity	= 5
 	light.distance	= 4
 	light.position.x= -0.5
 	sprite.add(light)
-window.pointLight	= light
 	
 	var light	= new THREE.HemisphereLight( 0xfffff0, 0x101020, 0.2 );
 	light.position.set( 0.75, 1, 0.25 );			
@@ -76,7 +76,7 @@ window.pointLight	= light
 		depthWrite	: false,
 		transparent	: true
 	})
-	var geometry	= new THREE.PlaneGeometry(1, 0.03)
+	var geometry	= new THREE.PlaneGeometry(1, 0.1)
 	var nPlanes	= 16;
 	for(var i = 0; i < nPlanes; i++){
 		var mesh	= new THREE.Mesh(geometry, material)
@@ -122,13 +122,12 @@ window.pointLight	= light
 	raycaster.ray.origin	= container.position
 
 	updateFcts.push(function(delta, now){
+		container.updateMatrixWorld();
 
 		var matrixWorld	= container.matrixWorld
-		var direction	= new THREE.Vector3( 1, 0, 0 )
-		direction.applyMatrix4( matrixWorld )
-		direction.normalize()
-		raycaster.ray.direction.copy(direction)
-		//console.log('direction', direction)
+		raycaster.ray.direction.set(1,0,0)
+			.applyMatrix4( matrixWorld )
+			.normalize()
 
 		var intersects	= raycaster.intersectObjects( scene.children );
 		if( intersects.length > 0 ){
@@ -153,26 +152,11 @@ window.pointLight	= light
 			side	: THREE.BackSide,
 		});
 		var object3d	= new THREE.Mesh( geometry, material )
-		object3d.scale.set(1,1,1).multiplyScalar(10)
+		object3d.scale.set(1,1,1).multiplyScalar(20)
 		scene.add(object3d)
 	})()
 	
-	;(function(){
-		var geometry	= new THREE.CubeGeometry(0.5, 0.5, 0.5);
-		var material	= new THREE.MeshPhongMaterial({
-			color	: 0xffffff,
-			specular: 0xffffff,
-			shininess: 200,
-		});
-		var object3d	= new THREE.Mesh( geometry, material )
-		object3d.position.x	= 0.9
-		scene.add(object3d)
-		updateFcts.push(function(delta, now){
-			object3d.position.x	= 2.9 + Math.cos(now)*0.3
-		})
-	})()
-	
-	for(var i = 0; i < 60; i++){
+	for(var i = 0; i < 200; i++){
 		(function(){
 			var geometry	= new THREE.TorusGeometry(0.5-0.1, 0.1, 32, 16);
 			var geometry	= new THREE.SphereGeometry(0.5, 32, 16);
@@ -184,9 +168,9 @@ window.pointLight	= light
 			var object3d	= new THREE.Mesh( geometry, material );
 			object3d.scale.set(1,1,1).multiplyScalar(1/2)
 			scene.add( object3d );
-			object3d.position.x	= (Math.random()-0.5)*5
-			object3d.position.y	= (Math.random()-0.5)*5
-			object3d.position.z	= (Math.random()-0.5)*5
+			object3d.position.x	= (Math.random()-0.5)*10
+			object3d.position.y	= (Math.random()-0.5)*10
+			object3d.position.z	= (Math.random()-0.5)*10
 			
 			object3d.rotation.x	= (Math.random()-0.5)*Math.PI*2
 			object3d.rotation.y	= (Math.random()-0.5)*Math.PI*2
