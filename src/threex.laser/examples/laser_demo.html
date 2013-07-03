@@ -31,8 +31,8 @@
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
 	}, false)
 	updateFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*30 - camera.position.x) * 0.01
-		camera.position.y += (mouse.y*30 - camera.position.y) * 0.01
+		camera.position.x += (mouse.x*20 - camera.position.x) * 0.01
+		camera.position.y += (mouse.y*20 - camera.position.y) * 0.01
 		camera.lookAt( scene.position )
 	})
 
@@ -87,8 +87,7 @@
 		scene.add(object3d)
 		
 		updateFcts.push(function(delta, now){
-			now	*= 10
-			var angle	= 0.01*Math.PI*2*now
+			var angle	= 0.1*Math.PI*2*now
 			angle	= Math.cos(angle)*Math.PI/15 + 3*Math.PI/2
 			var radius	= 30
 			object3d.position.x	= Math.cos(angle)*radius
