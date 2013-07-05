@@ -1,4 +1,4 @@
-var Map	= function(){
+var MapTable	= function(){
 	// handle updateFcts for sounds
 	var updateFcts	= [];
 	this.update	= function(delta, now){
@@ -20,42 +20,6 @@ var Map	= function(){
 	addWallGridLine( 25, 14, 25,-14)
 	addWallGridLine( 25,-15,-25,-15)
 	
-	for(var i = 0; i < 0; i++){
-		(function(){
-			var botBouncer	= new BotBouncer
-			updateFcts.push(function(delta, now){
-				botBouncer.update(delta, now)
-			})
-			var body	= botBouncer.object3d.userData.cannonBody.origin
-			body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
-		})()
-	}
-
-	var botGoal	= new BotGoal
-	updateFcts.push(function(delta, now){
-		botGoal.update(delta, now)
-	})
-	var body	= botGoal.object3d.userData.cannonBody.origin
-	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
-
-	for(var i = 0; i < 0; i++){
-		(function(){
-			var botEnemy	= new BotEnemy()
-			updateFcts.push(function(delta, now){
-				botEnemy.update(delta, now)
-			})
-		})()
-	}
-
-	for(var i = 0; i < 4; i++){
-		(function(){
-			var botBall	= new BotBall()
-			updateFcts.push(function(delta, now){
-				botBall.update(delta, now)
-			})
-		})()
-	}
-
 
 	// addWallGridLine( 19,-14, 19, -6)
 	// addWallGridLine( 24,  4, 11,  4)
@@ -80,9 +44,7 @@ var Map	= function(){
 	// addHole(- 9, 12)
 	// addHole(  2,  8)
 	// addHole( 13,  9)
-
-	return;
-
+	return
 	function addWallGridLine(gridX1, gridZ1, gridX2, gridZ2){
 		if( gridX1 === gridX2 ){
 			addWallVert(gridX1, gridZ1, gridZ2)
@@ -205,44 +167,5 @@ var Map	= function(){
 			body.update(delta, now)
 		});
 	}
-	
-	function addHole(gridX, gridZ){
-		var texture	= cache.getSet('texture.holes', function(){
-			//var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg')
-			var texture	= THREE.ImageUtils.loadTexture('images/jupitermap.jpg');
-			return texture
-		})
-		var radius	= 1.5 * tileW
-		var geometry	= new THREE.SphereGeometry(radius, 32, 16)
-		var material	= new THREE.MeshPhongMaterial({
-			color		: new THREE.Color().setHSL(Math.random(),1,0.5),
-			map		: texture,
-			bumpMap		: texture,
-			bumpScale	: 0.05,
-		})
 
-		var mesh	= new THREE.Mesh(geometry, material)
-		table.add( mesh )
-
-		mesh.position.x	= gridX * tileW
-		mesh.position.z	= gridZ * tileW		
-
-		mesh.receiveShadow	= true
-		mesh.castShadow		= true
-
-
-		// init physics
-		var body	= new THREEx.CannonBody({
-			mesh	: mesh,
-			mass	: 0
-		}).addTo(physicsWorld)
-		updateFcts.push(function(delta, now){
-			body.update(delta, now)
-		});
-		
-		body.origin.addEventListener("collide",function(event){
-			if( event.with.material.name !== 'pMaterialPlayer' )	return;
-			yeller.dispatchEvent('killPlayer')
-		})
-	}	
 }

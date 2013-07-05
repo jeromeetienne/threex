@@ -16,5 +16,7 @@ THREEx.LingeringControls	= function(controlled, centerObject, radius){
 		
 		controlled.position.x	= centerPos.x + Math.cos(angle)*radius
 		controlled.position.z	= centerPos.z + Math.sin(angle)*radius
+		
+		controlled.lookAt(centerPos)
 	}
 }

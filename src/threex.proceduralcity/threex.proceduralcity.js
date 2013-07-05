@@ -94,9 +94,9 @@ THREEx.ProceduralCity	= function(){
 		canvas2.height	= 1024;
 		var context	= canvas2.getContext( '2d' );
 		// disable smoothing
-		context.imageSmoothingEnabled = false;
-		context.webkitImageSmoothingEnabled = false;
-		context.mozImageSmoothingEnabled = false;
+		context.imageSmoothingEnabled		= false;
+		context.webkitImageSmoothingEnabled	= false;
+		context.mozImageSmoothingEnabled	= false;
 		// then draw the image
 		context.drawImage( canvas, 0, 0, canvas2.width, canvas2.height );
 		// return the just built canvas2

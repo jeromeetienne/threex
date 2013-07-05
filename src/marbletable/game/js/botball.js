@@ -10,7 +10,7 @@ var BotBall	= function(){
 			updateFct(delta, now)
 		})
 	}
-
+	// create THREE.Object3d
 	var radius	= 1.5 * GAME.tileW
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
 	var material	= new THREE.MeshPhongMaterial({
@@ -98,6 +98,14 @@ var BotBall	= function(){
 		GAME.emitterScore.emit(object3d.position, scorePoints)
 
 		this.destroy()
+		
+		var nInstances	= 0
+		scene.traverse(function(object3d){
+			nInstances	+= / ball /.test(object3d.name) ? +1 : 0
+		})
+		if( nInstances === 0 )	yeller.dispatchEvent('gameWon')
+
+		
 		return;
 
 		// reset ball intensity

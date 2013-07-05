@@ -27,7 +27,7 @@ How to generate the texture
 ---------------------------
 * the side texture for a building shows the floors.
 * It alternate between row of window and row of floor
-* window row are dark with a small noise to simulate lights in each room.
+* window row are dark with a small noise to simulate light variations in each room.
 * upscaling texture without filtering
 
 

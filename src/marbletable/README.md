@@ -3,24 +3,23 @@ demo.poollabyrinth
 
 marble labyrinth with realistic physics
 
+
 ## TODOs
 
 * when all balls are killed, you win the game and go to next level
-
+* TODO put a cage all around if any body touch it, kill it
 * have a game won sequence
   * easy but require to win a game
   * currently not possible
 
-* when you kill a ball, it doesnt come back
-  * how to remove it temporarily ?
-    * up to when ?
-    * need to reset it later
-  * NOTE: so dont remove it, let them hover on the map
+* Keep score between map
+  * as the page is reloaded... how to do that ?
+  * cookie ? sessionStorage ?
+  * who write in it ? who remove ?
 
 * have multiple levels
   * how to do multiple model
   * a pool table. you got all the balls already. respect the topology
-
 
 * have a shark ball, you got the texture, get the music, something 
   scary, louder and louder as it is coming close to you
@@ -35,6 +34,12 @@ marble labyrinth with realistic physics
   * it may be a number in a canvas... simple and the code is already there
 * put it in its own repo. usefull to publish the site
 
+* DONE when you kill a ball, it doesnt come back
+  * how to remove it temporarily ?
+    * up to when ?
+    * need to reset it later
+  * NOTE: so dont remove it, let them hover on the map
+
 * DONE if a ball is hit, it is loaded a bit more
   * visualize the load by stars particles
   * the score when destroyed of the load
@@ -43,6 +48,14 @@ marble labyrinth with realistic physics
 * DONE botgoal texture, black and white chessboard
 * idea levels
   * DONE pools ball - bring them back from tQuery
+
+## States in sessionStorage
+* score
+  * reset on homepage
+  * read it 
+* level
+  * in url ? via hash
+* force to go thru homepage
 
 ## ChangeLogs
 

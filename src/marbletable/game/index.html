@@ -29,7 +29,7 @@
 
 <script src="vendor/Tween.js"></script>
 <!-- include for threex.mirrorball -->
-<script src='vendor/webaudiox/build/webaudiox.js'></script>
+<script src='vendor/webaudiox/build/webaudiox-bundle.js'></script>
 <!-- include the .js files for jsfx.js -->
 <script src="vendor/webaudiox/examples/vendor/jsfx/audio.js"></script>
 <script src="vendor/webaudiox/examples/vendor/jsfx/jsfx.js"></script>
@@ -50,11 +50,13 @@
 <script src='js/botbouncer.js'></script>
 <script src='js/botgoal.js'></script>
 <script src='js/playercontrols.js'></script>
-<script src='js/map.js'></script>
+<script src='js/maptable.js'></script>
+<script src='js/map01.js'></script>
+<script src='js/map02.js'></script>
 <script src='js/threex.smoothholdercontrols.js'></script>
 <script src='js/threex.lingeringcontrols.js'></script>
 
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'>
 
 <!-- include Score html -->	
 <style>
@@ -108,6 +110,7 @@
 <div id="livesCounter" class='osdFont'></div>
 <div id="gameStartOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Ready ?</div>
 <div id="gameLostOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Over</div>
+<div id="gameWonOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Won</div>
 <!-- include killPlayer html -->	
 <style>
 #killPlayerOsd {
@@ -196,6 +199,7 @@ require([ '../../threex.glow/package.require.js'
 	GAME.nLives	= 3;
 	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
 
+	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -377,9 +381,39 @@ require([ '../../threex.glow/package.require.js'
 		})
 	})
 
+	yeller.addEventListener('gameWon', function(){
+		playerControls.disable	= true
+		Flow().seq(function(next){
+			document.querySelector('#gameWonOsd').style.display	= 'block'
+			next()
+		}).seq(function(next){
+			physicsWorld.stop()
+			setTimeout(function(){
+				next()
+			}, 1000*2)
+		}).seq(function(next){
+			document.querySelector('#gameWonOsd').style.display	= 'none';
+			var mapIds	= ['01', '02']
+			var index	= mapIds.indexOf(GAME.mapId)
+			console.assert( index !== -1 )
+			console.assert( index+1 < mapIds.length )
+			var newMapId	= mapIds[index+1]
+			
+			location.href	= './#'+newMapId
+		})
+	})
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		camera controls							//
 	//////////////////////////////////////////////////////////////////////////////////
+
+	// ;(function(){
+	// 	var controls	= new THREEx.LingeringControls(camera, GAME.ball, 1.5)
+	// 	camera.position.y = 1;
+	// 	updateFcts.push(function(delta, now){
+	// 		controls.update(delta, now)
+	// 	})
+	// })()
 
 	var cameraHolder	= new THREE.Object3D
 	scene.add(cameraHolder)
@@ -425,7 +459,11 @@ require([ '../../threex.glow/package.require.js'
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var map		= new Map()
+	if( GAME.mapId === '01' ){
+		var map		= new Map01()
+	}else if( GAME.mapId === '02' ){
+		var map		= new Map02()
+	}else	console.assert(false)
 	scene.add(map.object3d)
 	updateFcts.push(function(delta, now){
 		map.update(delta, now);		
