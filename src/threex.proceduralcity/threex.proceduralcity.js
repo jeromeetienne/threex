@@ -18,42 +18,44 @@ THREEx.ProceduralCity	= function(){
 	geometry.faceVertexUvs[0][2][1].set( 0, 0 );
 	geometry.faceVertexUvs[0][2][2].set( 0, 0 );
 	geometry.faceVertexUvs[0][2][3].set( 0, 0 );
+	// buildMesh
+	var buildingMesh= new THREE.Mesh( geometry );
 
-	var building	= new THREE.Mesh( geometry );
-
-	// base colors for vertexColors. light is for vertices at the bottom, shaddow is for the ones at the top
+	// base colors for vertexColors. light is for vertices at the top, shaddow is for the ones at the bottom
 	var light	= new THREE.Color( 0xffffff )
 	var shadow	= new THREE.Color( 0x303050 )
 
 	var cityGeometry= new THREE.Geometry();
 	for( var i = 0; i < 20000; i ++ ){
-		// establish the base color for the building
-		var value	= 1 - Math.random() * Math.random();
-		var color	= new THREE.Color().setRGB( value + Math.random() * 0.1, value, value + Math.random() * 0.1 );
-		
-		var top		= color.clone().multiply( light );
-		var bottom	= color.clone().multiply( shadow );
 		// put a random position
-		building.position.x	= Math.floor( Math.random() * 200 - 100 ) * 10;
-		building.position.z	= Math.floor( Math.random() * 200 - 100 ) * 10;
+		buildingMesh.position.x	= Math.floor( Math.random() * 200 - 100 ) * 10;
+		buildingMesh.position.z	= Math.floor( Math.random() * 200 - 100 ) * 10;
 		// put a random rotation
-		building.rotation.y	= Math.random()*Math.PI*2;
+		buildingMesh.rotation.y	= Math.random()*Math.PI*2;
 		// put a random scale
-		building.scale.x	= Math.random() * Math.random() * Math.random() * Math.random() * 50 + 10;
-		building.scale.y	= (Math.random() * Math.random() * Math.random() * building.scale.x) * 8 + 8;
-		building.scale.z	= building.scale.x
+		buildingMesh.scale.x	= Math.random() * Math.random() * Math.random() * Math.random() * 50 + 10;
+		buildingMesh.scale.y	= (Math.random() * Math.random() * Math.random() * buildingMesh.scale.x) * 8 + 8;
+		buildingMesh.scale.z	= buildingMesh.scale.x
 
-		var geometry	= building.geometry;
-		
+		// establish the base color for the buildingMesh
+		var value	= 1 - Math.random() * Math.random();
+		var baseColor	= new THREE.Color().setRGB( value + Math.random() * 0.1, value, value + Math.random() * 0.1 );
+		// set topColor/bottom vertexColors as adjustement of baseColor
+		var topColor	= baseColor.clone().multiply( light );
+		var bottomColor	= baseColor.clone().multiply( shadow );
+		// set .vertexColors for each face
+		var geometry	= buildingMesh.geometry;		
 		for ( var j = 0, jl = geometry.faces.length; j < jl; j ++ ) {
 			if ( j === 2 ) {
-				geometry.faces[ j ].vertexColors = [ color, color, color, color ];
+				// set face.vertexColors on root face
+				geometry.faces[ j ].vertexColors = [ baseColor, baseColor, baseColor, baseColor ];
 			} else {
-				geometry.faces[ j ].vertexColors = [ top, bottom, bottom, top ];
+				// set face.vertexColors on sides faces
+				geometry.faces[ j ].vertexColors = [ topColor, bottomColor, bottomColor, topColor ];
 			}
 		}
-		// merge it with cityGeometry
-		THREE.GeometryUtils.merge( cityGeometry, building );
+		// merge it with cityGeometry - very important for performance
+		THREE.GeometryUtils.merge( cityGeometry, buildingMesh );
 	}
 
 	// generate the texture
