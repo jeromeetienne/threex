@@ -111,6 +111,7 @@
 <div id="gameStartOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Ready ?</div>
 <div id="gameLostOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Over</div>
 <div id="gameWonOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Won</div>
+<div id="gameCompletedOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Completed</div>
 <!-- include killPlayer html -->	
 <style>
 #killPlayerOsd {
@@ -237,7 +238,7 @@ require([ '../../threex.glow/package.require.js'
 	// init lighting
 	initLighting(renderer, scene)
 
-
+	// keep updating tween.js
 	updateFcts.push(function(delta, now){
 		TWEEN.update()	
 	})	
@@ -383,6 +384,18 @@ require([ '../../threex.glow/package.require.js'
 
 	yeller.addEventListener('gameWon', function(){
 		playerControls.disable	= true
+
+		// find out nextMapId
+		var mapIds	= ['01', '02']
+		var index	= mapIds.indexOf(GAME.mapId)
+		var nextMapId	= mapIds[index+1]
+		console.assert( index !== -1 )
+		// if there is no more level, 
+		if( nextMapId === undefined ){
+			yeller.dispatchEvent('gameCompleted')
+			return;
+		}
+
 		Flow().seq(function(next){
 			document.querySelector('#gameWonOsd').style.display	= 'block'
 			next()
@@ -393,13 +406,27 @@ require([ '../../threex.glow/package.require.js'
 			}, 1000*2)
 		}).seq(function(next){
 			document.querySelector('#gameWonOsd').style.display	= 'none';
-			var mapIds	= ['01', '02']
-			var index	= mapIds.indexOf(GAME.mapId)
-			console.assert( index !== -1 )
-			console.assert( index+1 < mapIds.length )
-			var newMapId	= mapIds[index+1]
-			
-			location.href	= './#'+newMapId
+			// put nextMapId in location
+			location.href	= './#'+nextMapId
+			// reload the page				
+			location.reload()			
+		})
+	})
+
+	// 
+	yeller.addEventListener('gameCompleted', function(){
+		playerControls.disable	= true
+		Flow().seq(function(next){
+			document.querySelector('#gameCompletedOsd').style.display	= 'block'
+			next()
+		}).seq(function(next){
+			physicsWorld.stop()
+			setTimeout(function(){
+				next()
+			}, 1000*2)
+		}).seq(function(next){
+			document.querySelector('#gameCompletedOsd').style.display	= 'none';
+			location.href	= '..';
 		})
 	})
 
