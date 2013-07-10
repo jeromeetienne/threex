@@ -19,9 +19,7 @@
 	updateFcts.push(function(delta, now){
 		var videoElement	= videoTexture.video
 		if( videoElement.currentTime === videoElement.duration ){
-			console.log('reset1 video.src')
 			videoTexture.video.src = videoTexture.video.src	
-			console.log('reset2 video.src')
 		}
 	})
 
