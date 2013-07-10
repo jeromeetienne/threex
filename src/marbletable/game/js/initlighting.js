@@ -31,7 +31,6 @@ function initLighting(renderer, scene){
 	light.shadowMapWidth	= 1024*2
 	light.shadowMapHeight	= 1024*2
 
-	scene.add( light )
-	
+	scene.add( light )	
 }
 
