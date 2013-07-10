@@ -33,7 +33,9 @@ var SoundsBank	= function(){
 
 	// Create lineOut
 	var lineOut	= new WebAudiox.LineOut(context)
-	lineOut.volume	= 0
+	lineOut.volume	= 0.2
+	// expose lineOut
+	sounds.lineOut	= lineOut
 
 	// handle updateFcts for sounds
 	sounds.updateFcts	= [];

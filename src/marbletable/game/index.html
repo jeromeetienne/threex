@@ -58,11 +58,20 @@
 
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'>
 
+<style>
+@font-face {
+	font-family: 'FontAwesome';
+	src: url('vendor/Font-Awesome/font/fontawesome-webfont.eot?v=3.2.1');
+	src: url('vendor/Font-Awesome/font/fontawesome-webfont.eot?#iefix&v=3.2.1') format('embedded-opentype'), url('vendor/Font-Awesome/font/fontawesome-webfont.woff?v=3.2.1') format('woff'), url('vendor/Font-Awesome/font/fontawesome-webfont.ttf?v=3.2.1') format('truetype'), url('vendor/Font-Awesome/font/fontawesome-webfont.svg#fontawesomeregular?v=3.2.1') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+</style>
 <!-- include Score html -->	
 <style>
 .osdFont {
-	position	: absolute;
-
+//	position	: absolute;
+	
 	font-family	: arial, verdana, sans-serif;
 	font-size	: 500%;
 	font-weight	: bolder;
@@ -71,56 +80,60 @@
 	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
 }
 </style>
+
 <style>
-#score {
-	top		: 0px;
-	left		: 0;
-	padding-left	: 10px;
-	padding-right	: 10px;
-}
-</style>
-<div id="score" class='osdFont'></div>
-<!-- include Score html -->	
-<style>
-#timer {
+#osdLeftColumn {
 	position	: absolute;
-	bottom		: 0px;
+	text-align	: left;
+
+	top		: 0;
 	left		: 0;
-
-	font-family	: arial, verdana, sans-serif;
-	font-size	: 500%;
-	font-weight	: bolder;
-
-	color		: #000;
-	text-shadow	: 0 0 0.2em #fbc, 0 0 0.2em #fbc, 0 0 0.2em #fbc;
-
 	padding-left	: 10px;
-	padding-right	: 10px;
+}
+#muteOsd {
+	font-family: FontAwesome;
+}
+#muteOsd:before {
+	content: "\f028";
+}
+#muteOsd.mutted:before {
+	content: "\f026";
 }
 </style>
-<div id="timer"></div>
+<div id='osdLeftColumn'>
+	<div id="score" class='osdFont'></div>
+	<div id="muteOsd" class='osdFont'></div>
+</div>
 <!-- include live html -->	
 <style>
-#livesCounter {
+#osdRightColumn {
+	position	: absolute;
+	text-align	: right;
+
 	top		: 0;
 	right		: 0;
 	padding-right	: 10px;
 }
 </style>
-<div id="livesCounter" class='osdFont'></div>
-<div id="gameStartOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Ready ?</div>
-<div id="gameLostOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Over</div>
-<div id="gameWonOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Won</div>
-<div id="gameCompletedOsd" class='osdFont' style='top: 30%; text-align: center;width: 100%; display:none'>Game Completed</div>
-<!-- include killPlayer html -->	
+<div id='osdRightColumn'>
+	<div id="livesCounter" class='osdFont'>3</div>
+</div>
 <style>
-#killPlayerOsd {
-	top		: 30%;
+#osdCenterColumn {
+	position	: absolute;
+	top		: 30%; 
+
 	text-align	: center;
 	width		: 100%;
 }
 </style>
-<div id="killPlayerOsd" class='osdFont' style='display:none'>You die!</div>
+<div id='osdCenterColumn'>
+	<div id="gameStartOsd" class='osdFont' style='display:none'>Ready ?</div>
+	<div id="gameLostOsd" class='osdFont' style='display:none'>Game Over</div>
+	<div id="gameWonOsd" class='osdFont' style='display:none'>Game Won</div>
+	<div id="gameCompletedOsd" class='osdFont' style='display:none'>Game Completed</div>
+	<div id="killPlayerOsd" class='osdFont' style='display:none'>You die!</div>
+</div>
 <script>
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
@@ -233,6 +246,11 @@ require([ '../../threex.glow/package.require.js'
 	window.sounds	= new SoundsBank();
 	updateFcts.push(function(delta, now){
 		sounds.update(delta, now)
+	})
+	
+	document.querySelector('#muteOsd').addEventListener('click', function(event){
+		sounds.lineOut.toggeMute()
+		event.target.classList.toggle("mutted");
 	})
 
 	// init lighting
