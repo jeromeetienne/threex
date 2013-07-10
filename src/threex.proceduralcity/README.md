@@ -5,8 +5,10 @@ This post explains an example which proceduraly build a city.
 @mrdoob recently released a small demo showing up a city fully generated on the fly.
 It was a very eleguant solution, simple and efficient. 
 
+[here is the screencast]()
+
 How it is done from 10000 miles high
-------------------------------------
+====================================
 * building the city is less than 100 lines long
   * fully procedural so no download
 * build cube.
@@ -164,6 +166,22 @@ in a single geometry.
   }
 ```
 
+Now we got a single large geometry for the whole city, let's build
+a mesh from it.
+
+
+```
+  // build the mesh
+  var material  = new THREE.MeshLambertMaterial({
+    map           : texture,
+    vertexColors  : THREE.VertexColors
+  });
+  var mesh = new THREE.Mesh(cityGeometry, material );
+```
+
+This mesh is a whole city.
+Rather cool. now one last step. let's explain how to make this texture.
+
 Procedural generation of Building's Texture
 ===========================================
 
@@ -244,3 +262,6 @@ see [tojiro on anisotropy]() for detail.
   texture.anisotropy  = renderer.getMaxAnisotropy();
   texture.needsUpdate = true;
 ```
+
+Conclusion
+==========
