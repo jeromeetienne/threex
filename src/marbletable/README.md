@@ -6,7 +6,17 @@ marble labyrinth with realistic physics
 
 ## TODOs
 
-* when all balls are killed, you win the game and go to next level
+* keep mute status
+  * handle a setting saved in LocalStorage
+
+* handle profile
+  * renderingProfile.js
+  * renderingProfile.skymapEnabled
+  * renderingProfile.shadowMapEnabled
+  * renderingProfile.soundFxEnabled
+  * renderingProfile.soundTrackEnabled
+
+* DONE when all balls are killed, you win the game and go to next level
 * TODO put a cage all around if any body touch it, kill it
 * have a game won sequence
   * easy but require to win a game

@@ -1,9 +1,5 @@
 
 function initLighting(renderer, scene){
-	renderer.shadowMapEnabled	= true
-	//renderer.shadowMapType	= THREE.PCFSoftShadowMap
-
-
 	var light	= new THREE.AmbientLight( 0x444444 )
 	scene.add( light )
 

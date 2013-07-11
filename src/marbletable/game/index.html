@@ -53,6 +53,7 @@
 <script src='js/maptable.js'></script>
 <script src='js/map01.js'></script>
 <script src='js/map02.js'></script>
+<script src='js/renderingprofile.js'></script>
 <script src='js/threex.smoothholdercontrols.js'></script>
 <script src='js/threex.lingeringcontrols.js'></script>
 
@@ -209,11 +210,17 @@ require([ '../../threex.glow/package.require.js'
 	window.GAME	= {}
 
 	GAME.tileW	= 0.2
-	
+	GAME.profile	= new RenderingProfile()
 	GAME.nLives	= 3;
 	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
 
 	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
+
+	if( GAME.profile.shadowMapEnabled ){
+		renderer.shadowMapEnabled	= true
+		//renderer.shadowMapType	= THREE.PCFSoftShadowMap		
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -262,8 +269,10 @@ require([ '../../threex.glow/package.require.js'
 	})	
 
 	// add a skymap	
-	var mesh	= THREEx.createSkymap('skybox')
-	scene.add( mesh );
+	if( GAME.profile.skymapEnabled ){
+		var mesh	= THREEx.createSkymap('skybox')
+		scene.add( mesh )		
+	}
 
 	// // add gameTimer
 	// var gameTimer	= new GameTimer()
