@@ -139,6 +139,21 @@
 require([ '../../threex.glow/package.require.js'
 	, '../../threex.skymap/package.require.js'
 ], function(){
+	window.cache	= new Microcache()
+	window.yeller	= MicroeventMixin({});
+	window.GAME	= {}
+
+	GAME.tileW	= 0.2
+	GAME.profile	= new RenderingProfile()
+	GAME.nLives	= 3;
+	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
+
+	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	var renderer	= new THREE.WebGLRenderer()
 	renderer.setSize( window.innerWidth, window.innerHeight )
 	document.body.appendChild( renderer.domElement )
@@ -151,11 +166,14 @@ require([ '../../threex.glow/package.require.js'
 	camera.position.z	= 6
 	camera.lookAt( scene.position )
 
-	var physicsWorld= new THREEx.CannonWorld()
-	physicsWorld.start()
-
 	// setup winResize
-	var winResize	= new THREEx.WindowResize(renderer, camera)
+	var windowResize	= new THREEx.WindowResize(renderer, camera)
+	// set deviceProfileRatio
+	renderer.devicePixelRatio	= GAME.profile.devicePixelRatio
+	windowResize.trigger();
+
+
+	renderer.shadowMapEnabled	= GAME.profile.shadowMapEnabled ? true : false
 
 	// init keyboard		
 	var keyboard	= new THREEx.KeyboardState(document.body);
@@ -168,6 +186,13 @@ require([ '../../threex.glow/package.require.js'
 	window.renderer	= renderer
 	window.camera	= camera
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	var physicsWorld= new THREEx.CannonWorld()
+	physicsWorld.start()
 
 	window.physicsWorld	= physicsWorld
 
@@ -205,21 +230,6 @@ require([ '../../threex.glow/package.require.js'
 	));
 
 
-	window.cache	= new Microcache()
-	window.yeller	= MicroeventMixin({});
-	window.GAME	= {}
-
-	GAME.tileW	= 0.2
-	GAME.profile	= new RenderingProfile()
-	GAME.nLives	= 3;
-	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
-
-	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
-
-	if( GAME.profile.shadowMapEnabled ){
-		renderer.shadowMapEnabled	= true
-		//renderer.shadowMapType	= THREE.PCFSoftShadowMap		
-	}
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -249,17 +259,33 @@ require([ '../../threex.glow/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	
-	// upadte sounds
+	// create soundsBank
 	window.sounds	= new SoundsBank();
-	updateFcts.push(function(delta, now){
+	// update soundsBank - usefull for sound localisation
+	sounds.soundEnabled && updateFcts.push(function(delta, now){
 		sounds.update(delta, now)
 	})
-	
+	// handle mute UI
 	document.querySelector('#muteOsd').addEventListener('click', function(event){
+		if( sounds.soundEnabled === false )	return
+		// change sounds
 		sounds.lineOut.toggeMute()
-		event.target.classList.toggle("mutted");
+		// change display
+		var element	= event.target
+		element.classList.toggle("mutted");
+		// save 
+		localStorage.setItem('isMuted', sounds.lineOut.isMuted ? 'muted' : 'no' )
 	})
-
+	if( localStorage.getItem('isMuted') === 'muted' || sounds.soundEnabled === false ){
+		var element	= document.querySelector('#muteOsd')
+		element.classList.toggle("mutted");
+		sounds.soundEnabled && sounds.lineOut.toggeMute()
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	// init lighting
 	initLighting(renderer, scene)
 

@@ -6,9 +6,8 @@ marble labyrinth with realistic physics
 
 ## TODOs
 
-* keep mute status
-  * handle a setting saved in LocalStorage
-
+* TODO make a load/save for the renderingProfile
+  * used for custom renderingProfile
 * handle profile
   * renderingProfile.js
   * renderingProfile.skymapEnabled
@@ -27,6 +26,8 @@ marble labyrinth with realistic physics
   * cookie ? sessionStorage ?
   * who write in it ? who remove ?
 
+* DONE keep mute status
+  * handle a setting saved in LocalStorage
 * have multiple levels
   * how to do multiple model
   * a pool table. you got all the balls already. respect the topology
