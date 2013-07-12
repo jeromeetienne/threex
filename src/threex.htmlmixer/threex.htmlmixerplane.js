@@ -11,7 +11,7 @@ THREEx.HtmlmixerPlane	= function(domElement, opts){
 	// opts.planeW	= opts.planeW !== undefined	? opts.planeW	: 360
 	// opts.planeH	= opts.planeH !== undefined	? opts.planeH	: 240
 
-	opts.elementW	= opts.elementW	!== undefined	? opts.elementW	: 960
+	opts.elementW	= opts.elementW	!== undefined	? opts.elementW	: 512
 	opts.planeW	= opts.planeW !== undefined	? opts.planeW	: 360
 	opts.planeH	= opts.planeH !== undefined	? opts.planeH	: 240
 

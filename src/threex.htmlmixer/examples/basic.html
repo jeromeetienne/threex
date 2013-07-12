@@ -47,10 +47,6 @@
 
 	cssScene.add( mixerPlane.objectCSS )
 
-	updateFcts.push(function(){
-		mixerRenderer.render( cssScene, camera )
-	})
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +59,10 @@
 		// var angle		= now * Math.PI*2 * 0.1
 		// planeMesh.position.x	= Math.cos(angle) * 400
 		// planeMesh.position.z	= Math.sin(angle) * 200
+	})
+
+	updateFcts.push(function(){
+		mixerRenderer.render( cssScene, camera )
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////

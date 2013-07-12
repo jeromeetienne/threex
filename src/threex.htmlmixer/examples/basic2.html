@@ -11,29 +11,7 @@
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
-	camera.position.z = 30;
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		add an object and make it move					//
-	//////////////////////////////////////////////////////////////////////////////////	
-	var geometry	= new THREE.CubeGeometry( 10, 10, 10);
-	var material	= new THREE.MeshNormalMaterial();
-	var mesh	= new THREE.Mesh( geometry, material );
-	scene.add( mesh );
-	
-	updateFcts.push(function(delta, now){
-		var angle	= now * Math.PI * 2 * 0.1
-		mesh.position.x	= Math.cos(angle)* 20;
-		mesh.position.z	= Math.sin(angle)* 20;
-	})
-	
-;(function(){
-	var geometry	= new THREE.CubeGeometry( 40, 40, 10);
-	var material	= new THREE.MeshNormalMaterial();
-	var mesh	= new THREE.Mesh( geometry, material );
-	mesh.position.z	= -200
-	scene.add( mesh );
-})();
+	camera.position.z = 3;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -43,14 +21,13 @@
 	var cssScene	= new THREE.Scene()
 
 	var url		= '../../../../index.html'
-	var mixerPlane	= THREEx.HtmlmixerPlane.createFromIframe(url)
+	var mixerPlane	= THREEx.HtmlmixerPlane.createFromIframe(url, {
+		planeW	: 1,
+		planeH	: 1
+	})
 	scene.add( mixerPlane.object3d )
 
 	cssScene.add( mixerPlane.objectCSS )
-
-	updateFcts.push(function(){
-		mixerRenderer.render( cssScene, camera )
-	})
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -65,6 +42,11 @@
 		// planeMesh.position.x	= Math.cos(angle) * 400
 		// planeMesh.position.z	= Math.sin(angle) * 200
 	})
+
+	updateFcts.push(function(){
+		mixerRenderer.render( cssScene, camera )
+	})
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
