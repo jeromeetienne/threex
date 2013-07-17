@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+<h1 style='font-size: 600%; text-align: center;'><br/><br/>
+	<a href='http://mrdoob.github.io/three.js'>three.js</a> is beautifull.
+</h1>
+<script>
+	var domZElement	= 3
+
+	var frontRenderer	= new THREE.WebGLRenderer();
+	frontRenderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( frontRenderer.domElement );
+	frontRenderer.domElement.style.position	= 'absolute'
+	frontRenderer.domElement.style.top	= '0px'
+	frontRenderer.domElement.style.left	= '0px'
+	frontRenderer.domElement.style.pointerEvents	= 'none'
+	frontRenderer.domElement.style.zIndex	= 1
+
+	var frontCamera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, domZElement );
+	frontCamera.position.z	= 3
+
+	var frontScene	= new THREE.Scene();
+
+	var backRenderer	= new THREE.WebGLRenderer();
+	backRenderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( backRenderer.domElement );
+	backRenderer.domElement.style.position	= 'absolute'
+	backRenderer.domElement.style.top	= '0px'
+	backRenderer.domElement.style.left	= '0px'
+	backRenderer.domElement.style.pointerEvents	= 'none'
+	backRenderer.domElement.style.zIndex	= -1
+
+	var backCamera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, domZElement, 1000 );
+	backCamera.position.z	= 3
+	// backCamera.position = frontRenderer.position;
+	// backCamera.rotation = frontRenderer.rotation;
+
+	var backScene	= new THREE.Scene();
+
+	var updateFcts	= [];
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+;(function(){
+	var geometry	= new THREE.TorusGeometry( 1-0.25, 0.25, 32, 32);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.rotation.y	= Math.PI/2
+	frontScene.add( mesh );
+	updateFcts.push(function(delta, now){
+		mesh.position.x	= Math.cos(0.1 * now * Math.PI*2)*3
+	})	
+})()
+;(function(){
+	var geometry	= new THREE.TorusGeometry( 1-0.25, 0.25, 32, 32);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.rotation.y	= Math.PI/2
+	backScene.add( mesh );
+	updateFcts.push(function(delta, now){
+		mesh.position.x	= Math.cos(0.1 * now * Math.PI*2)*3
+	})	
+})()
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		// frontCamera.position.x += (mouse.x*5 - frontCamera.position.x) * (delta*3)
+		// frontCamera.position.y += (mouse.y*5 - frontCamera.position.y) * (delta*3)
+		// frontCamera.lookAt( scene.position )
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		frontRenderer.render( frontScene, frontCamera );		
+	})
+	updateFcts.push(function(){
+		backRenderer.render( backScene, backCamera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script>
+
+</body>
