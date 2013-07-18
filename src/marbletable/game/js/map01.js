@@ -18,7 +18,7 @@ var Map01	= function(){
 	updateFcts.push(function(delta, now){
 		botGoal.update(delta, now)
 	})
-	var body	= botGoal.object3d.userData.cannonBody.origin
+	var body	= botGoal.object3d.userData.cannonBody.body
 	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
 
 	// add botEnemy

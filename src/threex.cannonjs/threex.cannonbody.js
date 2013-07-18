@@ -39,7 +39,14 @@ THREEx.CannonBody	= function(opts){
 	}else	console.assert(false, 'unknown geometry type')
 
 	var body	= new CANNON.RigidBody(mass, shape, material)
-	this.origin	= body
+	this.body	= body
+	// @TODO to remove
+	Object.defineProperty(this, 'origin', {
+		get	: function(){
+			console.warn('THREEx.cannonBody depreciate .origin, use .body instead')
+			return body
+		}
+	})
 	
 	body.userData	= body.userData	|| {}
 	body.userData.object3d	= mesh
@@ -82,7 +89,7 @@ THREEx.CannonBody.prototype.applyImpulse = function(force, deltaTime) {
 	var ballPosition= new THREE.Vector3().getPositionFromMatrix( ball.matrixWorld )
 
 	// do an impulse to the ball
-	var body	= ball.userData.cannonBody.origin
+	var body	= ball.userData.cannonBody.body
 	var worldPoint	= new CANNON.Vec3(ballPosition.x, ballPosition.y, ballPosition.z)
 	var impulse	= new CANNON.Vec3(impulse.x, impulse.y, impulse.z)
 	body.applyImpulse(impulse, worldPoint);
@@ -96,7 +103,7 @@ THREEx.CannonBody.prototype.applyForce = function(force) {
 	var ballPosition= new THREE.Vector3().getPositionFromMatrix( ball.matrixWorld )
 
 	// do an impulse to the ball
-	var body	= ball.userData.cannonBody.origin
+	var body	= ball.userData.cannonBody.body
 	var worldPoint	= new CANNON.Vec3(ballPosition.x, ballPosition.y, ballPosition.z)
 	var cforce	= new CANNON.Vec3(force.x, force.y, force.z)
 	body.applyForce(cforce, worldPoint);
@@ -107,12 +114,12 @@ THREEx.CannonBody.prototype.applyForce = function(force) {
 //////////////////////////////////////////////////////////////////////////////////
 
 
-THREEx.CannonBody.prototype.addTo = function(world) {
-	world.origin.add(this.origin)
+THREEx.CannonBody.prototype.addTo = function(worldx) {
+	worldx.world.add(this.body)
 	return this;
 };
 
-THREEx.CannonBody.prototype.removeFrom = function(world) {
-	world.origin.remove(this.origin)
+THREEx.CannonBody.prototype.removeFrom = function(worldx) {
+	worldx.world.remove(this.body)
 	return this;
 };

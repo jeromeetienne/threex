@@ -34,7 +34,7 @@ var BotBall	= function(){
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)
 	})
-	var body	= bodyx.origin
+	var body	= bodyx.body
 
 	// count the number of body of this type - used to fix startPosition
 	var bodyCounter	= 0

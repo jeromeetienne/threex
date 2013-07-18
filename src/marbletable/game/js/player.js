@@ -1,4 +1,8 @@
-var Player	= function(){
+var Player	= function(opts){
+	// handle default arguments
+	opts	= opts	|| {}
+	opts.liveMirror	= opts.liveMirror !== undefined ? opts.liveMirror : true
+	// init texture
 	var texture	= cache.getSet('texture.player.rocks', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
 		var texture	= THREE.ImageUtils.loadTexture('images/wood.jpg');
@@ -46,22 +50,22 @@ var Player	= function(){
 		bodyx.update(delta, now)
 	})
 
-if( true ){
-// to get a mirror ball
-	// create the camera
-	var cubeCamera	= new THREE.CubeCamera( 0.001, 1000, 512 );
-	scene.add( cubeCamera )
-	updateFcts.push(function(delta, now){
-		cubeCamera.position.copy(mesh.position)
-		mesh.visible	= false
-		cubeCamera.updateCubeMap(renderer, scene);
-		mesh.visible	= true
-	})
-	mesh.material.envMap	= cubeCamera.renderTarget
-	mesh.material.reflectivity	= 0.2
-}
+	// to get a mirror ball
+	if( opts.liveMirror ){
+		// create the camera
+		var cubeCamera	= new THREE.CubeCamera( 0.001, 1000, 512 );
+		scene.add( cubeCamera )
+		updateFcts.push(function(delta, now){
+			cubeCamera.position.copy(mesh.position)
+			mesh.visible	= false
+			cubeCamera.updateCubeMap(renderer, scene);
+			mesh.visible	= true
+		})
+		mesh.material.envMap	= cubeCamera.renderTarget
+		mesh.material.reflectivity	= 0.2
+	}
 
-	var body	= bodyx.origin
+	var body	= bodyx.body
 
 	body.angularDamping	= 0.9
 	// body.linearDamping	= 0.5

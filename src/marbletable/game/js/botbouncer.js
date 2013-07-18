@@ -31,7 +31,6 @@ var BotBouncer	= function(){
 	mesh.castShadow		= true
 	scene.add( mesh )
 
-	mesh.useQuaternion	= true
 	mesh.lookAt(new THREE.Vector3(0,1,0))	
 
 	var bodyx	= new THREEx.CannonBody({
@@ -39,7 +38,7 @@ var BotBouncer	= function(){
 		mass	: 0,
 		geometry: new THREE.SphereGeometry(radius, 32, 32),
 	}).addTo(physicsWorld)
-	var body	= bodyx.origin
+	var body	= bodyx.body
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)
 	})

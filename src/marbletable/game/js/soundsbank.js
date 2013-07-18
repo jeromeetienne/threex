@@ -185,7 +185,7 @@ var SoundsBank	= function(soundEnabled){
 
 		this.updateFcts.push(function(delta, now){
 			// compute body speed
-			var body	= object3d.userData.cannonBody.origin
+			var body	= object3d.userData.cannonBody.body
 			var speed	= body.velocity.norm();
 			// set playbackRate depending on speed
 			source.playbackRate.value	= 0.0001 + speed * 0.9;

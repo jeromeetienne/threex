@@ -50,7 +50,7 @@ var PlayerControls	= function(ball){
 
 		if( keyboard.eventMatches(event, 'space') === false )	return
 
-		var body	= ball.userData.cannonBody.origin
+		var body	= ball.userData.cannonBody.body
 		if( Math.abs(body.velocity.y) > 0.1 )	return;			
 
 		sounds.playEatPill()

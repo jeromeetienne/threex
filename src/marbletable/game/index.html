@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html manifest='manifest.appcache'>
 <script>
 console.warn = console.error
 </script>
@@ -63,7 +64,7 @@ console.warn = console.error
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'>
 
 <style>
-@font-face {
+@font-face {	/* for mute button which is part of awesome font */
 	font-family: 'FontAwesome';
 	src: url('vendor/Font-Awesome/font/fontawesome-webfont.eot?v=3.2.1');
 	src: url('vendor/Font-Awesome/font/fontawesome-webfont.eot?#iefix&v=3.2.1') format('embedded-opentype'), url('vendor/Font-Awesome/font/fontawesome-webfont.woff?v=3.2.1') format('woff'), url('vendor/Font-Awesome/font/fontawesome-webfont.ttf?v=3.2.1') format('truetype'), url('vendor/Font-Awesome/font/fontawesome-webfont.svg#fontawesomeregular?v=3.2.1') format('svg');
@@ -145,11 +146,13 @@ require([ '../../threex.glow/package.require.js'
 	window.GAME	= {}
 
 	GAME.tileW	= 0.2
-	GAME.profile	= new RenderingProfile()
 	GAME.nLives	= 3;
 	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
-
 	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
+
+	var onMobile	= 'ontouchstart' in window ? true : false
+	GAME.profile	= new RenderingProfile(onMobile ? 'mobile' : 'normal')
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -212,20 +215,20 @@ require([ '../../threex.glow/package.require.js'
 	window.pMaterialWall	= pMaterialWall
 	
 	// We must add the contact materials to the world
-	physicsWorld.origin.addContactMaterial(new CANNON.ContactMaterial(
+	physicsWorld.world.addContactMaterial(new CANNON.ContactMaterial(
 		pMaterialPlayer,
 		pMaterialEnemy,
 		0.01,	// friction coefficient
 		1	// restitution
 	));
-	physicsWorld.origin.addContactMaterial(new CANNON.ContactMaterial(
+	physicsWorld.world.addContactMaterial(new CANNON.ContactMaterial(
 		pMaterialPlayer,
 		pMaterialWall,
 		0.00,	// friction coefficient
 		1.2	// restitution
 	));
 	// We must add the contact materials to the world
-	physicsWorld.origin.addContactMaterial(new CANNON.ContactMaterial(
+	physicsWorld.world.addContactMaterial(new CANNON.ContactMaterial(
 		pMaterialPlayer,
 		pMaterialGround,
 		0.01,		// friction coefficient
@@ -322,12 +325,14 @@ require([ '../../threex.glow/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	//		ball								//
 	//////////////////////////////////////////////////////////////////////////////////
-	var player	= new Player()
+	var player	= new Player({
+		liveMirror	: GAME.profile.playerLiveMirror
+	})
 	GAME.ball	= player.mesh
 	updateFcts.push(function(delta, now){
 		player.update(delta, now)
 	})
-	var body	= GAME.ball.userData.cannonBody.origin
+	var body	= GAME.ball.userData.cannonBody.body
 	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
 
 	//////////////////////////////////////////////////////////////////////////
@@ -341,7 +346,7 @@ require([ '../../threex.glow/package.require.js'
 
 	// if the ball is below the table, kill it
 	updateFcts.push(function(delta, now){
-		var body	= GAME.ball.userData.cannonBody.origin
+		var body	= GAME.ball.userData.cannonBody.body
 		var position	= body.position
 		if( position.y < -2 )	yeller.dispatchEvent('killPlayer')
 	})
@@ -362,14 +367,13 @@ require([ '../../threex.glow/package.require.js'
 	})
 
 	yeller.addEventListener('spawnPlayer', function(){
-		console.log('spawnPlayer')
 
 		playerControls.disable	= false
 		if( physicsWorld.isRunning() === false )	physicsWorld.start()
 
 		sounds.playSpawn()
 
-		var body	= GAME.ball.userData.cannonBody.origin
+		var body	= GAME.ball.userData.cannonBody.body
 		body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
 		
 		body.velocity.set(0,0,0)
@@ -384,7 +388,7 @@ require([ '../../threex.glow/package.require.js'
 
 			sounds.playDie()
 			
-			var body	= GAME.ball.userData.cannonBody.origin
+			var body	= GAME.ball.userData.cannonBody.body
 			body.velocity.set(0,0,0)
 			body.angularVelocity.set(0,0,0)
 
@@ -580,3 +584,4 @@ require([ '../../threex.glow/package.require.js'
 	})
 })
 </script></body>
+</html>

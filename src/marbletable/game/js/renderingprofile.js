@@ -12,6 +12,7 @@ var RenderingProfile	= function(type){
 	this.soundEnabled	= false
 	this.rendererAntialias	= true
 	this.devicePixelRatio	= 1
+	this.playerLiveMirror	= true
 
 	// specify the profile depending of its preconfigured type
 	if( type === 'normal' ){
@@ -20,7 +21,14 @@ var RenderingProfile	= function(type){
 		this.skymapEnabled	= false
 		this.shadowMapEnabled	= false		
 		this.devicePixelRatio	= 1/2
-	}else if( type === 'high' ){
+		this.playerLiveMirror	= false
+	}else if( type === 'mobile' ){
+		this.skymapEnabled	= false
+		this.shadowMapEnabled	= false
+		this.soundEnabled	= false
+		this.rendererAntialias	= false
+		this.devicePixelRatio	= 1/2
+		this.playerLiveMirror	= false
 	}else	console.assert(false)
 }
 

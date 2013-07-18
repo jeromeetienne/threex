@@ -16,7 +16,15 @@ THREEx.CannonWorld	= function(){
 
 	// world.solver.iterations = 30
 
-	this.origin	= world
+	this.world	= world
+	// @TODO to remove
+	Object.defineProperty(this, 'origin', {
+		get	: function(){
+			console.warn('THREEx.cannonWorld depreciate .origin, use .world instead')
+			return world
+		}
+	})
+
 	           
 	var timerId	= null;
 
@@ -36,15 +44,11 @@ THREEx.CannonWorld	= function(){
 		if( this.isRunning() === true )	return
 		period	= period !== undefined ? period : 1/60;
 		timerId	= setInterval(function(){
-	// console.log('pre step')
 			world.step(period);
-	// console.log('post step')
 			// honor this.bodiesToRemove
 			this.bodiesToRemove.forEach(function(body){
-	// console.log('actually remove one body', body)
 				world.remove(body)
 			})
-	// console.log('post removal')
 			this.bodiesToRemove	= []
 		}.bind(this), period*1000)
 		return this;

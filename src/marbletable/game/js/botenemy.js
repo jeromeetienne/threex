@@ -47,7 +47,7 @@ var BotEnemy	= function(){
 		mesh	: mesh,
 		material: pMaterialEnemy,
 	}).addTo(physicsWorld)
-	var body	= bodyx.origin
+	var body	= bodyx.body
 
 	updateFcts.push(function(delta, now){
 		bodyx.update(delta, now)

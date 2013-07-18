@@ -20,7 +20,7 @@ var Map02	= function(){
 			updateFcts.push(function(delta, now){
 				botBouncer.update(delta, now)
 			})
-			var body	= botBouncer.object3d.userData.cannonBody.origin
+			var body	= botBouncer.object3d.userData.cannonBody.body
 			body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
 		})()
 	}
@@ -30,7 +30,7 @@ var Map02	= function(){
 	updateFcts.push(function(delta, now){
 		botGoal.update(delta, now)
 	})
-	var body	= botGoal.object3d.userData.cannonBody.origin
+	var body	= botGoal.object3d.userData.cannonBody.body
 	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
 
 	// add botEnemy
