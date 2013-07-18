@@ -48,18 +48,21 @@ require([ '../../threex.effectcomposer/package.require.js'
 	var meshGlow		= new THREE.Mesh( mesh.geometry.clone(), materialOn )
 	meshGlow.position	= mesh.position
 	meshGlow.rotation	= mesh.rotation
+	meshGlow.quaternion	= mesh.quaternion
 	meshGlow.scale		= mesh.scale
 	sceneGlow.add( meshGlow )
 
 	var torus1Glow		= new THREE.Mesh( torus1.geometry.clone(), materialOff )
 	torus1Glow.position	= torus1.position
 	torus1Glow.rotation	= torus1.rotation
+	torus1Glow.quaternion	= torus1.quaternion
 	torus1Glow.scale	= torus1.scale
 	sceneGlow.add( torus1Glow )
 
 	var torus2Glow		= new THREE.Mesh( torus2.geometry.clone(), materialOff )
 	torus2Glow.position	= torus2.position
 	torus2Glow.rotation	= torus2.rotation
+	torus2Glow.quaternion	= torus2.quaternion
 	torus2Glow.scale	= torus2.scale
 	sceneGlow.add( torus2Glow )
 

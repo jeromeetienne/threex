@@ -9,7 +9,8 @@ var RenderingProfile	= function(type){
 	// set profile values
 	this.skymapEnabled	= true
 	this.shadowMapEnabled	= true
-	this.soundEnabled	= true
+	this.soundEnabled	= false
+	this.rendererAntialias	= true
 	this.devicePixelRatio	= 1
 
 	// specify the profile depending of its preconfigured type

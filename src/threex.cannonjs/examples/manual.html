@@ -42,8 +42,6 @@
 	var mass	= 1
 	var body	= new CANNON.RigidBody(mass, shape)
 
-	mesh.useQuaternion	= true
-	
 	updateFcts.push(function(delta, now){
 		body.position.copy(mesh.position);
 		body.quaternion.copy(mesh.quaternion);
@@ -51,6 +49,7 @@
 	physicsWorld.add(body);
 	
 	body.angularVelocity.set(0,2,0);
+	body.angularDamping	= 0.5;
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//

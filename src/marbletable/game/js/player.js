@@ -38,7 +38,6 @@ var Player	= function(){
 
 	mesh.name	= (mesh.name || ' ') + 'player ';
 
-	mesh.useQuaternion	= true
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: mesh,
 		material: pMaterialPlayer,
@@ -76,6 +75,9 @@ if( true ){
 		}
 		sounds.playRoll(mesh)
 	}, 100)
+	// update the listener on this mesh
+	soundsBank.soundEnabled	&& setListenerUpdater(mesh)
+
 
 	updateFcts.push(function(delta, now){
 		var speed	= body.velocity.norm();

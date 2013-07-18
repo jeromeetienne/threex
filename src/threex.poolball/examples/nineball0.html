@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../threex.poolball.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 3;
+
+	var light	= new THREE.AmbientLight( 0x444444 )
+	scene.add( light )
+
+	var light	= new THREE.DirectionalLight( 0xcccccc, 1 )
+	scene.add( light )
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var container	= new THREE.Object3D()
+	container.rotation.x	= Math.PI/2
+	container.position.z	= -2
+	scene.add(container)
+
+	// MIDDLE LINE 8 - 9 - 2
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '9',
+		stripped	: true
+	});
+	mesh.position.set(0,0,0)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '8',
+		stripped	: false
+	});
+	mesh.position.set(-1,0,0)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '3',
+		stripped	: false
+	});
+	mesh.position.set(1,0,0)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+
+	// MIDDLE LINE 2 - 6 
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '2',
+		stripped	: false
+	});
+	mesh.position.set(-0.5,0,-1)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '6',
+		stripped	: false
+	});
+	mesh.position.set(0.5,0,-1)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+	
+	// TOP LINE 4
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '4',
+		stripped	: false
+	});
+	mesh.position.set(0.0,0,-2)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+
+
+	// MIDDLE LINE 2 - 6 
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '5',
+		stripped	: false
+	});
+	mesh.position.set(-0.5,0, 1)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '7',
+		stripped	: false
+	});
+	mesh.position.set(0.5,0, 1)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+	
+	// TOP LINE 4
+	var mesh	= THREEx.createPoolBall({
+		ballDesc	: '1',
+		stripped	: false
+	});
+	mesh.position.set(0.0,0,2)
+	mesh.rotation.x	= -Math.PI/2
+	container.add( mesh );
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

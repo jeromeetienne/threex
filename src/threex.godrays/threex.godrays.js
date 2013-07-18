@@ -30,7 +30,7 @@ THREEx.GodRays	= function(renderer, camera, renderTarget){
 
 	console.assert( THREE.HorizontalBlurShader )
 	console.assert( THREE.VerticalBlurShader )
-	console.assert( THREE.RadialBlurShader )
+	console.assert( THREEx.RadialBlurShader )
 
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
@@ -98,6 +98,7 @@ THREEx.GodRays.prototype.copyScene = function(srcScene, materialCb){
 		// clone position/rotation/scale
 		dstObject.position	= srcObject.position
 		dstObject.rotation	= srcObject.rotation
+		dstObject.quaternion	= srcObject.quaternion
 		dstObject.scale		= srcObject.scale
 		// clone children
 		for(var i = 0; i < srcObject.children.length; i ++ ) {

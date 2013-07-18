@@ -21,6 +21,16 @@ var Map01	= function(){
 	var body	= botGoal.object3d.userData.cannonBody.origin
 	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
 
+	// add botEnemy
+	for(var i = 0; i < 0; i++){
+		(function(){
+			var botEnemy	= new BotEnemy()
+			updateFcts.push(function(delta, now){
+				botEnemy.update(delta, now)
+			})
+		})()
+	}
+
 	// add botBall
 	for(var i = 0; i < 1; i++){
 		(function(){

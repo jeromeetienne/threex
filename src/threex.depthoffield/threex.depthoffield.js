@@ -87,4 +87,5 @@ THREEx.DepthOfField.prototype.render = function(scene, camera){
 	renderer.render( scene, camera, this.renderTargetDepth, true );
 	// Render bokeh composite
 	renderer.render( this.scene, this.camera );
-};
+}
+

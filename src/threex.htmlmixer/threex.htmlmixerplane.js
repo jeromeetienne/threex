@@ -39,6 +39,7 @@ THREEx.HtmlmixerPlane	= function(domElement, opts){
 	// synchronize objectCSS position/rotation with planeMesh position/rotation 
 	objectCSS.position	= object3d.position
 	objectCSS.rotation	= object3d.rotation
+	objectCSS.quaternion	= object3d.quaternion
 	// resize this.objectCSS to same size as this.object3d
 	objectCSS.scale.x	/= opts.elementW / opts.planeW
 	objectCSS.scale.y	/= opts.elementW / opts.planeW

@@ -19,12 +19,13 @@
 	updateFcts.push(function(delta, now){
 		var videoElement	= videoTexture.video
 		if( videoElement.currentTime === videoElement.duration ){
-			videoTexture.video.src = videoTexture.video.src	
+			videoElement.src = videoElement.src	
 		}
 	})
 
 	// create the videoTexture
-	var videoTexture= new THREEx.VideoTexture('videos/sintel.ogv')
+	var url		= 'videos/sintel.ogv'
+	var videoTexture= new THREEx.VideoTexture(url)
 	updateFcts.push(function(delta, now){
 		videoTexture.update(delta, now)
 	})

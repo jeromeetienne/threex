@@ -40,8 +40,6 @@ var BotGoal	= function(){
 	this.object3d	= object3d
 	scene.add( object3d )
 
-	object3d.useQuaternion	= true
-
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: object3d,
 		mass	: 0,

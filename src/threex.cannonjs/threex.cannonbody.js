@@ -46,13 +46,7 @@ THREEx.CannonBody	= function(opts){
 
 	this.mesh	= mesh
 
-	// sanity check - if the object use Euler, check it is 0 vectors
-	console.assert(mesh.useQuaternion === true || 
-		(  mesh.rotation.x === 0
-		&& mesh.rotation.y === 0
-		&& mesh.rotation.z === 0), 'mesh MUST use quaternion')
 	// use quaternion
-	mesh.useQuaternion	= true
 	mesh.userData.cannonBody= this
 
 	body.position.x		= mesh.position.x
@@ -68,7 +62,10 @@ THREEx.CannonBody	= function(opts){
 		// TODO should i copy the mesh local position or global position
 		// global seems more likely
 		mesh.position.copy( body.position );
-		mesh.quaternion.copy( body.quaternion );
+		mesh.quaternion.x	= body.quaternion.x;
+		mesh.quaternion.y	= body.quaternion.y;
+		mesh.quaternion.z	= body.quaternion.z;
+		mesh.quaternion.w	= body.quaternion.w;
 	}
 }
 

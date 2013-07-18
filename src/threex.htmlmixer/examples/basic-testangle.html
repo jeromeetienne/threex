@@ -3,7 +3,7 @@
 <script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
 <script src='../threex.htmlmixerrenderer.js'></script>
 <script src='../threex.htmlmixerplane.js'></script>
-<body style='margin: 0px; background-color: #0000FF; overflow: hidden;'><script>
+<body style='margin: 0px; background-color: hotpink; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -20,33 +20,24 @@
 
 	var cssScene	= new THREE.Scene()
 
-	var url		= '../../../../index.html'
+	var url		= '../../../index.html'
 	var mixerPlane	= THREEx.HtmlmixerPlane.createFromIframe(url, {
-		planeW	: 1,
-		planeH	: 1
+		elementW: 512,
+		planeW	: 2,
+		planeH	: 2
 	})
 	scene.add( mixerPlane.object3d )
 
 	cssScene.add( mixerPlane.objectCSS )
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-
 	updateFcts.push(function(delta, now){
 		var object3d		= mixerPlane.object3d
 		object3d.rotation.y	= now * Math.PI*2 * 0.1
-	})
-	updateFcts.push(function(delta, now){
-		// var angle		= now * Math.PI*2 * 0.1
-		// planeMesh.position.x	= Math.cos(angle) * 400
-		// planeMesh.position.z	= Math.sin(angle) * 200
 	})
 
 	updateFcts.push(function(){
 		mixerRenderer.render( cssScene, camera )
 	})
-
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//

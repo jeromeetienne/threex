@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../threex.poolball.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 3;
+
+	var light	= new THREE.AmbientLight( 0x444444 )
+	scene.add( light )
+
+	var light	= new THREE.DirectionalLight( 0xcccccc, 1 )
+	scene.add( light )
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var container	= new THREE.Object3D()
+	container.position.y	= -1
+	container.position.z	= -1
+	scene.add(container)
+
+	/**
+	 * parameters to create a initial 9balls setupo
+	 * @type {Array}
+	 */
+	var nineballs	= [
+		{
+			ctorParams	: {
+				ballDesc	: '9',
+				stripped	: true				
+			},
+			position	: new THREE.Vector3(0,0,0)
+		},
+		{
+			ctorParams	: {
+				ballDesc	: '8',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3(-1,0,0)
+		},
+		{
+			ctorParams	: {
+				ballDesc	: '3',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3( 1,0,0)
+		},
+		// another line
+		{
+			ctorParams	: {
+				ballDesc	: '2',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3(-0.5,0,-Math.sin(1))
+		},
+		{
+			ctorParams	: {
+				ballDesc	: '6',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3(0.5,0,-Math.sin(1))
+		},
+		// another line
+		{
+			ctorParams	: {
+				ballDesc	: '4',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3(0,0,-2*Math.sin(1))
+		},
+		// another line
+		{
+			ctorParams	: {
+				ballDesc	: '5',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3(-0.5,0,+Math.sin(1))
+		},
+		{
+			ctorParams	: {
+				ballDesc	: '7',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3(0.5,0,+Math.sin(1))
+		},
+		// another line
+		{
+			ctorParams	: {
+				ballDesc	: '1',
+				stripped	: false				
+			},
+			position	: new THREE.Vector3(0,0,+2*Math.sin(1))
+		},
+	];
+	
+	nineballs.forEach(function(config){
+		var mesh	= THREEx.createPoolBall(config.ctorParams);
+		mesh.position.copy( config.position )
+		mesh.rotation.x	= -Math.PI/2
+		// mesh.rotation.x	= Math.random()*Math.PI*2
+		// mesh.rotation.y	= Math.random()*Math.PI*2
+		// mesh.rotation.z	= Math.random()*Math.PI*2
+		container.add( mesh );
+	})	
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

@@ -3,7 +3,7 @@
 <script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
 <script src='../threex.htmlmixerrenderer.js'></script>
 <script src='../threex.htmlmixerplane.js'></script>
-<body style='margin: 0px; background-color: #0000FF; overflow: hidden;'><script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -44,7 +44,6 @@
 	var url		= '../../../../index.html'
 	var mixerPlane	= THREEx.HtmlmixerPlane.createFromIframe(url)
 	scene.add( mixerPlane.object3d )
-
 	cssScene.add( mixerPlane.objectCSS )
 
 	//////////////////////////////////////////////////////////////////////////////////

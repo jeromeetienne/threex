@@ -27,8 +27,6 @@ var BotBall	= function(){
 	object3d.castShadow	= true
 	scene.add( object3d )
 
-	object3d.useQuaternion	= true
-
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: object3d,
 		material: pMaterialEnemy,

@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<script>
+console.warn = console.error
+</script>
 <!-- include three.js stuff -->
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
@@ -71,8 +74,6 @@
 <!-- include Score html -->	
 <style>
 .osdFont {
-//	position	: absolute;
-	
 	font-family	: arial, verdana, sans-serif;
 	font-size	: 500%;
 	font-weight	: bolder;
@@ -95,10 +96,10 @@
 	font-family: FontAwesome;
 }
 #muteOsd:before {
-	content: "\f028";
+	content: "\f028";	/* icon for non mute */
 }
-#muteOsd.mutted:before {
-	content: "\f026";
+#muteOsd.muted:before {
+	content: "\f026";	/* icon for muted */
 }
 </style>
 <div id='osdLeftColumn'>
@@ -154,7 +155,9 @@ require([ '../../threex.glow/package.require.js'
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var renderer	= new THREE.WebGLRenderer()
+	var renderer	= new THREE.WebGLRenderer({
+		antialias	: GAME.profile.rendererAntialias
+	})
 	renderer.setSize( window.innerWidth, window.innerHeight )
 	document.body.appendChild( renderer.domElement )
 
@@ -260,7 +263,8 @@ require([ '../../threex.glow/package.require.js'
 	
 	
 	// create soundsBank
-	window.sounds	= new SoundsBank();
+	window.sounds	= new SoundsBank(GAME.profile.soundEnabled);
+	window.soundsBank	= sounds
 	// update soundsBank - usefull for sound localisation
 	sounds.soundEnabled && updateFcts.push(function(delta, now){
 		sounds.update(delta, now)
@@ -272,13 +276,13 @@ require([ '../../threex.glow/package.require.js'
 		sounds.lineOut.toggeMute()
 		// change display
 		var element	= event.target
-		element.classList.toggle("mutted");
+		element.classList.toggle("muted");
 		// save 
 		localStorage.setItem('isMuted', sounds.lineOut.isMuted ? 'muted' : 'no' )
 	})
 	if( localStorage.getItem('isMuted') === 'muted' || sounds.soundEnabled === false ){
 		var element	= document.querySelector('#muteOsd')
-		element.classList.toggle("mutted");
+		element.classList.toggle("muted");
 		sounds.soundEnabled && sounds.lineOut.toggeMute()
 	}
 	
@@ -325,7 +329,6 @@ require([ '../../threex.glow/package.require.js'
 	})
 	var body	= GAME.ball.userData.cannonBody.origin
 	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
-
 
 	//////////////////////////////////////////////////////////////////////////
 	//		User Controls						//

@@ -33,7 +33,16 @@ var BotEnemy	= function(){
 	mesh.castShadow		= true
 	scene.add( mesh )
 
-	mesh.useQuaternion	= true
+	// ugly way to fix a missing 'onLoad()'
+	// FIXME possible now with the new webaudiox soundbank
+	setTimeout(function timeoutCb(){
+		if( !sounds.sharkTrackBuffer ){
+			setTimeout(timeoutCb, 100)
+			return;
+		}
+		sounds.playSharkTrack(mesh)
+	}, 100)
+
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: mesh,
 		material: pMaterialEnemy,
@@ -54,6 +63,7 @@ var BotEnemy	= function(){
 	// setup origin	
 	var origin	= new CANNON.Vec3()
 	origin.set(-20*GAME.tileW, 6*GAME.tileW, -10*GAME.tileW)
+	origin.set(-10*GAME.tileW, 0*GAME.tileW, -0*GAME.tileW)
 	origin.z	*= Math.floor(bodyCounter % 2) === 1 ? 1 : -1
 	origin.x	+= (Math.random()-0.5)*GAME.tileW*10;
 	origin.y	+= bodyCounter * radius*2 * 1.5

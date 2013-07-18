@@ -34,17 +34,81 @@ var SoundsBank	= function(soundEnabled){
 
 	// Create lineOut
 	var lineOut	= new WebAudiox.LineOut(context)
-	lineOut.volume	= 0.2
+	lineOut.volume	= 1
 	// expose lineOut
 	this.lineOut	= lineOut
 
 	// handle updateFcts for this
-	this.updateFcts	= [];
+	var updateFcts	= [];
+	this.updateFcts	= updateFcts;
 	this.update	= function(delta, now){
 		this.updateFcts.forEach(function(updateFct){
 			updateFct(delta, now)
 		})
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * setup a WebAudiox.ListenerObject3DUpdater for a given object3d
+	 * @param  {THREE.Object3D} object3d the object3d which represent the listener
+	 * @return {WebAudiox.ListenerObject3DUpdater} just built
+	 */
+	this.setListenerUpdater	= function(object3d){
+		// put a ListenerObject3DUpdater
+		var listenerUpdater	= new WebAudiox.ListenerObject3DUpdater(context, camera)
+		updateFcts.push(function(delta, now){
+			listenerUpdater.update(delta, now)
+		})
+		return listenerUpdater
+	}
+
+	// load the sound
+	//WebAudiox.loadBuffer(context, 'sounds/techno.mp3', function(buffer){
+	WebAudiox.loadBuffer(context, 'sounds/kick.wav', function(buffer){
+		this.sharkTrackBuffer	= buffer;
+	}.bind(this))
+	// setup a play function
+	this.playSharkTrack	= function(object3d){
+		// if buffer not yet loaded do nothing
+		if( !this.sharkTrackBuffer )	return
+		var destination	= lineOut.destination;
+
+		// init AudioPannerNode
+		var panner	= context.createPanner()
+		panner.coneOuterGain	= 0.1
+		panner.coneOuterAngle	= Math.PI *180/Math.PI
+		panner.coneInnerAngle	= 0 *180/Math.PI
+		panner.connect(destination)
+		destination	= panner
+		// put a PannerObject3DUpdater
+		var pannerUpdater	= new WebAudiox.PannerObject3DUpdater(panner, object3d)
+		updateFcts.push(function(delta, now){
+			pannerUpdater.update(delta, now)
+		})
+		
+		var volumeGain	= context.createGain()
+		volumeGain.connect(destination)
+		volumeGain.gain.value	= 15
+		destination	= volumeGain
+
+
+		// init AudioBufferSourceNode
+		var source	= context.createBufferSource();
+		source.buffer	= this.sharkTrackBuffer
+		source.loop	= true
+		source.connect(destination)
+		destination	= source
+		
+		// start the sound now
+		source.start(0);
+	}
+	
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -53,6 +117,7 @@ var SoundsBank	= function(soundEnabled){
 	// init eatPill sound
 	this.playSoundTrack	= function(){
 		if( !this.soundTrack )	return
+
 		var source	= context.createBufferSource()
 		source.buffer	= this.soundTrack
 		source.loop	= true
@@ -78,7 +143,7 @@ var SoundsBank	= function(soundEnabled){
 	}
 	WebAudiox.loadBuffer(context, 'sounds/eatpill.mp3', function(buffer){
 		this.eatPillBuffer	= buffer;
-	})
+	}.bind(this))
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -101,7 +166,7 @@ var SoundsBank	= function(soundEnabled){
 	}
 	WebAudiox.loadBuffer(context, 'sounds/kick.wav', function(buffer){
 		this.kickBuffer	= buffer;
-	})
+	}.bind(this))
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -131,7 +196,7 @@ var SoundsBank	= function(soundEnabled){
 	}
 	WebAudiox.loadBuffer(context, 'sounds/roll.mp3', function(buffer){
 		this.rollBuffer	= buffer
-	})
+	}.bind(this))
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -209,10 +274,4 @@ var SoundsBank	= function(soundEnabled){
 	}
 	var lib		= ["saw",0.0000,0.4000,0.0000,0.2020,0.0000,0.4040,20.0000,443.0000,2400.0000,0.3240,0.0000,0.0000,0.0100,0.0003,0.0000,0.0000,0.0000,0.0000,0.0000,0.7456,0.0000,0.0000,1.0000,0.0000,0.0000,0.0000,0.0000]	
 	this.scoreupBuffer	= WebAudiox.getBufferFromJsfx(context, lib)
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	return this;	
 }

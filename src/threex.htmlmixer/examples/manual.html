@@ -71,7 +71,7 @@
 	var cssObject	= new THREE.CSS3DObject( element );
 	// synchronize cssObject position/rotation with planeMesh position/rotation 
 	cssObject.position	= planeMesh.position;
-	cssObject.rotation	= planeMesh.rotation;
+	cssObject.quaternion	= planeMesh.quaternion;
 	// resize cssObject to same size as planeMesh (plus a border)
 	cssObject.scale.x	/= elementWidth / planeWidth;
 	cssObject.scale.y	/= elementWidth / planeWidth;

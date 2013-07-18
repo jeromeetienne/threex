@@ -14,7 +14,7 @@ var Map02	= function(){
 	})
 	
 	// add bouncers
-	for(var i = 0; i < 0; i++){
+	for(var i = 0; i < 1; i++){
 		(function(){
 			var botBouncer	= new BotBouncer
 			updateFcts.push(function(delta, now){
