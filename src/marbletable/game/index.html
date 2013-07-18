@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html manifest='manifest.appcache'>
+<html>
 <script>
 console.warn = console.error
 </script>
@@ -7,6 +7,10 @@ console.warn = console.error
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
 <script src='../../../vendor/three.js/examples/js/ImprovedNoise.js'></script>
+<!-- include stats.js stuff -->
+<script src="bower_components/stats.js/build/Stats.js"></script>
+<!-- include threex.rendererstats.js stuff -->
+<script src="bower_components/threex.rendererstats/threex.rendererstats.js"></script>
 <!-- include require.js stuff -->
 <script src="../../../vendor/require.js/require.js"></script>
 <!-- include threex.cannonjs -->
@@ -178,6 +182,28 @@ require([ '../../threex.glow/package.require.js'
 	renderer.devicePixelRatio	= GAME.profile.devicePixelRatio
 	windowResize.trigger();
 
+	;(function(){
+		var stats	=  new Stats();
+		// Align top-left
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left	= '0px';
+		stats.domElement.style.bottom	= '0px';
+		document.body.appendChild( stats.domElement );
+		updateFcts.push(function(delta, now){
+			stats.update();		
+		})
+	})()
+
+	;(function(){
+		var rendererStats	= new THREEx.RendererStats()
+		rendererStats.domElement.style.position	= 'absolute'
+		rendererStats.domElement.style.right	= '0px'
+		rendererStats.domElement.style.bottom	= '0px'
+		document.body.appendChild( rendererStats.domElement )
+		updateFcts.push(function(delta, now){
+			rendererStats.update(renderer);
+		})
+	})()
 
 	renderer.shadowMapEnabled	= GAME.profile.shadowMapEnabled ? true : false
 
