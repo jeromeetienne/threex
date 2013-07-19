@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+<body style='margin: 0px; background-color: #bb00bb; overflow: hidden;'>
 <script id="fragmentShaderNoise" type="x-shader/x-fragment">
 
 	//
@@ -104,27 +104,21 @@
 									  dot( p2, x2 ), dot( p3, x3 ) ) );
 
 	}
-
-	float surface3( vec3 coord ) {
-
-		float n = 0.0;
-
-		n += 1.0 * abs( snoise( coord ) );
-		n += 0.5 * abs( snoise( coord * 2.0 ) );
-		n += 0.25 * abs( snoise( coord * 4.0 ) );
-		n += 0.125 * abs( snoise( coord * 8.0 ) );
-
-		return n;
-
+	float surface3( vec3 coord ){
+		float height	= 0.0;
+		height	+= abs(snoise(coord      )) * 1.0;
+		height	+= abs(snoise(coord * 2.0)) * 0.5;
+		height	+= abs(snoise(coord * 4.0)) * 0.25;
+		height	+= abs(snoise(coord * 8.0)) * 0.125;
+		return height;
 	}
 
 	void main( void ) {
+		vec3 coord	= vec3( vUv, time );
+		float height	= surface3( coord );
 
-		vec3 coord = vec3( vUv, -time );
-		float n = surface3( coord );
-
-		gl_FragColor = vec4( vec3( n, n, n ), 1.0 );
-
+		gl_FragColor	= vec4( vec3(height, height, height), 1.0 );
+		// gl_FragColor	= vec4( vec3(0,0,0), height );
 	}
 
 </script>
@@ -151,28 +145,34 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
 
+
+var THREEx = THREEx || {}
+
+THREEx.NoiseShaderMaterial	= function(){	
+	var material	= new THREE.ShaderMaterial( {
+		uniforms	: {
+			time	: { type: "f", value: 1.0 },
+			scale	: { type: "v2", value: new THREE.Vector2( 1, 1 ) },
+			offset	: { type: "v2", value: new THREE.Vector2( 0, 0 ) },
+		},
+		vertexShader	: document.getElementById( 'vertexShader' ).textContent,
+		fragmentShader	: document.getElementById( 'fragmentShaderNoise' ).textContent,
+	}); 
+	return material
+}
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
-	var geometry	= new THREE.PlaneGeometry( 5, 4);
-	var material	= new THREE.MeshNormalMaterial();
-	var uniformsNoise	= {
-		time	: { type: "f", value: 1.0 },
-		scale	: { type: "v2", value: new THREE.Vector2( 3, 3 ) },
-		offset	: { type: "v2", value: new THREE.Vector2( 0, 0 ) },
-	};
-	var material = new THREE.ShaderMaterial( {
-		uniforms	: uniformsNoise,
-		vertexShader	: document.getElementById( 'vertexShader' ).textContent,
-		fragmentShader	: document.getElementById( 'fragmentShaderNoise' ).textContent,
-	});
+	var geometry	= new THREE.SphereGeometry( 0.5, 32, 32);
+	var material	= new THREEx.NoiseShaderMaterial()
+	var mesh	= new THREE.Mesh( geometry, material );
 
 	updateFcts.push(function(delta, now){
-		uniformsNoise[ "time" ].value += delta/5;
-		uniformsNoise[ "offset" ].value.x += delta/10;
+		material.uniforms[ "time" ].value		+= delta/5;
+		material.uniforms[ "offset" ].value.x	+= delta/10;
 	})
 	
-	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 	
 	// updateFcts.push(function(delta, now){
