@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../../../vendor/require.js/require.js'></script>
+<script src='../threex.noiseshadermaterial.js'></script>
+<body style='margin: 0px; background-color: #bb00bb; overflow: hidden;'><script>
+require([ '../../threex.skymap/package.require.js'
+	], function(){
+	var renderer	= new THREE.WebGLRenderer({
+		antialiasing	: true
+	});
+
+	renderer.devicePixelRatio	= 1/4
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 40;
+	
+;(function(){
+	// directly from @mrdoob in http://mrdoob.com/lab/javascript/webgl/clouds/
+	var canvas	= document.createElement( 'canvas' );
+	var context	= canvas.getContext( '2d' );
+	canvas.width	= 32;
+	canvas.height	= window.innerHeight;
+
+	var gradient	= context.createLinearGradient( 0, 0, 0, canvas.height );
+	gradient.addColorStop(0  , "#1e4877");
+	gradient.addColorStop(0.5, "#4584b4");
+
+	context.fillStyle	= gradient;
+	context.fillRect(0, 0, canvas.width, canvas.height);
+
+	var url		= canvas.toDataURL('image/png');
+	document.body.style.background	= 'url(' + url + ')';	
+})()
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+	//
+var fragmentShader	= [
+	THREEx.NoiseShaderMaterial.noiseFragmentShader,
+	'',
+	'',
+	'uniform float time;',
+	'varying vec2 vUv;',
+	'',
+	'float surface3( vec3 coord ){',
+		'float height	= 0.0;',
+		'coord	*= 0.8;',
+		'height	+= abs(snoise(coord      )) * 1.0;',
+		'height	+= abs(snoise(coord * 2.0)) * 0.5;',
+		'height	+= abs(snoise(coord * 4.0)) * 0.25;',
+		'height	+= abs(snoise(coord * 8.0)) * 0.125;',
+		'return height;',
+	'}',
+	'',
+	'void main( void ) {',
+		'vec3 coord	= vec3( vUv, time );',
+		'float height	= surface3( coord );',
+		'if( height < 0.8 ) discard;',
+		'height = (height-0.8)/0.2;',
+		'float alpha = height/1.0;',
+		'if(height < 0.9){',
+			'alpha = (height/0.9);',
+		'}else{',
+			'alpha = 1.0;',
+		'}',
+		'alpha = alpha / 2.0;',
+		'height = height*0.4 + 0.4;',
+		'gl_FragColor	= vec4( vec3(height, height, height), alpha );',
+	'}',
+].join('\n')
+
+var nPlanes	= 100;
+for(var i = 0; i < nPlanes; i++){
+	;(function(){
+		var geometry	= new THREE.SphereGeometry( 0.5, 32, 32);
+		var geometry	= new THREE.PlaneGeometry(30,20);
+		var material	= new THREEx.NoiseShaderMaterial({
+			fragmentShader	: fragmentShader,
+			depthWrite	: false,
+			transparent	: true,
+		})
+		var mesh	= new THREE.Mesh( geometry, material );
+		mesh.position.z	= (i-nPlanes/2) / 2
+		mesh.position.y	= 3
+		
+		material.uniforms[ "time" ].value	+= i/50
+		updateFcts.push(function(delta, now){
+			material.uniforms[ "time" ].value	+= -delta/2;
+		})
+
+		scene.add( mesh ); 
+	})()
+	
+}
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*40 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*20 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+})
+</script></body>
