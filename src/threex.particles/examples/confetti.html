@@ -19,15 +19,15 @@
 	setInterval(function(){
 		var position	= new THREE.Vector3(0,-1,-2)
 		confetti.emit(position);
-		// confetti.emit(position);
-		// confetti.emit(position);
-		// confetti.emit(position);
-		// confetti.emit(position);
-		// confetti.emit(position);
-		// confetti.emit(position);
-		// confetti.emit(position);
-		// confetti.emit(position);
-	}, 0.2*1000);
+		confetti.emit(position);
+		confetti.emit(position);
+		confetti.emit(position);
+		confetti.emit(position);
+		confetti.emit(position);
+		confetti.emit(position);
+		confetti.emit(position);
+		confetti.emit(position);
+	}, 0.04*1000);
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -64,9 +64,9 @@ function Confetti(container){
 	this.emit	= function(position){
 		// randomize the initial position
 		position	= position.clone()
-		position.x	+= (Math.random()-0.5)*0.3
+		position.x	+= (Math.random()-0.5)*0.5
 		position.y	+= (Math.random()-0.5)*0.1
-		position.z	+= (Math.random()-0.5)*0.3
+		position.z	+= (Math.random()-0.5)*0.5
 		// init sprite material
 		var geometry	= new THREE.PlaneGeometry(0.1,0.1);
 		var material	= new THREE.MeshBasicMaterial({
@@ -79,18 +79,16 @@ function Confetti(container){
 
 		var maxAge	= 1 + Math.random()*0.4
 		// set velocity
-		var velocity	= new THREE.Vector3(0, 0.5, 0)
-		velocity.x	+= (Math.random()-0.5)*0.5
-		velocity.y	+= (Math.random()-0.5)*0.1
-		velocity.z	+= (Math.random()-0.5)*0.5
-		velocity.setLength(2 + (Math.random()-0.5)*0.5)
+		var velocity	= new THREE.Vector3(0, 3, 0)
+		velocity.x	+= (Math.random()-0.5)*2
+		velocity.y	+= (Math.random()-0.5)*2
+		velocity.z	+= (Math.random()-0.5)*2
 		
 		var acceleration= new THREE.Vector3(0, -3, 0)
 		
-		var angularVelocity	= new THREE.Vector3()
-		angularVelocity.x	= Math.PI*2*(1.5+0.5*Math.random());
-
-		var angularDamping	= new THREE.Vector3().set(1,1,1).multiplyScalar(0.98)
+		var angularAxis		= new THREE.Vector3(Math.random()-0.5,Math.random()-0.5,Math.random()-0.5).normalize();
+		var angularVelocity	= Math.PI*2*(1.5+0.5*Math.random());
+		var angularDamping	= 0.99
 		
 		var birthDate	= Date.now()/1000
 		updateFcts.push(function callback(delta, now){
@@ -101,12 +99,9 @@ function Confetti(container){
 				return;	
 			}
 			
-			angularVelocity.multiply(angularDamping)
+			angularVelocity	*= angularDamping
 
-			object3d.rotateX(angularVelocity.x * delta)
-			object3d.rotateY(angularVelocity.y * delta)
-			object3d.rotateZ(angularVelocity.z * delta)
-
+			object3d.rotateOnAxis(angularAxis, angularVelocity * delta)
 
 			// handle acceleration	
 			velocity.add(acceleration.clone().multiplyScalar(delta))

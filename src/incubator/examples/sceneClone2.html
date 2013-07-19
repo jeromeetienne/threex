@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='./threex.scenecloner.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 <h1 style='font-size: 600%; text-align: center;'><br/><br/>
 	<a href='http://mrdoob.github.io/three.js'>three.js</a> is beautiful.
@@ -35,72 +36,15 @@
 	backCamera.rotation	= frontCamera.rotation;
 	backCamera.scale	= frontCamera.scale;
 
-//////////////////////////////////////////////////////////////////////////////////
-//		comment								//
-//////////////////////////////////////////////////////////////////////////////////
 
-var THREEx	= THREEx	|| {}
-
-THREEx.SceneCloner	= function(label, srcScene){
-	label	= 'sceneCloner-'+label
-	var dstScene	= new THREE.Scene()
-	this.dstScene	= dstScene
-	srcScene.userData[label]	= dstScene
-	
-	this.addedCallback	= function(event){
-		var srcObject	= event.target
-
-		var geometry	= srcObject.geometry.clone()
-		var material	= srcObject.material.clone()
-		var dstObject	= new THREE.Mesh(geometry, material)
-
-		srcObject.clone(dstObject)
-		dstObject.position	= srcObject.position
-		dstObject.quaternion	= srcObject.quaternion
-		dstObject.scale		= srcObject.scale
-		
-		console.assert(srcObject.parent)
-		var dstParent	= srcObject.parent.userData[label]
-		dstParent.add(dstObject)
-
-		console.assert(srcObject.userData[label] === undefined)
-		srcObject.userData[label]	= dstObject
-	}
-}
-
-	var backCloner	= new THREEx.SceneCloner('back', frontScene)
-
-//////////////////////////////////////////////////////////////////////////////////
-//		comment								//
-//////////////////////////////////////////////////////////////////////////////////
-
-	var backScene	= new THREE.Scene()
-	
-	// init the initial scene
-	frontScene.userData.backClone	= backScene
-
-	// the callback for every THREE.Object3D added
-	function addedCb(event){
-		var srcObject	= event.target
-
-		var geometry	= srcObject.geometry.clone()
-		var material	= srcObject.material.clone()
-		var dstObject	= new THREE.Mesh(geometry, material)
-
-		srcObject.clone(dstObject)
-		dstObject.position	= srcObject.position
-		dstObject.quaternion	= srcObject.quaternion
-		dstObject.scale		= srcObject.scale
-		
-		console.assert(srcObject.parent)
-		var dstParent	= srcObject.parent.userData.backClone
-		dstParent.add(dstObject)
-
-		console.assert(srcObject.userData.backClone === undefined)
-		srcObject.userData.backClone	= dstObject
-	};
-	
 	var updateFcts	= []
+
+	var backCloner	= new THREEx.SceneCloner('back', frontScene, function(dstObject, srcObject){
+		console.log(dstObject)
+		dstObject.material	= new THREE.MeshBasicMaterial({
+			color	: new THREE.Color('red')
+		});
+	})
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
@@ -110,7 +54,7 @@ THREEx.SceneCloner	= function(label, srcScene){
 	var material	= new THREE.MeshNormalMaterial()
 	var frontMesh	= new THREE.Mesh( geometry, material )
 	frontMesh.rotation.y	= Math.PI/2
-	frontMesh.addEventListener('added', addedCb)
+	backCloner.add(frontMesh)
 	frontScene.add( frontMesh )
 
 	updateFcts.push(function(delta, now){
@@ -123,9 +67,9 @@ THREEx.SceneCloner	= function(label, srcScene){
 	var geometry	= new THREE.TorusGeometry( 1-0.25, 0.25, 32, 32)
 	var material	= new THREE.MeshNormalMaterial()
 	var mesh	= new THREE.Mesh( geometry, material )
+	backCloner.add(mesh)
 	mesh.scale.multiplyScalar(1/2)
-	mesh.addEventListener('added', addedCb)
-	frontMesh.add( mesh );	
+	frontMesh.add( mesh );
 })()
 
 
@@ -136,7 +80,7 @@ THREEx.SceneCloner	= function(label, srcScene){
 		frontRenderer.render( frontScene, frontCamera )
 	})
 	updateFcts.push(function(){
-		backRenderer.render( backScene, backCamera )	
+		backRenderer.render( backCloner.dstScene, backCamera )	
 	})
 	
 	//////////////////////////////////////////////////////////////////////////////////
