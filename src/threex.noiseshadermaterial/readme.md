@@ -6,15 +6,15 @@ It is all procedural with perlin3d so no download, full random.
 released under MIT license.
 
 Here is the basic example 
-[live](http://jeromeetienne.github.io/jeromeetienne/threex/src/threex.noiseshadermaterial/examples/basic.html)
+[live](http://jeromeetienne.github.io/threex/src/threex.noiseshadermaterial/examples/basic.html)
  and its 
 [source](https://github.com/jeromeetienne/threex/blob/master/src/threex.noiseshadermaterial/examples/basic.html).
 Here is the lsd psychedlic kindof example 
-[live](http://jeromeetienne.github.io/jeromeetienne/threex/src/threex.noiseshadermaterial/examples/lsd.html)
+[live](http://jeromeetienne.github.io/threex/src/threex.noiseshadermaterial/examples/lsd.html)
  and its 
 [source](http://github.com/jeromeetienne/threex/blob/master/src/threex.noiseshadermaterial/examples/lsd.html).
 Here is an volumetric cloud genereated by a perlin/simplex3d, it is 
-[live](http://jeromeetienne.github.io/jeromeetienne/threex/src/threex.noiseshadermaterial/examples/volumetric-cloud-procedural.html)
+[live](http://jeromeetienne.github.io/threex/src/threex.noiseshadermaterial/examples/volumetric-cloud-procedural.html)
  and its 
 [source](http://github.com/jeromeetienne/threex/blob/master/src/threex.noiseshadermaterial/examples/volumetric-cloud-procedural.html).
 
@@ -80,7 +80,7 @@ material.uniforms[ "offset" ].value.x	+= delta/10;
 You can even provide your own piece of fragment shader to do your own effects.
 lsd example is a good example for that.
 Here it is 
-[live](http://jeromeetienne.github.io/jeromeetienne/threex/src/threex.noiseshadermaterial/examples/lsd.html)
+[live](http://jeromeetienne.github.io/threex/src/threex.noiseshadermaterial/examples/lsd.html)
  and its 
 [source](http://github.com/jeromeetienne/threex/blob/master/src/threex.noiseshadermaterial/examples/lsd.html).
 
