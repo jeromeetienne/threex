@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<script src='../threex.scenecloner.js'></script>
+<script src='../threex.scenemirror.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 <h1 style='font-size: 600%; text-align: center;'><br/><br/>
 	<a href='http://mrdoob.github.io/three.js'>three.js</a> is beautiful.
@@ -39,11 +39,14 @@
 
 	var updateFcts	= []
 
-	var backCloner	= new THREEx.SceneCloner('back', frontScene, function(dstObject, srcObject){
-		console.log(dstObject)
-		dstObject.material	= new THREE.MeshBasicMaterial({
-			color	: new THREE.Color('red')
-		});
+	var backSceneMirror	= new THREEx.SceneMirror(frontScene, {
+		onAdded	: function(dstObject, srcObject){
+			console.log(dstObject)
+			srcObject.material	= new THREE.MeshBasicMaterial({
+				color		: new THREE.Color('black'),
+				wireframe	: true,
+			});
+		},
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -54,12 +57,12 @@
 	var material	= new THREE.MeshNormalMaterial()
 	var frontMesh	= new THREE.Mesh( geometry, material )
 	frontMesh.rotation.y	= Math.PI/2
-	backCloner.add(frontMesh)
+	backSceneMirror.add(frontMesh)
 	frontScene.add( frontMesh )
 
 	updateFcts.push(function(delta, now){
 		frontMesh.position.x	= Math.cos(0.1 * now * Math.PI*2)*2
-		frontMesh.scale.set(1,1,1).multiplyScalar(1 + 0.2 * Math.sin(Math.PI + 0.2 * now * Math.PI*2)*3)
+		frontMesh.position.z	= Math.cos(0.1 * now * Math.PI*2)*0.5
 	})
 
 
@@ -67,7 +70,7 @@
 	var geometry	= new THREE.TorusGeometry( 1-0.25, 0.25, 32, 32)
 	var material	= new THREE.MeshNormalMaterial()
 	var mesh	= new THREE.Mesh( geometry, material )
-	backCloner.add(mesh)
+	backSceneMirror.add(mesh)
 	mesh.scale.multiplyScalar(1/2)
 	frontMesh.add( mesh );
 })()
@@ -80,7 +83,7 @@
 		frontRenderer.render( frontScene, frontCamera )
 	})
 	updateFcts.push(function(){
-		backRenderer.render( backCloner.dstScene, backCamera )	
+		backRenderer.render( backSceneMirror.dstScene, backCamera )	
 	})
 	
 	//////////////////////////////////////////////////////////////////////////////////

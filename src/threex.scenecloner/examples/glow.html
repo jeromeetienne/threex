@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <script src="../../../vendor/three.js/build/three.min.js"></script>
 <script src="../../../vendor/require.js/require.js"></script>
-<script src="../threex.scenecloner.js"></script>
+<script src="../threex.scenemirror.js"></script>
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
 require([ '../../threex.glow/package.require.js'
 ], function(){
@@ -26,12 +26,16 @@ require([ '../../threex.glow/package.require.js'
 	materialOff.color.set('black')
 
 	var glow	= new THREEx.Glow(renderer, camera);
-	var glowCloner	= new THREEx.SceneCloner('glow', scene, function(dstObject, srcObject){
-		var domClasses	= srcObject.userData.domClasses
-		var glowing	= domClasses && domClasses.match(/ glowing /)
-		var material	= glowing ? materialOn	: materialOff
-		dstObject.material	= material
-	}, undefined, glow.scene)
+
+	var glowSceneMirror	= new THREEx.SceneMirror(scene, {
+		dstScene: glow.scene,
+		onAdded	: function(dstObject, srcObject){
+			var domClasses	= srcObject.userData.domClasses
+			var glowing	= domClasses && domClasses.match(/ glowing /)
+			var material	= glowing ? materialOn	: materialOff
+			dstObject.material	= material
+		},
+	})
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +46,7 @@ require([ '../../threex.glow/package.require.js'
 	var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15)
 	var material	= new THREE.MeshNormalMaterial()
 	var mesh	= new THREE.Mesh( geometry, material )
-	glowCloner.add(mesh)
+	glowSceneMirror.add(mesh) 
 	mesh.userData.domClasses	+= ' glowing '
 	mesh.scale.set(1,1,1).multiplyScalar(2)
 	scene.add( mesh )
@@ -50,7 +54,7 @@ require([ '../../threex.glow/package.require.js'
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
 	var material	= new THREE.MeshNormalMaterial()
 	var torus1	= new THREE.Mesh( geometry, material )
-	glowCloner.add(torus1)
+	glowSceneMirror.add(torus1)
 	torus1.position.x	= 0.5;
 	torus1.scale.set(1,1,1).multiplyScalar(1/2)
 	mesh.add( torus1 )
@@ -58,7 +62,7 @@ require([ '../../threex.glow/package.require.js'
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
 	var material	= new THREE.MeshNormalMaterial()
 	var torus2	= new THREE.Mesh( geometry, material )
-	glowCloner.add(torus2)
+	glowSceneMirror.add(torus2)
 	torus2.position.x	= -0.5;
 	torus2.scale.set(1,1,1).multiplyScalar(1/2)
 	scene.add( torus2 )

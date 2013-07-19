@@ -2,21 +2,28 @@ var THREEx	= THREEx	|| {}
 
 /**
  * [ description]
- * @param  {String} label    the label of the sceneMirror
+ * @param  {String} labelSuffix    the label of the sceneMirror
  * @param  {THREE.Scene} srcScene the scene to mirror
- * @return {THREE.SceneCloner}          [description]
+ * @return {THREE.SceneMirror}          [description]
  */
-THREEx.SceneCloner	= function(label, srcScene, onAdded, onRemoved, dstScene){
-	label	= 'sceneCloner-'+label
+THREEx.SceneMirror	= function(srcScene, opts){
+	opts		= opts	|| {}
+	var labelSuffix	= opts.labelSuffix	|| Math.floor(Math.random()*0x10000).toString(16)
+	var onAdded	= opts.onAdded		|| function(dstObject, srcObject, event){}
+	var dstScene	= opts.dstScene		|| new THREE.Scene()
+	this.dstScene	= dstScene
 
-//	onAdded	= onAdded	|| function(dstObject, srcObject, event){}
+	var label	= 'sceneMirror-'+labelSuffix
+
+	// TODO refactor this API
+	// - with a opts i guess
 
 	dstScene	= dstScene	|| new THREE.Scene()
 	this.dstScene	= dstScene
 
 	srcScene.userData[label]	= dstScene
 	
-	this._addedDefaultCallback	= function(event){
+	var addedCallback	= function(event){
 		var srcObject	= event.target
 
 		var geometry	= srcObject.geometry.clone()
@@ -40,6 +47,6 @@ THREEx.SceneCloner	= function(label, srcScene, onAdded, onRemoved, dstScene){
 	}
 	
 	this.add	= function(srcObject3d){
-		srcObject3d.addEventListener('added', this._addedDefaultCallback)	
+		srcObject3d.addEventListener('added', addedCallback)	
 	}
 }
