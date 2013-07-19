@@ -6,12 +6,12 @@ var THREEx	= THREEx	|| {}
  * @param  {THREE.Scene} srcScene the scene to mirror
  * @return {THREE.SceneCloner}          [description]
  */
-THREEx.SceneCloner	= function(label, srcScene, onAdded, onRemoved){
+THREEx.SceneCloner	= function(label, srcScene, onAdded, onRemoved, dstScene){
 	label	= 'sceneCloner-'+label
 
 //	onAdded	= onAdded	|| function(dstObject, srcObject, event){}
 
-	var dstScene	= new THREE.Scene()
+	dstScene	= dstScene	|| new THREE.Scene()
 	this.dstScene	= dstScene
 
 	srcScene.userData[label]	= dstScene

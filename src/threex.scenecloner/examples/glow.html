@@ -16,6 +16,10 @@ require([ '../../threex.glow/package.require.js'
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.z	= 3;
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
 	var materialOn	= new THREE.MeshBasicMaterial()
 	materialOn.color.set(0x88ccff)
 	var materialOff	= new THREE.MeshBasicMaterial()
@@ -24,14 +28,10 @@ require([ '../../threex.glow/package.require.js'
 	var glow	= new THREEx.Glow(renderer, camera);
 	var glowCloner	= new THREEx.SceneCloner('glow', scene, function(dstObject, srcObject){
 		var domClasses	= srcObject.userData.domClasses
-		var glowing	= domClasses && domClasses.match(/glowing/)
+		var glowing	= domClasses && domClasses.match(/ glowing /)
 		var material	= glowing ? materialOn	: materialOff
-		console.log('material', material.color)
 		dstObject.material	= material
 	}, undefined, glow.scene)
-
-	window.glow	= glow
-	window.glowCloner= glowCloner
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ require([ '../../threex.glow/package.require.js'
 	var material	= new THREE.MeshNormalMaterial()
 	var mesh	= new THREE.Mesh( geometry, material )
 	glowCloner.add(mesh)
-	mesh.userData.domClasses	+= ' glowing'
+	mesh.userData.domClasses	+= ' glowing '
 	mesh.scale.set(1,1,1).multiplyScalar(2)
 	scene.add( mesh )
 
