@@ -80,7 +80,7 @@ var Player	= function(opts){
 		sounds.playRoll(mesh)
 	}, 100)
 	// update the listener on this mesh
-	soundsBank.soundEnabled	&& setListenerUpdater(mesh)
+	soundsBank.soundEnabled	&& soundsBank.setListenerUpdater(mesh)
 
 
 	updateFcts.push(function(delta, now){

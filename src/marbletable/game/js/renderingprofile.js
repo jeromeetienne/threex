@@ -9,7 +9,7 @@ var RenderingProfile	= function(type){
 	// set profile values
 	this.skymapEnabled	= true
 	this.shadowMapEnabled	= true
-	this.soundEnabled	= false
+	this.soundEnabled	= true
 	this.rendererAntialias	= true
 	this.devicePixelRatio	= 1
 	this.playerLiveMirror	= true

@@ -1,0 +1,45 @@
+<body>
+<script src='../../../vendor/three.js/examples/js/ImprovedNoise.js'></script>
+<script src='../../../vendor/three.js/examples/js/SimplexNoise.js'></script>
+<script>
+	var simplex	= new SimplexNoise()
+	var canvas	= document.createElement('canvas')
+	canvas.width	= 256
+	canvas.height	= 256
+	document.body.appendChild(canvas)
+	var context	= canvas.getContext("2d");
+	
+	for(var x = 0; x < canvas.width; x++){
+		for(var y = 0; y < canvas.height; y++){
+			var height	= 0
+			var level	= 8
+			height	+= (simplex.noise(x/level, y/level)/2 + 0.5) * 0.125
+			level	*= 3
+			height	+= (simplex.noise(x/level, y/level)/2 + 0.5) * 0.25
+			level	*= 2
+			height	+= (simplex.noise(x/level, y/level)/2 + 0.5) * 0.5
+			level	*= 2
+			height	+= (simplex.noise(x/level, y/level)/2 + 0.5) * 1
+			height	/= 1+0.5+0.25+0.125
+
+			if( height < 0.5 ){
+				height		= (height*2)*0.5 + 0.2
+				height		= Math.floor(height * 256)
+				context.fillStyle = 'rgb(0, 0,'+height+')'
+				context.fillRect(x, y, 1, 1)
+			}else if( height < 0.7 ){
+				height		= (height-0.5)/0.2
+				height		= height*0.5 + 0.2
+				height		= Math.floor(height * 256)
+				context.fillStyle = 'rgb(0, '+height+', 0)'
+				context.fillRect(x, y, 1, 1)
+			}else{
+				height		= (height-0.7)/0.3
+				height		= height*0.5 + 0.5
+				height		= Math.floor(height * 256)
+				context.fillStyle = 'rgb('+height+','+height+','+height+')'
+				context.fillRect(x, y, 1, 1)
+			}
+		}
+	}
+</script></body>

@@ -35,42 +35,59 @@
 	backCamera.rotation	= frontCamera.rotation;
 	backCamera.scale	= frontCamera.scale;
 
-	var backScene	= new THREE.Scene();
+	var backScene	= new THREE.Scene()
+	// init the initial scene
+	frontScene.userData.backClone	= backScene
 
+	// the callback for every THREE.Object3D added
+	function addedCb(event){
+		var srcObject	= event.target
+
+		var geometry	= srcObject.geometry.clone()
+		var material	= srcObject.material.clone()
+		var dstObject	= new THREE.Mesh(geometry, material)
+
+		srcObject.clone(dstObject)
+		dstObject.position	= srcObject.position
+		dstObject.quaternion	= srcObject.quaternion
+		dstObject.scale		= srcObject.scale
+		
+		console.assert(srcObject.parent)
+		var dstParent	= srcObject.parent.userData.backClone
+		dstParent.add(dstObject)
+
+		console.assert(srcObject.userData.backClone === undefined)
+		srcObject.userData.backClone	= dstObject
+	};
 	
-
-	var updateFcts	= [];
+	var updateFcts	= []
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
-	//////////////////////////////////////////////////////////////////////////////////	
+	//////////////////////////////////////////////////////////////////////////////////
 
 	var geometry	= new THREE.TorusGeometry( 1-0.25, 0.25, 32, 32)
 	var material	= new THREE.MeshNormalMaterial()
 	var frontMesh	= new THREE.Mesh( geometry, material )
 	frontMesh.rotation.y	= Math.PI/2
-	frontMesh.addEventListener('added', function(event){
-		var srcObject3d	= event.target
-		var geometry	= srcObject3d.geometry.clone()
-		var material	= srcObject3d.material.clone()
-		var dstObject3d	= new THREE.Mesh(geometry, material)
-		srcObject3d.clone(dstObject3d)
+	frontMesh.addEventListener('added', addedCb)
+	frontScene.add( frontMesh )
 
-		backScene.add( dstObject3d );
-		dstObject3d.position	= srcObject3d.position
-		dstObject3d.quaternion	= srcObject3d.quaternion
-		dstObject3d.scale	= srcObject3d.scale
-				
-		console.assert(frontMesh.userData.backClone === undefined)
-		frontMesh.userData.backClone	= dstObject3d
-	})
-
-	frontScene.add( frontMesh );
 	updateFcts.push(function(delta, now){
-		frontMesh.position.x	= Math.cos(0.5 * now * Math.PI*2)*2
-		// frontMesh.position.z	= Math.cos(0.5 * now * Math.PI*2)*3
-		frontMesh.scale.set(1,1,1).multiplyScalar(1 + 0.2 * Math.sin(Math.PI + 1 * now * Math.PI*2)*3)
+		frontMesh.position.x	= Math.cos(0.1 * now * Math.PI*2)*2
+		frontMesh.scale.set(1,1,1).multiplyScalar(1 + 0.2 * Math.sin(Math.PI + 0.2 * now * Math.PI*2)*3)
 	})
+
+
+;(function(){
+	var geometry	= new THREE.TorusGeometry( 1-0.25, 0.25, 32, 32)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh( geometry, material )
+	mesh.scale.multiplyScalar(1/2)
+	mesh.addEventListener('added', addedCb)
+	frontMesh.add( mesh );	
+})()
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//

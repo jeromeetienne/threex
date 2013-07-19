@@ -70,7 +70,7 @@ var SoundsBank	= function(soundEnabled){
 
 	// load the sound
 	//WebAudiox.loadBuffer(context, 'sounds/techno.mp3', function(buffer){
-	WebAudiox.loadBuffer(context, 'sounds/kick.wav', function(buffer){
+	WebAudiox.loadBuffer(context, 'sounds/132134__filmfx__scary-violin.mp3', function(buffer){
 		this.sharkTrackBuffer	= buffer;
 	}.bind(this))
 	// setup a play function

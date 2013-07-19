@@ -46,9 +46,10 @@ THREEx.HtmlmixerPlane	= function(domElement, opts){
 }
 
 THREEx.HtmlmixerPlane.createFromIframe	= function(url, opts){
+	// create the iframe element
 	var domElement	= document.createElement('iframe')
 	domElement.src	= url
 	domElement.style.border	= 'none'
-	
+	// create the THREEx.HtmlmixerPlane for that
 	return new THREEx.HtmlmixerPlane(domElement, opts)
 }
