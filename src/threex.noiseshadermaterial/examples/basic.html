@@ -15,6 +15,7 @@
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 	var geometry	= new THREE.SphereGeometry( 0.5, 32, 32);
+	var geometry	= new THREE.PlaneGeometry(1,1);
 	var material	= new THREEx.NoiseShaderMaterial()
 	var mesh	= new THREE.Mesh( geometry, material );
 
@@ -25,10 +26,10 @@
 	
 	scene.add( mesh );
 	
-	updateFcts.push(function(delta, now){
-		mesh.rotation.x += 1 * delta;
-		mesh.rotation.y += 2 * delta;		
-	})
+	// updateFcts.push(function(delta, now){
+	// 	mesh.rotation.x += 1 * delta;
+	// 	mesh.rotation.y += 2 * delta;		
+	// })
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
