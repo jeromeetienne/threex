@@ -14,7 +14,7 @@ var Map02	= function(){
 	})
 	
 	// add bouncers
-	for(var i = 0; i < 1; i++){
+	for(var i = 0; i < 0; i++){
 		(function(){
 			var botBouncer	= new BotBouncer
 			updateFcts.push(function(delta, now){
@@ -43,7 +43,7 @@ var Map02	= function(){
 		})()
 	}
 	// add botBall
-	for(var i = 0; i < 4; i++){
+	for(var i = 0; i < 0; i++){
 		(function(){
 			var botBall	= new BotBall()
 			updateFcts.push(function(delta, now){

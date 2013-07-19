@@ -126,7 +126,7 @@ var SoundsBank	= function(soundEnabled){
 	}
 	WebAudiox.loadBuffer(context, 'sounds/marbles.mp3', function(buffer){
 		this.soundTrack	= buffer;
-		this.playSoundTrack()
+		//this.playSoundTrack()
 	}.bind(this))
 
 	//////////////////////////////////////////////////////////////////////////////////

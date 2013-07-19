@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z = 3;
+
+
+	// emit 3 puff every seconds
+	var confetti	= new Confetti(scene);
+	updateFcts.push(function(delta, now){
+		confetti.update(delta, now)
+	})
+	setInterval(function(){
+		var position	= new THREE.Vector3(0,-1,-2)
+		confetti.emit(position);
+		// confetti.emit(position);
+		// confetti.emit(position);
+		// confetti.emit(position);
+		// confetti.emit(position);
+		// confetti.emit(position);
+		// confetti.emit(position);
+		// confetti.emit(position);
+		// confetti.emit(position);
+	}, 0.2*1000);
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+	
+function Confetti(container){
+	// load the texture
+	var updateFcts	= []
+	this.emit	= function(position){
+		// randomize the initial position
+		position	= position.clone()
+		position.x	+= (Math.random()-0.5)*0.3
+		position.y	+= (Math.random()-0.5)*0.1
+		position.z	+= (Math.random()-0.5)*0.3
+		// init sprite material
+		var geometry	= new THREE.PlaneGeometry(0.1,0.1);
+		var material	= new THREE.MeshBasicMaterial({
+			color	: new THREE.Color().setHSL(Math.random(), 1, 0.5),
+			side	: THREE.DoubleSide,
+		})
+		var object3d	= new THREE.Mesh(geometry, material)
+		object3d.position.copy(position)
+		container.add(object3d)
+
+		var maxAge	= 1 + Math.random()*0.4
+		// set velocity
+		var velocity	= new THREE.Vector3(0, 0.5, 0)
+		velocity.x	+= (Math.random()-0.5)*0.5
+		velocity.y	+= (Math.random()-0.5)*0.1
+		velocity.z	+= (Math.random()-0.5)*0.5
+		velocity.setLength(2 + (Math.random()-0.5)*0.5)
+		
+		var acceleration= new THREE.Vector3(0, -3, 0)
+		
+		var angularVelocity	= new THREE.Vector3()
+		angularVelocity.x	= Math.PI*2*(1.5+0.5*Math.random());
+
+		var angularDamping	= new THREE.Vector3().set(1,1,1).multiplyScalar(0.98)
+		
+		var birthDate	= Date.now()/1000
+		updateFcts.push(function callback(delta, now){
+			var age	= Date.now()/1000 - birthDate
+			if( age >= maxAge ){
+				object3d.parent.remove(object3d)
+				updateFcts.splice(updateFcts.indexOf(callback),1)
+				return;	
+			}
+			
+			angularVelocity.multiply(angularDamping)
+
+			object3d.rotateX(angularVelocity.x * delta)
+			object3d.rotateY(angularVelocity.y * delta)
+			object3d.rotateZ(angularVelocity.z * delta)
+
+
+			// handle acceleration	
+			velocity.add(acceleration.clone().multiplyScalar(delta))
+			// move by velocity
+			object3d.position.add( velocity.clone().multiplyScalar(delta) )
+		})
+	}
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+}
+</script></body>
