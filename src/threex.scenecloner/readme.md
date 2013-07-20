@@ -16,6 +16,7 @@ You can see a basic example
 [live](http://jeromeetienne.github.io/threex/src/threex.scenecloner/examples/basic.html)
 and its
 [source](https://github.com/jeromeetienne/threex/blob/master/src/threex.scenecloner/examples/basic.html).
+You can see a examples with threex.glow
 [live](http://jeromeetienne.github.io/threex/src/threex.scenecloner/examples/glow.html)
 and its
 [source](https://github.com/jeromeetienne/threex/blob/master/src/threex.scenecloner/examples/glow.html).
