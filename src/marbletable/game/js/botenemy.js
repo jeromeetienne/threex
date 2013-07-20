@@ -79,7 +79,7 @@ var BotEnemy	= function(){
 		if( !sounds )	return;
 		var speed	= body.velocity.norm();
 		var volume	= speed/5;
-		sounds.playKick(volume);
+		//sounds.playKick(volume);
 	})
 
 	// always be attracked by player

@@ -77,7 +77,7 @@ var Player	= function(opts){
 			setTimeout(timeoutCb, 100)
 			return;
 		}
-		sounds.playRoll(mesh)
+		//sounds.playRoll(mesh)
 	}, 100)
 	// update the listener on this mesh
 	soundsBank.soundEnabled	&& soundsBank.setListenerUpdater(mesh)
@@ -95,7 +95,7 @@ var Player	= function(opts){
 		if( !sounds )	return;
 		var speed	= body.velocity.norm();
 		var volume	= speed/5;
-		sounds.playKick(volume);
+		//sounds.playKick(volume);
 	})
 	// particke of collision
 	body.addEventListener("collide",function(event){

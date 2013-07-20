@@ -41,9 +41,7 @@
 
 	var backSceneMirror	= new THREEx.SceneMirror(frontScene, {
 		onAdded	: function(dstObject, srcObject){
-			console.log(dstObject)
 			srcObject.material	= new THREE.MeshBasicMaterial({
-				color		: new THREE.Color('black'),
 				wireframe	: true,
 			});
 		},

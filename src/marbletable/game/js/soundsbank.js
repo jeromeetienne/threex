@@ -91,12 +91,12 @@ var SoundsBank	= function(soundEnabled){
 		updateFcts.push(function(delta, now){
 			pannerUpdater.update(delta, now)
 		})
+
 		
 		var volumeGain	= context.createGain()
 		volumeGain.connect(destination)
-		volumeGain.gain.value	= 15
+		volumeGain.gain.value	= 40
 		destination	= volumeGain
-
 
 		// init AudioBufferSourceNode
 		var source	= context.createBufferSource();
@@ -104,6 +104,22 @@ var SoundsBank	= function(soundEnabled){
 		source.loop	= true
 		source.connect(destination)
 		destination	= source
+
+		updateFcts.push(function(delta, now){
+			var direction	= GAME.ball.position.clone().sub(object3d.position);
+			var intensity	= direction.length()
+			// all the same when it is further than 4
+			intensity	= Math.min(intensity, 4)
+			// put it between 0 and 1
+			intensity	= (4 - intensity)/4
+			// change playbackRate
+			source.playbackRate.value	= 1 + intensity*1;
+			// change gain
+			volumeGain.gain.value	= 0.0+intensity*2
+			// this sound is subsampled
+			volumeGain.gain.value	*= 100
+		})		
+
 		
 		// start the sound now
 		source.start(0);
@@ -116,6 +132,7 @@ var SoundsBank	= function(soundEnabled){
 
 	// init eatPill sound
 	this.playSoundTrack	= function(){
+return
 		if( !this.soundTrack )	return
 
 		var source	= context.createBufferSource()
@@ -151,6 +168,7 @@ var SoundsBank	= function(soundEnabled){
 
 	// init kick sound
 	this.playKick	= function(volume){
+return
 		if( !this.kickBuffer )	return
 		var destination	= lineOut.destination
 
@@ -175,6 +193,7 @@ var SoundsBank	= function(soundEnabled){
 
 	// init a sound with jsfx
 	this.playRoll	= function(object3d){
+return
 		if( !this.rollBuffer )	return
 
 		var source	= context.createBufferSource();
@@ -204,6 +223,7 @@ var SoundsBank	= function(soundEnabled){
 
 	// init a sound with jsfx
 	this.playSpawn	= function(){
+return
 		if( !this.spawnBuffer )	return
 		var source	= context.createBufferSource()
 		source.buffer	= this.spawnBuffer
@@ -220,7 +240,8 @@ var SoundsBank	= function(soundEnabled){
 
 	// init a sound with jsfx
 	this.playDie	= function(){
-		if( !this.bounceBuffer )	return
+return
+		if( !this.dieBuffer )	return
 		var source	= context.createBufferSource()
 		source.buffer	= this.dieBuffer
 		source.connect(lineOut.destination)
@@ -251,6 +272,7 @@ var SoundsBank	= function(soundEnabled){
 
 	// init a sound with jsfx
 	this.playExplosion	= function(){
+return
 		if( !this.explosionBuffer )	return
 		var source	= context.createBufferSource()
 		source.buffer	= this.explosionBuffer
@@ -266,6 +288,7 @@ var SoundsBank	= function(soundEnabled){
 
 	// init a sound with jsfx
 	this.playScoreup	= function(){
+return
 		if( !this.scoreupBuffer )	return
 		var source	= context.createBufferSource()
 		source.buffer	= this.scoreupBuffer
