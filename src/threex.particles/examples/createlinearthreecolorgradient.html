@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	// sample gradient
+	var gradient	= createLinearTHREEColorGradient([
+		{percent: 0.00, color: new THREE.Color('#ffffff')},
+		{percent: 0.25, color: new THREE.Color('#ffff00')},
+		{percent: 0.75, color: new THREE.Color('#ff0000')},
+		{percent: 1.00, color: new THREE.Color('#000000')}
+	]);
+
+	// unit test
+	console.assert(gradient(1-0).equals(	new THREE.Color('#000000')	) );
+	console.assert(gradient(1-0.25/2).equals(	new THREE.Color().setRGB(0.5,0,0) ));
+	console.assert(gradient(1-0.25).equals(	new THREE.Color('#ff0000')	) );
+	console.assert(gradient(1-0.50).equals(	new THREE.Color().setRGB(1,0.5,0) ));
+	console.assert(gradient(1-0.75).equals(	new THREE.Color().setRGB(1,1,0)	) )
+	console.assert(gradient(1-1.00).equals(	new THREE.Color().setRGB(1,1,1)	) )
+
+
+	/**
+	 * create a linear gradient from an array {x: 42, y:99} element
+	 * x must be in increasing order.
+	 * 
+	 * @param  {Array} keyPoints [description]
+	 * @return {function(){}}           the y value, interpolated
+	 */
+	function createLinearTHREEColorGradient(keyPoints){
+		return function(percent){
+			// find the keyPoints 
+			for( var i = 0; i < keyPoints.length; i++ ){
+				if( percent <= keyPoints[i].percent )	break;
+			}
+			if( i === 0 )	return keyPoints[0].color.clone();
+			// sanity check
+			console.assert(i < keyPoints.length );
+			// compute the color
+			var previous	= keyPoints[i-1];
+			var next	= keyPoints[i];
+			var ratio	= (percent - previous.percent) / (next.percent - previous.percent)
+			var color	= previous.color.clone().lerp(next.color, ratio)
+			// return color
+			return color;
+		}
+	}
+</script></body>

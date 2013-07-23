@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src="../../marbletable/game/vendor/webaudiox/build/webaudiox-bundle.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	// emit 3 puff every seconds
+	var confettiEmitterSmall	= new ConfettiEmitter(scene, 1, createLinearTHREEColorGradient([
+		{percent: 0.00, color: new THREE.Color('#ffffff')},
+		{percent: 0.25, color: new THREE.Color('#ffff00')},
+		{percent: 0.75, color: new THREE.Color('#ff0000')},
+		{percent: 1.00, color: new THREE.Color('#000000')}
+	]));
+	updateFcts.push(function(delta, now){
+		confettiEmitterSmall.update(delta, now)
+	})
+	var confettiEmitterLarge	= new ConfettiEmitter(scene, 2, createLinearTHREEColorGradient([
+		{percent: 0.00, color: new THREE.Color('#ffffff')},
+		{percent: 0.25, color: new THREE.Color('#ffff00')},
+		{percent: 0.75, color: new THREE.Color('#ffaaaa')},
+		{percent: 1.00, color: new THREE.Color('#444444')}
+	]));
+	updateFcts.push(function(delta, now){
+		confettiEmitterLarge.update(delta, now)
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	var context	= new AudioContext()
+	// Create lineOut
+	var lineOut	= new WebAudiox.LineOut(context)
+	lineOut.volume	= 1
+
+	// load a sound and play it immediatly
+	var bufferApplause	= null
+	var url	= 'sounds/freesound-firework-applause-119032__joedeshon__polite-applause-12.wav';
+	var url	= 'sounds/applause-short.wav';
+	WebAudiox.loadBuffer(context, url, function(buffer){
+		bufferApplause	= buffer
+		onSoundLoaded()
+	});
+
+	var bufferExplosion	= null;
+	var url	= 'sounds/freesound-firework-explosion-102733__sarge4267__explosion3.wav';
+	var url	= 'sounds/explosion-short.wav';
+	WebAudiox.loadBuffer(context, url, function(buffer){
+		bufferExplosion	= buffer
+		onSoundLoaded()
+	});
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	function onSoundLoaded() {
+		// wait until all sound are loaded
+		if( !bufferExplosion )	return
+		if( !bufferApplause )	return;
+
+		// spawn the particles
+		var position	= new THREE.Vector3(0,0,0)
+		for(var i = 0; i < 100; i++){
+			confettiEmitterSmall.emit(position);		
+		}
+		for(var i = 0; i < 500; i++){
+			confettiEmitterLarge.emit(position);		
+		}
+
+		// init AudioBufferSourceNode
+		var source	= context.createBufferSource();
+		source.buffer	= bufferExplosion
+		source.connect(lineOut.destination)
+		// start the sound now
+		source.start(0);
+
+		// init AudioBufferSourceNode
+		var source	= context.createBufferSource();
+		source.buffer	= bufferApplause
+		source.connect(lineOut.destination)
+		// start the sound now
+		source.start(1);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+	
+function ConfettiEmitter(container, initialSpeed, age2Color){
+	initialSpeed	= initialSpeed !== undefined ? initialSpeed : 1
+	age2Color	= age2Color	|| createLinearTHREEColorGradient([
+		{percent: 0.00, color: new THREE.Color('#ffffff')},
+		{percent: 0.25, color: new THREE.Color('#ffff00')},
+		{percent: 0.75, color: new THREE.Color('#ff0000')},
+		{percent: 1.00, color: new THREE.Color('#000000')}
+	]);
+	// load the texture
+	var updateFcts	= []
+	var geometry	= new THREE.CircleGeometry(0.04, 3)
+	var material	= new THREE.MeshBasicMaterial({
+		side	: THREE.DoubleSide,
+	})
+	var maxAge	= 7
+	var age2Opacity	= createTweenMidi(maxAge, 0.0, 0.1*maxAge);
+	var damping	= 0.96
+	this.emit	= function(position){
+		// init sprite material
+		var object3d	= new THREE.Mesh(geometry, material)
+		object3d.position.copy(position)
+		container.add(object3d)
+
+		// set velocity
+		var velocity	= new THREE.Vector3(0, 0, 0)
+		velocity.x	+= (Math.random()-0.5)*2
+		velocity.y	+= (Math.random()-0.5)*2
+		velocity.z	+= (Math.random()-0.5)*2
+		object3d.lookAt(velocity)
+		velocity.setLength( initialSpeed )
+		
+				
+		var birthDate	= Date.now()/1000
+		updateFcts.push(function callback(delta, now){
+			var age	= Date.now()/1000 - birthDate
+			if( age >= maxAge ){
+				object3d.parent.remove(object3d)
+				updateFcts.splice(updateFcts.indexOf(callback),1)
+				return;	
+			}
+
+			material.color.copy( age2Color(age/maxAge) )
+			
+			velocity.multiplyScalar(damping)
+			// move by velocity
+			object3d.position.add( velocity.clone().multiplyScalar(delta) )
+
+			material.opacity	= age2Opacity(age)
+		})
+	}
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+	function createTweenMidi(maxAge, attackTime, releaseTime){
+		return function(age){
+			if( age < attackTime ){
+				return age / attackTime
+			}else if( age < maxAge - releaseTime ){
+				return 1;
+			}else{
+				return (maxAge - age) / releaseTime
+			}
+		}	
+	}
+}
+	/**
+	 * create a linear gradient from an array {x: 42, y:99} element
+	 * x must be in increasing order.
+	 * 
+	 * @param  {Array} keyPoints [description]
+	 * @return {function(){}}           the y value, interpolated
+	 */
+	function createLinearTHREEColorGradient(keyPoints){
+		return function(percent){
+			// find the keyPoints 
+			for( var i = 0; i < keyPoints.length; i++ ){
+				if( percent <= keyPoints[i].percent )	break;
+			}
+			if( i === 0 )	return keyPoints[0].color.clone();
+			// sanity check
+			console.assert(i < keyPoints.length );
+			// compute the y
+			var previous	= keyPoints[i-1];
+			var next	= keyPoints[i];
+			var ratio	= (percent - previous.percent) / (next.percent - previous.percent)
+			var color	= previous.color.clone().lerp(next.color, ratio)
+			// return y
+			return color;
+		}
+	}
+
+</script></body>

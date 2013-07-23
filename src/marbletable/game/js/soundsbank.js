@@ -272,7 +272,6 @@ return
 
 	// init a sound with jsfx
 	this.playExplosion	= function(){
-return
 		if( !this.explosionBuffer )	return
 		var source	= context.createBufferSource()
 		source.buffer	= this.explosionBuffer

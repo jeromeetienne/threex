@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+	// sample gradient
+	var gradient	= createLinearGradient([
+		{x : 0.00, y: 1.00},
+		{x : 0.50, y: 1.00},
+		{x : 0.70, y: 0.90},
+		{x : 1.00, y: 0.70}
+	]);
+	
+	// unit test
+	console.assert(gradient(0) === 1)
+	console.assert(gradient(0.25) === 1)
+	console.assert(gradient(0.5) === 1)
+	console.assert(gradient(0.6) === 0.95)
+	console.assert(gradient(0.85) === 0.80)
+	console.assert(gradient(1.00) === 0.70)
+
+
+	/**
+	 * create a linear gradient from an array {x: 42, y:99} element
+	 * x must be in increasing order.
+	 * 
+	 * @param  {Array} keyPoints [description]
+	 * @return {function(){}}           the y value, interpolated
+	 */
+	function createLinearGradient(keyPoints){
+		return function(x){
+			// find the keyPoints 
+			for( var i = 0; i < keyPoints.length; i++ ){
+				if( x <= keyPoints[i].x )	break;
+			}
+			if( i === 0 )	return keyPoints[0].y;
+			// sanity check
+			console.assert(i < keyPoints.length );
+			// compute the y
+			var previous	= keyPoints[i-1];
+			var next	= keyPoints[i];
+			var ratio	= (x - previous.x) / (next.x - previous.x)
+			var y		= previous.y + ratio * (next.y - previous.y)
+			// return y
+			return y;
+		}
+	}
+</script></body>

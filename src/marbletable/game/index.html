@@ -7,6 +7,8 @@ console.warn = console.error
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../../../vendor/three.js/examples/js/modifiers/SubdivisionModifier.js'></script>
 <script src='../../../vendor/three.js/examples/js/ImprovedNoise.js'></script>
+
+<script src="vendor/virtualjoystick.js"></script>
 <!-- include stats.js stuff -->
 <script src="bower_components/stats.js/build/Stats.js"></script>
 <!-- include threex.rendererstats.js stuff -->
@@ -212,6 +214,12 @@ require([ '../../threex.glow/package.require.js'
 	window.keyboard	= keyboard
 	keyboard.domElement.setAttribute("tabIndex", "0");
 	keyboard.domElement.focus();
+
+	var joystick	= new VirtualJoystick({
+		container	: renderer.domElement.parent,
+		mouseSupport	: true
+	});
+	GAME.joystick	= joystick
 
 
 	window.scene	= scene

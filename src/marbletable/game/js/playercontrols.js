@@ -1,21 +1,35 @@
 var PlayerControls	= function(ball){
 	this.disable	= false
+	var input	= {};
 	this.update	= function(delta, now){
 		// if disablePlayerControls is true, return now
 		if( this.disable )	return
+			
+		input	= {};
+		input.left	= input.right	= input.up	= input.bottom	= false
+
+		input.left	|= keyboard.pressed('left')
+		input.right	|= keyboard.pressed('right')
+		input.up	|= keyboard.pressed('up')
+		input.down	|= keyboard.pressed('down')
+		
+		input.left	|= GAME.joystick.left()
+		input.right	|= GAME.joystick.right()
+		input.up	|= GAME.joystick.up()
+		input.down	|= GAME.joystick.down()
 		
 		// prevent controls if the ball isnt on the ground
 //		if( ball.position.y > ball.geometry.radius )	return
 
 		var force	= new THREE.Vector3()
-		if( keyboard.pressed('right') ){
+		if( input.right ){
 			force.x	= +1
-		}else if( keyboard.pressed('left') ){
+		}else if( input.left ){
 			force.x	= -1
 		}
-		if( keyboard.pressed('up') ){
+		if( input.up ){
 			force.z	= -1
-		}else if( keyboard.pressed('down') ){
+		}else if( input.down ){
 			force.z	= +1
 		}
 		force.multiplyScalar(1)
