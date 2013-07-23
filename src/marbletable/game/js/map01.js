@@ -40,4 +40,13 @@ var Map01	= function(){
 			})
 		})()
 	}
+
+	;(function(){
+		var botBall	= new BotBall({
+			texture	: THREEx.createPoolBall.ballTexture('8', true, "#000000", 1024)
+		})
+		updateFcts.push(function(delta, now){
+			botBall.update(delta, now)
+		})
+	})()
 }

@@ -6,6 +6,20 @@ marble labyrinth with realistic physics
 
 ## TODOs
 
+* levels
+  * pool
+  * soccer
+  * planete
+* light effect
+  * police: from pacmaze
+  * raining: with particles
+  * strombo
+* post effect
+  * chroma shift
+  * motion blur
+  * film
+
+
 * TODO make a load/save for the renderingProfile
   * used for custom renderingProfile
 * handle profile
@@ -59,6 +73,23 @@ marble labyrinth with realistic physics
 * DONE botgoal texture, black and white chessboard
 * idea levels
   * DONE pools ball - bring them back from tQuery
+
+## notes
+* video marble arena
+  * game i tried to copied at the begining
+  * http://www.youtube.com/watch?v=BifLFPiV41E marble arena 1 soccer version
+  * http://www.youtube.com/watch?v=CL9f33ZQ4C0 marble arena 1 arena verion
+* monkey ball
+  * fun marble game
+  * only a table moving
+  * http://www.youtube.com/watch?v=X7ynOZf1KaQ
+* juice video
+  * http://www.youtube.com/watch?v=Fy0aCDmgnxg
+* other marble game
+  * marble madness http://www.youtube.com/watch?v=vMYibbzJlVs
+* chrome marble
+  * demo chrome to play a marble game
+  * http://www.youtube.com/watch?v=Fy0aCDmgnxg
 
 ## States in sessionStorage
 * score

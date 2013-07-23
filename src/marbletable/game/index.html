@@ -63,6 +63,7 @@ console.warn = console.error
 <script src='js/maptable.js'></script>
 <script src='js/map01.js'></script>
 <script src='js/map02.js'></script>
+<script src='js/map03.js'></script>
 <script src='js/renderingprofile.js'></script>
 <script src='js/threex.smoothholdercontrols.js'></script>
 <script src='js/threex.lingeringcontrols.js'></script>
@@ -217,8 +218,8 @@ require([ '../../threex.glow/package.require.js'
 
 	var joystick	= new VirtualJoystick({
 		container	: renderer.domElement.parent,
-		mouseSupport	: true
-	});
+		mouseSupport	: false
+	})
 	GAME.joystick	= joystick
 
 
@@ -270,6 +271,31 @@ require([ '../../threex.glow/package.require.js'
 	));
 
 
+	updateFcts.push(function(delta, now){
+	        var up		= camera.up.clone().setLength(9.81)
+	        var gravity	= physicsWorld.world.gravity
+	        gravity.x	= -up.x
+	        gravity.y	= -up.y
+	        gravity.z	= -up.z
+	})
+	
+	;(function(){
+		var euler	= new THREE.Euler
+		var matrix	= new THREE.Matrix4
+		updateFcts.push(function(delta, now){
+			if( keyboard.pressed('j') )	euler.z	-= 0.3*delta*Math.PI*2
+			if( keyboard.pressed('l') )	euler.z	+= 0.3*delta*Math.PI*2
+			if( keyboard.pressed('i') )	euler.x	-= 0.3*delta*Math.PI*2
+			if( keyboard.pressed('k') )	euler.x	+= 0.3*delta*Math.PI*2
+				
+			euler.x	*= 0.95;
+			euler.z	*= 0.95;
+			
+			matrix.makeRotationFromEuler(euler)
+			camera.up.set(0,1,0).applyMatrix4(matrix)
+		//	camera.up.copy(camera.up)
+		})		
+	})()
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -480,7 +506,7 @@ require([ '../../threex.glow/package.require.js'
 		playerControls.disable	= true
 
 		// find out nextMapId
-		var mapIds	= ['01', '02']
+		var mapIds	= ['01', '02', '03']
 		var index	= mapIds.indexOf(GAME.mapId)
 		var nextMapId	= mapIds[index+1]
 		console.assert( index !== -1 )
@@ -584,6 +610,8 @@ require([ '../../threex.glow/package.require.js'
 		var map		= new Map01()
 	}else if( GAME.mapId === '02' ){
 		var map		= new Map02()
+	}else if( GAME.mapId === '03' ){
+		var map		= new Map03()
 	}else	console.assert(false)
 	scene.add(map.object3d)
 	updateFcts.push(function(delta, now){

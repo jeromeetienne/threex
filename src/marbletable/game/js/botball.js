@@ -1,8 +1,11 @@
-var BotBall	= function(){
-	var texture	= cache.getSet('texture.botball', function(){
+var BotBall	= function(opts){
+	opts	= opts	|| {}
+	var ballAttraction	= opts.ballAttraction !== undefined ? opts.ballAttraction : 0.1
+	var texture	= opts.texture || cache.getSet('texture.botball', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
 		return texture
 	})
+	
 	// handle updateFcts for sounds
 	var updateFcts	= [];
 	this.update	= function(delta, now){
@@ -22,7 +25,6 @@ var BotBall	= function(){
 	this.object3d	= object3d
 	object3d.name	= (object3d.name || ' ') + 'ball ';
 
-	object3d.position.y	= 3
 	object3d.receiveShadow	= true
 	object3d.castShadow	= true
 	scene.add( object3d )
@@ -36,22 +38,27 @@ var BotBall	= function(){
 	})
 	var body	= bodyx.body
 
-	// count the number of body of this type - used to fix startPosition
-	var bodyCounter	= 0
-	scene.traverse(function(object3d){
-		var isBall	= / ball /.test(object3d.name) ? true : false
-		if( !isBall )	return
-		bodyCounter++
-	})
 	// setup origin	
-	var origin	= new CANNON.Vec3()
-	origin.set(-6*GAME.tileW, 6*GAME.tileW, -10*GAME.tileW)
-	origin.z	*= Math.floor(bodyCounter % 2) === 1 ? 1 : -1
-	origin.x	+= (Math.random()-0.5)*GAME.tileW*10;
-	origin.y	+= bodyCounter * radius*2 * 1.5
-	origin.z	+= (Math.random()-0.5)*GAME.tileW*5;
-	// init origin
-	body.position.set(origin.x, origin.y, origin.z)
+	if( opts.position ){
+		var position	= opts.position.clone()
+		//console.log('position', position)
+	}else{
+		// count the number of body of this type - used to fix startPosition
+		var bodyCounter	= 0
+		scene.traverse(function(object3d){
+			var isBall	= / ball /.test(object3d.name) ? true : false
+			if( !isBall )	return
+			bodyCounter++
+		})
+		var position	= new THREE.Vector3()
+		position.set(-6*GAME.tileW, 6*GAME.tileW, -10*GAME.tileW)
+		position.z	*= Math.floor(bodyCounter % 2) === 1 ? 1 : -1
+		position.x	+= (Math.random()-0.5)*GAME.tileW*10;
+		position.y	+= bodyCounter * radius*2 * 1.5
+		position.z	+= (Math.random()-0.5)*GAME.tileW*5;
+	}
+
+	body.position.set(position.x, position.y, position.z)		
 	
 	// always be attracked by player
 	updateFcts.push(function(delta, now){
@@ -61,7 +68,7 @@ var BotBall	= function(){
 		// compute the force
 		var direction	= GAME.ball.position.clone().sub(object3d.position);
 		direction.y	= 0
-		var force	= direction.setLength(0.1)
+		var force	= direction.setLength(ballAttraction)
 		// apply it
 		bodyx.applyImpulse(force, delta)
 	})
@@ -102,17 +109,6 @@ var BotBall	= function(){
 			nInstances	+= / ball /.test(object3d.name) ? +1 : 0
 		})
 		if( nInstances === 0 )	yeller.dispatchEvent('gameWon')
-
-		
-		return;
-
-		// reset ball intensity
-		ballIntensity.intensity(0)
-		// reset all velocity
-		body.velocity.set(0,0,0)
-		body.angularVelocity.set(0,0,0)
-		// set player position
-		body.position.set(origin.x, origin.y, origin.z)
 	}.bind(this))
 
 	this.destroy	= function(){

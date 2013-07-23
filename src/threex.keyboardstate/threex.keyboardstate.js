@@ -86,7 +86,6 @@ THREEx.KeyboardState.prototype._onKeyChange	= function(event)
 	var keyCode		= event.keyCode
 	var pressed		= event.type === 'keydown' ? true : false
 	this.keyCodes[keyCode]	= pressed
-
 	// update this.modifiers
 	this.modifiers['shift']	= event.shiftKey
 	this.modifiers['ctrl']	= event.ctrlKey

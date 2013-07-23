@@ -12,7 +12,7 @@ var Player	= function(opts){
 		//var texture	= THREE.ImageUtils.loadTexture('images/neptunemap.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/jupitermap.jpg');
 		//var texture	= THREE.ImageUtils.loadTexture('images/tile01.jpg');
-		var texture	= THREEx.createPoolBall.ballTexture('p', true, "#FDD017", 1024);
+		var texture	= THREEx.createPoolBall.ballTexture('9', true, "#FDD017", 1024);
 		// var texture	= THREEx.createPoolBall.ballTexture('0', true, "#ffffff", opts.textureW);
 		return texture
 	})

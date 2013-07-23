@@ -1,23 +1,32 @@
 var PlayerControls	= function(ball){
 	this.disable	= false
-	var input	= {};
+	
 	this.update	= function(delta, now){
 		// if disablePlayerControls is true, return now
 		if( this.disable )	return
 			
-		input	= {};
-		input.left	= input.right	= input.up	= input.bottom	= false
+		var input	= {};
+		input.left	= false
+		input.right	= false
+		input.up	= false
+		input.down	= false
+		// support keyboard
+		input.left	= input.left	|| keyboard.pressed('left')
+					|| keyboard.pressed('a')
+					|| keyboard.pressed('q')
+		input.right	= input.right	|| keyboard.pressed('right')
+					|| keyboard.pressed('d')	
+		input.up	= input.up	|| keyboard.pressed('up')
+					|| keyboard.pressed('w')
+					|| keyboard.pressed('z')
+		input.down	= input.down	|| keyboard.pressed('down')
+					|| keyboard.pressed('s')
+		// support joystick
+		input.left	|= input.left	|| GAME.joystick.left()
+		input.right	|= input.right	|| GAME.joystick.right()
+		input.up	|= input.up	|| GAME.joystick.up()
+		input.down	|= input.down	|| GAME.joystick.down()
 
-		input.left	|= keyboard.pressed('left')
-		input.right	|= keyboard.pressed('right')
-		input.up	|= keyboard.pressed('up')
-		input.down	|= keyboard.pressed('down')
-		
-		input.left	|= GAME.joystick.left()
-		input.right	|= GAME.joystick.right()
-		input.up	|= GAME.joystick.up()
-		input.down	|= GAME.joystick.down()
-		
 		// prevent controls if the ball isnt on the ground
 //		if( ball.position.y > ball.geometry.radius )	return
 
