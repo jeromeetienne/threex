@@ -59,7 +59,7 @@ THREEx.ProceduralCity	= function(){
 	}
 
 	// generate the texture
-	var texture		= new THREE.Texture( generateTexture() );
+	var texture		= new THREE.Texture( generateTextureCanvas() );
 	texture.anisotropy	= renderer.getMaxAnisotropy();
 	texture.needsUpdate	= true;
 
@@ -70,8 +70,8 @@ THREEx.ProceduralCity	= function(){
 	});
 	var mesh = new THREE.Mesh(cityGeometry, material );
 	return mesh
-	
-	function generateTexture() {
+
+	function generateTextureCanvas(){
 		// build a small canvas 32x64 and paint it in white
 		var canvas	= document.createElement( 'canvas' );
 		canvas.width	= 32;
@@ -101,6 +101,11 @@ THREEx.ProceduralCity	= function(){
 		context.mozImageSmoothingEnabled	= false;
 		// then draw the image
 		context.drawImage( canvas, 0, 0, canvas2.width, canvas2.height );
+document.body.appendChild(canvas2)
+canvas2.style.zoom = '50%'
+document.body.appendChild(canvas)
+canvas.style.width	= '256px'
+canvas.style.height	= '512px'
 		// return the just built canvas2
 		return canvas2;
 	}

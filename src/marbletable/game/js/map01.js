@@ -31,6 +31,18 @@ var Map01	= function(){
 		})()
 	}
 
+	// add bouncers
+	for(var i = 0; i < 1; i++){
+		(function(){
+			var botBouncer	= new BotBouncer
+			updateFcts.push(function(delta, now){
+				botBouncer.update(delta, now)
+			})
+			var body	= botBouncer.object3d.userData.cannonBody.body
+			body.position.set(-10*GAME.tileW, 1 * GAME.tileW, 0*GAME.tileW)
+		})()
+	}
+
 	// add botBall
 	for(var i = 0; i < 1; i++){
 		(function(){

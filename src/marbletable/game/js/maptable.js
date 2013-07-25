@@ -101,11 +101,10 @@ var MapTable	= function(){
 		faceVertexUvs[4].forEach(function(vector){ vector.x *= width;	})
 		faceVertexUvs[5].forEach(function(vector){ vector.x *= width;	})
 
-
 		var mesh	= new THREE.Mesh(geometry, material)
-		mesh.position.x	= x1 + width/2
+		mesh.position.x	= x1 + width /2
 		mesh.position.y	=      height/2
-		mesh.position.z	= z1 + depth/2
+		mesh.position.z	= z1 + depth /2
 
 		mesh.receiveShadow	= true
 		mesh.castShadow		= true

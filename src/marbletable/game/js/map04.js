@@ -1,4 +1,4 @@
-var Map02	= function(){
+var Map04	= function(){
 	// handle updateFcts for sounds
 	var updateFcts	= [];
 	this.update	= function(delta, now){
@@ -20,10 +20,14 @@ var Map02	= function(){
 	})
 	var body	= botGoal.object3d.userData.cannonBody.body
 	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
-	
+
 	;(function(){
+		var texture	= cache.getSet('texture.basketball', function(){
+			var texture	= THREE.ImageUtils.loadTexture('images/sports/Basketball texture small.jpgb0270bdb-8751-473f-86c6-0c72ca7480b9Large.jpg')
+			return texture
+		})
 		var botBall	= new BotBall({
-			texture	: THREE.ImageUtils.loadTexture('images/planets/jupitermap.jpg')
+			texture	: texture
 		})
 		updateFcts.push(function(delta, now){
 			botBall.update(delta, now)
@@ -31,26 +35,12 @@ var Map02	= function(){
 	})()
 
 	;(function(){
+		var texture	= cache.getSet('texture.soccerball', function(){
+			var texture	= THREE.ImageUtils.loadTexture('images/sports/Footballballfree.jpg59a2a1dc-64c8-4bc3-83ef-1257c9147fd1Large.jpg')
+			return texture
+		})
 		var botBall	= new BotBall({
-			texture	: THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg')
-		})
-		updateFcts.push(function(delta, now){
-			botBall.update(delta, now)
-		})
-	})()
-
-	;(function(){
-		var botBall	= new BotBall({
-			texture	: THREE.ImageUtils.loadTexture('images/planets/neptunemap.jpg')
-		})
-		updateFcts.push(function(delta, now){
-			botBall.update(delta, now)
-		})
-	})()
-
-	;(function(){
-		var botBall	= new BotBall({
-			texture	: THREE.ImageUtils.loadTexture('images/planets/venusmap.jpg')
+			texture	: texture
 		})
 		updateFcts.push(function(delta, now){
 			botBall.update(delta, now)

@@ -2,7 +2,10 @@ var BotBall	= function(opts){
 	opts	= opts	|| {}
 	var ballAttraction	= opts.ballAttraction !== undefined ? opts.ballAttraction : 0.1
 	var texture	= opts.texture || cache.getSet('texture.botball', function(){
-		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
+		var texture	= THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg');
+		var texture	= THREE.ImageUtils.loadTexture('images/sports/Footballrealisticsmall.jpgf0067587-1f18-410c-8650-63532bd9370fLarge.jpg')
+		var texture	= THREE.ImageUtils.loadTexture('images/sports/Footballballfree.jpg59a2a1dc-64c8-4bc3-83ef-1257c9147fd1Large.jpg')
+		var texture	= THREE.ImageUtils.loadTexture('images/sports/Basketball texture small.jpgb0270bdb-8751-473f-86c6-0c72ca7480b9Large.jpg')
 		return texture
 	})
 	

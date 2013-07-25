@@ -19,6 +19,9 @@ marble labyrinth with realistic physics
   * motion blur
   * film
 
+* how to make the table move ?
+  * make the physics of the table to follow the 3d
+  * 
 
 * TODO make a load/save for the renderingProfile
   * used for custom renderingProfile

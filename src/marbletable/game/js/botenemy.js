@@ -1,11 +1,11 @@
 var BotEnemy	= function(){
 	var texture	= cache.getSet('texture.enemy', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/rocks.jpg');
-		var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg');
+		var texture	= THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg');
 		var texture	= THREE.ImageUtils.loadTexture('images/sharksphere.jpg');
-		//var texture	= THREE.ImageUtils.loadTexture('images/venusmap.jpg');
-		//var texture	= THREE.ImageUtils.loadTexture('images/neptunemap.jpg');
-		//var texture	= THREE.ImageUtils.loadTexture('images/jupitermap.jpg');
+		//var texture	= THREE.ImageUtils.loadTexture('images/planets/venusmap.jpg');
+		//var texture	= THREE.ImageUtils.loadTexture('images/planets/neptunemap.jpg');
+		//var texture	= THREE.ImageUtils.loadTexture('images/planets/jupitermap.jpg');
 		return texture
 	})
 	// handle updateFcts for sounds

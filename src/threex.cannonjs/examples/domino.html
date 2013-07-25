@@ -17,8 +17,8 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000)
 	camera.position.z = 7
 
-	var physicsWorld= new THREEx.CannonWorld().start()
-	physicsWorld.origin.defaultContactMaterial.friction = 0.005
+	var worldx	= new THREEx.CannonWorld().start()
+	worldx.world.defaultContactMaterial.friction = 0.005
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -93,7 +93,6 @@
 	var mesh	= new THREE.Mesh(geometry, material);
 	scene.add( mesh );
 	
-	mesh.useQuaternion	= true;
 	mesh.lookAt(mesh.position.clone().add(new THREE.Vector3(0,1,0)))
 
 	mesh.receiveShadow	= true;
@@ -102,7 +101,7 @@
 	var body	= new THREEx.CannonBody({
 		mesh	: mesh,
 		mass	: 0
-	}).addTo(physicsWorld)
+	}).addTo(worldx)
 	updateFcts.push(function(delta, now){
 		body.update(delta, now)
 	});	
@@ -154,7 +153,6 @@
 			mesh.castShadow	= true
 			scene.add( mesh )
 
-			mesh.useQuaternion	= true
 			// var target	= points[((i+1)+points.length)%points.length]
 			// mesh.lookAt(new THREE.Vector3(target.x,0.5,target.y))
 
@@ -166,7 +164,7 @@
 
 			var body	= new THREEx.CannonBody({
 				mesh	: mesh
-			}).addTo(physicsWorld)
+			}).addTo(worldx)
 			updateFcts.push(function(delta, now){
 				body.update(delta, now)
 			})
@@ -175,7 +173,7 @@
 			if( i === 0 ){
 				var worldPoint	= new CANNON.Vec3(mesh.position.x, mesh.position.y+0.5, mesh.position.z)
 				var force	= new CANNON.Vec3(200,0,0)
-				body.origin.applyForce(force,worldPoint)
+				body.body.applyForce(force,worldPoint)
 			}
 		})()
 	}

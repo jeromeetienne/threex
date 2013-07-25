@@ -3,7 +3,7 @@
 <script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
 <script src='../threex.htmlmixerrenderer.js'></script>
 <script src='../threex.htmlmixerplane.js'></script>
-<body style='margin: 0px; background-color: hotpink; overflow: hidden;'><script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -23,17 +23,17 @@
 	var url		= '../../../index.html'
 	var mixerPlane	= THREEx.HtmlmixerPlane.createFromIframe(url, {
 		elementW: 512,
-		planeW	: 2,
-		planeH	: 2
+		planeW	: 5,
+		planeH	: 5
 	})
+	
 	scene.add( mixerPlane.object3d )
-
 	cssScene.add( mixerPlane.objectCSS )
-
-	updateFcts.push(function(delta, now){
-		var object3d		= mixerPlane.object3d
-		object3d.rotation.y	= now * Math.PI*2 * 0.1
-	})
+	
+	// updateFcts.push(function(delta, now){
+	// 	var object3d		= mixerPlane.object3d
+	// 	object3d.rotation.y	= now * Math.PI*2 * 0.1
+	// })
 
 	updateFcts.push(function(){
 		mixerRenderer.render( cssScene, camera )

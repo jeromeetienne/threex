@@ -10,7 +10,7 @@ THREEx.CannonBody	= function(opts){
 	var shape	= opts.shape !== undefined 	? opts.shape	: null;
 	var material	= opts.material !== undefined	? opts.material	: undefined;
 	var geometry	= opts.geometry || mesh.geometry
-
+	var cannon2three= opts.cannon2three !== undefined ? opts.cannon2three : true
 	// 
 	if( geometry instanceof THREE.SphereGeometry ){
 		geometry.computeBoundingBox()
@@ -56,23 +56,46 @@ THREEx.CannonBody	= function(opts){
 	// use quaternion
 	mesh.userData.cannonBody= this
 
+	// copy mesh.position to body.position
 	body.position.x		= mesh.position.x
 	body.position.y		= mesh.position.y
 	body.position.z		= mesh.position.z
-
+	// copy mesh.quaternion to body.quaternion
 	body.quaternion.x	= mesh.quaternion.x
 	body.quaternion.y	= mesh.quaternion.y
 	body.quaternion.z	= mesh.quaternion.z
 	body.quaternion.w	= mesh.quaternion.w
 
-	this.update	= function(delta, now){
-		// TODO should i copy the mesh local position or global position
-		// global seems more likely
-		mesh.position.copy( body.position );
-		mesh.quaternion.x	= body.quaternion.x;
-		mesh.quaternion.y	= body.quaternion.y;
-		mesh.quaternion.z	= body.quaternion.z;
-		mesh.quaternion.w	= body.quaternion.w;
+	if( cannon2three ){
+		this.update	= function(delta, now){
+			// copy body.position to mesh.position
+			mesh.position.x		= body.position.x
+			mesh.position.y		= body.position.y
+			mesh.position.z		= body.position.z
+			// copy body.quaternion to mesh.quaternion
+			mesh.quaternion.x	= body.quaternion.x;
+			mesh.quaternion.y	= body.quaternion.y;
+			mesh.quaternion.z	= body.quaternion.z;
+			mesh.quaternion.w	= body.quaternion.w;
+		}
+	}else{
+		
+		var pos
+		this.update	= function(delta, now){
+			// get position/quaternion in worldMatrix
+			mesh.updateMatrixWorld()
+			var position	= new THREE.Vector3().getPositionFromMatrix(mesh.matrixWorld)
+			var quaternion	= new THREE.Quaternion().setFromRotationMatrix(mesh.matrixWorld)
+			// copy mesh.position to body.position
+			body.position.x		= position.x
+			body.position.y		= position.y
+			body.position.z		= position.z
+			// copy mesh.quaternion to body.quaternion
+			body.quaternion.x	= quaternion.x
+			body.quaternion.y	= quaternion.y
+			body.quaternion.z	= quaternion.z
+			body.quaternion.w	= quaternion.w
+		}
 	}
 }
 

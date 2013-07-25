@@ -1,5 +1,5 @@
 var BotGoal	= function(){
-	var texture	= THREE.ImageUtils.loadTexture('images/mars_1k_color.jpg')
+	// var texture	= THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg')
 	//var texture	= THREE.ImageUtils.loadTexture('images/wood.jpg')
 	//var texture	= THREE.ImageUtils.loadTexture('images/water.jpg')
 	var texture	= THREE.ImageUtils.loadTexture('images/checkerboard.jpg')

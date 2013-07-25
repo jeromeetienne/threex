@@ -271,6 +271,33 @@ require([ '../../threex.glow/package.require.js'
 		0.6		// restitution
 	));
 
+	
+	updateFcts.push(function(delta, now){
+	        var up		= camera.up.clone().setLength(9.81)
+	        var gravity	= physicsWorld.world.gravity
+	        gravity.x	= -up.x
+	        gravity.y	= -up.y
+	        gravity.z	= -up.z
+	})
+	
+	;(function(){
+		var euler	= new THREE.Euler
+		var matrix	= new THREE.Matrix4
+		updateFcts.push(function(delta, now){
+			if( keyboard.pressed('j') )	euler.z	-= 0.3*delta*Math.PI*2
+			if( keyboard.pressed('l') )	euler.z	+= 0.3*delta*Math.PI*2
+			if( keyboard.pressed('i') )	euler.x	-= 0.3*delta*Math.PI*2
+			if( keyboard.pressed('k') )	euler.x	+= 0.3*delta*Math.PI*2
+
+			euler.x	*= 0.95;
+			euler.z	*= 0.95;
+
+			matrix.makeRotationFromEuler(euler)
+			camera.up.set(0,1,0).applyMatrix4(matrix)
+		})
+	})()
+
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////

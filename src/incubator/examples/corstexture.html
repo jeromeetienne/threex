@@ -1,11 +1,5 @@
 <!DOCTYPE html>
-<script>
-console.warn = console.error
-</script>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<script src='../vendor/cannon.js/build/cannon.min.js'></script>
-<script src='../threex.cannonworld.js'></script>
-<script src='../threex.cannonbody.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -13,61 +7,40 @@ console.warn = console.error
 
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
-
-	var worldx	= new THREEx.CannonWorld().start();
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
-	//////////////////////////////////////////////////////////////////////////////////
-
-	var stoneMaterial	= new CANNON.Material('stone');
-	worldx.world.addContactMaterial(new CANNON.ContactMaterial(
-		stoneMaterial,
-		stoneMaterial,
-		0.3,	// friction
-		0.1	// Restitution
-	))
-
-;(function(){
-	var geometry	= new THREE.SphereGeometry(0.5)
-	var material	= new THREE.MeshNormalMaterial()
-	var mesh	= new THREE.Mesh(geometry, material)
-	mesh.position.y	= 3
-	mesh.name	= 'ball'
-	scene.add( mesh )
-	var bodyx	= new THREEx.CannonBody({
-		mesh	: mesh,
-		material: stoneMaterial,
-	}).addTo(worldx)
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var url		= 'http://www.corsproxy.com/s5.wat.fr/f/rendez-vous-eco-beloola_4xyrv_480x270_20qg9g.jpg'
+	var url		= 'http://www.corsproxy.com/sphotos-a.xx.fbcdn.net/hphotos-ash4/c0.0.403.403/p403x403/3664_558685550829949_2077911814_n.jpg';
+	var material	= new THREE.MeshBasicMaterial({
+		map	: THREE.ImageUtils.loadTexture(url)
+	});
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	
 	updateFcts.push(function(delta, now){
-		bodyx.update(delta, now)
+		mesh.rotation.x += 1 * delta;
+		mesh.rotation.y += 2 * delta;		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
 	})
 
-	bodyx.body.angularVelocity.set(0,0,20)
-
-//	bodyx.body.angularDamping	= 0.0;
-//	bodyx.body.linearDamping	= 0.0;
-})()
-
-;(function(){
-	var geometry	= new THREE.CubeGeometry(10, 0.1, 10);
-	var material	= new THREE.MeshNormalMaterial();
-	var mesh	= new THREE.Mesh(geometry, material);
-	mesh.position.y	= -1
-	mesh.position.z	= -3
-	scene.add( mesh );
-	// init physics
-	var bodyx	= new THREEx.CannonBody({
-		mesh	: mesh,
-		material: stoneMaterial,
-		mass	: 0
-	}).addTo(worldx)
-	updateFcts.push(function(delta, now){
-		bodyx.update(delta, now)
-	});	
-})()	
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
@@ -75,7 +48,7 @@ console.warn = console.error
 	updateFcts.push(function(){
 		renderer.render( scene, camera );		
 	})
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loop runner							//
 	//////////////////////////////////////////////////////////////////////////////////
