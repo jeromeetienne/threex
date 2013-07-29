@@ -6,8 +6,20 @@ var Map01	= function(){
 			updateFct(delta, now)
 		})
 	}
+	// add a skymap	
+	if( GAME.profile.skymapEnabled ){
+		var mesh	= THREEx.createSkymap('skybox')
+		scene.add( mesh )		
+	}
+	// init lighting
+	var lighting	= new LightingDefault()
+	this.lighting	= lighting
+	scene.add(lighting.object3d)
+
+
 	// add table
 	var table	= new MapTable()
+	this.table	= table;
 	scene.add(table.object3d)
 	updateFcts.push(function(delta, now){
 		table.update(delta, now)
@@ -15,6 +27,7 @@ var Map01	= function(){
 	
 	// add botGoal
 	var botGoal	= new BotGoal
+	table.object3d.add(botGoal.object3d)
 	updateFcts.push(function(delta, now){
 		botGoal.update(delta, now)
 	})
@@ -22,7 +35,7 @@ var Map01	= function(){
 	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
 
 	// add botEnemy
-	for(var i = 0; i < 0; i++){
+	for(var i = 0; i < 1; i++){
 		(function(){
 			var botEnemy	= new BotEnemy()
 			updateFcts.push(function(delta, now){
@@ -35,6 +48,8 @@ var Map01	= function(){
 	for(var i = 0; i < 1; i++){
 		(function(){
 			var botBouncer	= new BotBouncer
+			table.object3d.add(botBouncer.object3d)
+
 			updateFcts.push(function(delta, now){
 				botBouncer.update(delta, now)
 			})

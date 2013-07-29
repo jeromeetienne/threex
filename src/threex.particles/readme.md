@@ -19,6 +19,26 @@ here are the various steps of a particles
 * onDestroy
 * onUpdate
 
+## to emit at fixed rate
+
+```
+var _loopCb	= null;
+this.start	= function(position, rate){
+	var nToEmit	= 1
+	updateFcts.push(_loopCb	= function(delta, now){
+		nToEmit	+= rate * delta;
+		// rate limiter emition
+		for(; nToEmit >= 1; nToEmit--){
+			this.emit(position)
+		}
+	}.bind(this))
+	return this;
+}
+this.stop	= function(){
+	updateFcts.splice(updateFcts.indexOf(_loopCb),1)
+	return this;
+}
+```
 
 ## onUpdate with time to live
 

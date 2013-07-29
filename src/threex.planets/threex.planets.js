@@ -83,7 +83,7 @@ THREEx.Planets.createEarthCloud	= function(){
 			contextTrans.drawImage(imageTrans, 0, 0)
 			var dataTrans		= contextTrans.getImageData(0, 0, canvasTrans.width, canvasTrans.height)
 			// merge dataMap + dataTrans into dataResult
-			var dataResult		= contextMap.createImageData(imageMap.width, imageMap.height)
+			var dataResult		= contextMap.createImageData(canvasMap.width, canvasMap.height)
 			for(var y = 0, offset = 0; y < imageMap.height; y++){
 				for(var x = 0; x < imageMap.width; x++, offset += 4){
 					dataResult.data[offset+0]	= dataMap.data[offset+0]
@@ -166,9 +166,12 @@ THREEx.Planets.createSaturn	= function(){
 THREEx.Planets.createSaturnRing	= function(){
 	// create destination canvas
 	var canvasResult	= document.createElement('canvas')
-	canvasResult.width	= 915
-	canvasResult.height	= 64
-	var contextResult	= canvasResult.getContext('2d')		
+	canvasResult.width	= 64
+	canvasResult.height	= 915
+	// canvasResult.width	= 915
+	// canvasResult.height	= 64
+	var contextResult	= canvasResult.getContext('2d')	
+	document.body.appendChild(canvasResult)
 
 	// load earthcloudmap
 	var imageMap	= new Image();
@@ -197,7 +200,7 @@ THREEx.Planets.createSaturnRing	= function(){
 			for(var y = 0, offset = 0; y < imageMap.height; y++){
 				for(var x = 0; x < imageMap.width; x++, offset += 4){
 					var offset2	= offset;
-					offset2	= (y*canvasResult.width+x)*4
+					//offset2	= (x*canvasResult.width+y)*4
 					dataResult.data[offset2+0]	= dataMap.data[offset+0]
 					dataResult.data[offset2+1]	= dataMap.data[offset+1]
 					dataResult.data[offset2+2]	= dataMap.data[offset+2]
@@ -213,17 +216,18 @@ THREEx.Planets.createSaturnRing	= function(){
 	imageMap.src	= '../images/saturnringcolor.jpg';
 
 	
-	var geometry	= new THREE.RingGeometry(0.6, 0.75, 32, 3);
+	var geometry	= new THREE.RingGeometry(0.6, 1.5, 32, 3);
 	var material	= new THREE.MeshPhongMaterial({
-		map		: new THREE.Texture(canvasResult),
+		//map		: new THREE.Texture(canvasResult),
+		map		: THREE.ImageUtils.loadTexture(THREEx.Planets.baseURL+'images/ash_uvgrid01.jpg'),
 		side		: THREE.DoubleSide,
 		transparent	: true,
 		opacity		: 0.8,
 	})
 	var mesh	= new THREE.Mesh(geometry, material)
-	mesh.rotation.x	= Math.PI/2
-	mesh.rotation.y	= Math.PI/3
-	mesh.rotation.z	= Math.PI/4
+	// mesh.rotation.x	= Math.PI/2
+	// mesh.rotation.y	= Math.PI/3
+	// mesh.rotation.z	= Math.PI/4
 	return mesh	
 }
 

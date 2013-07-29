@@ -1,13 +1,15 @@
 
-function initLighting(renderer, scene){
+function LightingDefault(){
+	var object3d	= new THREE.Object3D()
+	this.object3d	= object3d
+
 	var light	= new THREE.AmbientLight( 0x444444 )
-	scene.add( light )
+	object3d.add( light )
 
-	var light	= new THREE.DirectionalLight( 0xcccccc, 1 )
-	scene.add( light )
-
+	var light	= new THREE.DirectionalLight( 'white', 1 )
 	light.position.set(5,5,5)
-	light.target.position.set( 0, 0, 0 )
+	light.target.position.set( 0, 1, 0 )
+	object3d.add( light )
 
 	light.castShadow	= true
 	light.shadowCameraNear	= 0.01
@@ -26,7 +28,5 @@ function initLighting(renderer, scene){
 
 	light.shadowMapWidth	= 1024*2
 	light.shadowMapHeight	= 1024*2
-
-	scene.add( light )	
 }
 

@@ -98,7 +98,6 @@ function BlackSmoke(container){
 			// rate limiter emition
 			if( rate === 0 || now - lastEmit < 1/rate )	return;
 			lastEmit	= now;
-
 			this.emit(position)
 		}.bind(this))
 		return this;

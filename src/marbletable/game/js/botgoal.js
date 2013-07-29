@@ -35,7 +35,7 @@ var BotGoal	= function(){
 	var object3d	= new THREE.Mesh(geometry, material)
 	object3d.receiveShadow	= true
 	object3d.castShadow	= true
-	object3d.name	= (object3d.name || ' ') + 'goal ';
+	object3d.name	+= ' goal ';
 
 	this.object3d	= object3d
 	scene.add( object3d )

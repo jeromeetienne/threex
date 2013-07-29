@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script src="../../../vendor/three.js/build/three.min.js"></script>
-<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+<body style='margin: 0px; background-color: lightblue; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -11,20 +11,15 @@
 	camera.position.z = 3;
 
 
-	var light	= new THREE.AmbientLight( 0x444444 )
-	scene.add( light )
-	var light	= new THREE.DirectionalLight( 'white', 1 )
-	light.position.set(5,5,5)
-	light.target.position.copy(scene.position)
-	scene.add( light )
-	
 	// emit 3 puff every seconds
-	var confetti	= new Confetti(scene);
+	var rainEmitter	= new RainEmitter(scene);
 	updateFcts.push(function(delta, now){
-		confetti.update(delta, now)
+		rainEmitter.update(delta, now)
 	})
-	var position	= new THREE.Vector3(0,-1,-2)
-	confetti.start(position, 100)
+
+	var position	= new THREE.Vector3(0,3,-5)
+	var rate	= 100
+	rainEmitter.start(position, rate)
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -55,63 +50,55 @@
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 	
-function Confetti(container){
+function RainEmitter(container){
 	// load the texture
+	var texture	= THREE.ImageUtils.loadTexture('images/stemkoski/snowflake.png')
 	var updateFcts	= []
 	this.emit	= function(position){
 		// randomize the initial position
 		position	= position.clone()
-		position.x	+= (Math.random()-0.5)*0.1
-		position.y	+= (Math.random()-0.5)*0.05
-		position.z	+= (Math.random()-0.5)*0.1
+		position.x	+= (Math.random()-0.5)*10
+		position.y	+= (Math.random()-0.5)*0.1
+		position.z	+= (Math.random()-0.5)*10
 		// init sprite material
-		var geometry	= new THREE.PlaneGeometry(0.1,0.1);
-		var material	= new THREE.MeshPhongMaterial({
-			color	: new THREE.Color().setHSL(Math.random(), 1, 0.5),
-			side	: THREE.DoubleSide,
-			specular: new THREE.Color('white'),
-			shininess	: 150,
-			shading	: THREE.FlatShading,
+		var material	= new THREE.SpriteMaterial({
+			map			: texture,
+			useScreenCoordinates	: false,
+			color			: 'white'
 		})
-		var object3d	= new THREE.Mesh(geometry, material)
-		object3d.position.copy(position)
-		container.add(object3d)
+		// init sprite
+		var sprite	= new THREE.Sprite(material)
+		sprite.position.copy(position)
+		sprite.scale.multiplyScalar(1/10)
+		container.add(sprite)
+		
+		var angularVelocity	= Math.PI/3 * (Math.random()-0.5)
+		angularVelocity	+= Math.PI/8 * (Math.random()-0.5)
 
-		var maxAge	= 1 + Math.random()*0.4
+		var maxAge	= 8 + (Math.random()-0.5)*1
 		// set velocity
-		var velocity	= new THREE.Vector3(0, 3, 0)
-		velocity.x	+= (Math.random()-0.5)*2
-		velocity.y	+= (Math.random()-0.5)*2
-		velocity.z	+= (Math.random()-0.5)*2
-		
-		var acceleration= new THREE.Vector3(0, -3, 0)
-		
-		var angularAxis		= new THREE.Vector3(Math.random()-0.5,Math.random()-0.5,Math.random()-0.5).normalize();
-		var angularVelocity	= Math.PI*2*(1.5+0.5*Math.random());
-		var angularDamping	= 0.99
+		var velocity	= new THREE.Vector3(0, -0.6, 0)
+		velocity.x	+= (Math.random()-0.5)*0.3
+		velocity.y	+= (Math.random()-0.5)*0.1
+		velocity.z	+= (Math.random()-0.5)*0.3
+		// init opacity
+		var age2Opacity	= createTweenMidi(maxAge, 0.05*maxAge, 0.05*maxAge)
+		material.opacity= age2Opacity(0)
 		
 		var birthDate	= Date.now()/1000
 		updateFcts.push(function callback(delta, now){
 			var age	= Date.now()/1000 - birthDate
 			if( age >= maxAge ){
-				object3d.parent.remove(object3d)
+				sprite.parent.remove(sprite)
 				updateFcts.splice(updateFcts.indexOf(callback),1)
 				return;	
 			}
-			
-			angularVelocity	*= angularDamping
-
-			object3d.rotateOnAxis(angularAxis, angularVelocity * delta)
-
-			// handle acceleration	
-			velocity.add(acceleration.clone().multiplyScalar(delta))
 			// move by velocity
-			object3d.position.add( velocity.clone().multiplyScalar(delta) )
-		})
-	}
-	this.update	= function(delta, now){
-		updateFcts.forEach(function(updateFct){
-			updateFct(delta, now)
+			sprite.position.add( velocity.clone().multiplyScalar(delta) )
+			// handle opacity
+			material.opacity= age2Opacity(age)
+			// handle angularVelocity
+			sprite.rotation	+= angularVelocity*delta;
 		})
 	}
 	var _loopCb	= null;
@@ -129,6 +116,22 @@ function Confetti(container){
 	this.stop	= function(){
 		updateFcts.splice(updateFcts.indexOf(_loopCb),1)
 		return this;
+	}
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+	function createTweenMidi(maxAge, attackTime, releaseTime){
+		return function(age){
+			if( age < attackTime ){
+				return age / attackTime
+			}else if( age < maxAge - releaseTime ){
+				return 1;
+			}else{
+				return (maxAge - age) / releaseTime
+			}
+		}	
 	}
 }
 </script></body>

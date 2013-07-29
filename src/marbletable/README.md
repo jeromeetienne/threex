@@ -18,10 +18,9 @@ marble labyrinth with realistic physics
   * chroma shift
   * motion blur
   * film
-
 * how to make the table move ?
   * make the physics of the table to follow the 3d
-  * 
+  * ERROR the table doesnt move, the up vector is
 
 * TODO make a load/save for the renderingProfile
   * used for custom renderingProfile
@@ -78,6 +77,10 @@ marble labyrinth with realistic physics
   * DONE pools ball - bring them back from tQuery
 
 ## notes
+* research on marble
+  * http://johnstejskal.com/blog/creating-a-marble-game-with-unity3d-part-1-research-and-concept/
+* hamster ball http://www.youtube.com/watch?v=H9FkUQhKU70
+
 * video marble arena
   * game i tried to copied at the begining
   * http://www.youtube.com/watch?v=BifLFPiV41E marble arena 1 soccer version

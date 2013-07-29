@@ -10,7 +10,6 @@ var MapTable	= function(){
 	var table	= new THREE.Object3D()
 	this.object3d	= table
 	var tileW	= GAME.tileW
-
 	
 	// add the ground
 	addGround(-35*tileW, -20*tileW, 35*tileW, 20*tileW)
@@ -116,6 +115,7 @@ var MapTable	= function(){
 			mesh	: mesh,
 			mass	: 0,
 			material: pMaterialWall,
+			cannon2three	: false,
 		}).addTo(physicsWorld)
 		updateFcts.push(function(delta, now){
 			body.update(delta, now)
@@ -127,6 +127,7 @@ var MapTable	= function(){
 			var texture	= THREE.ImageUtils.loadTexture('images/plywood.jpg')
 			var texture	= THREE.ImageUtils.loadTexture('images/tile01.jpg')
 			var texture	= THREE.ImageUtils.loadTexture('images/square-outline.png')
+			// var texture	= THREE.ImageUtils.loadTexture('images/SUNNY-Pool-Table.jpg');
 			return texture
 		})
 		var width	= Math.abs(x2 - x1)
@@ -146,7 +147,9 @@ var MapTable	= function(){
 		// texture.repeat.x= 4
 		// texture.repeat.y= 4
 
+
 		var mesh	= new THREE.Mesh(geometry, material)
+		mesh.name	+= ' ground ';
 		table.add( mesh )
 
 		mesh.position.x	= x1 + width/2
@@ -161,6 +164,7 @@ var MapTable	= function(){
 			mesh	: mesh,
 			mass	: 0,
 			material: pMaterialGround,
+			cannon2three	: false,
 		}).addTo(physicsWorld)
 		updateFcts.push(function(delta, now){
 			body.update(delta, now)

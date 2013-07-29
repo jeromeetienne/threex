@@ -42,8 +42,8 @@ THREEx.EffectComposer.prototype.renderPass	= function(scene, camera){
 
 THREEx.EffectComposer.prototype.vignette	= function(offset, darkness){
 	// handle parameters default values
-	offset	= offset 	!== undefined ? offset	: 1.05;
-	darkness= darkness	!== undefined ? darkness: 1.5;
+	offset	= offset 	!== undefined ? offset	: 1.01;
+	darkness= darkness	!== undefined ? darkness: 1.1;
 	// create the effect
 	var effect	= new THREE.ShaderPass( THREE.VignetteShader );
 	// setup the effect

@@ -31,8 +31,14 @@ var Player	= function(opts){
 		map	: texture,
 		bumpMap	: texture,
 		bumpScale: 0.02,
-		//color	: 'cyan',
+		// color	: 'cyan',
 	})
+	// var material	= new THREE.MeshPhongMaterial({
+	// 	color	: 'silver',
+	// 	metal	: true,
+	// 	shininess: 150,
+	// 	opacity	: 0.1,
+	// })
 	var mesh	= new THREE.Mesh(geometry, material)
 	this.mesh	= mesh
 
@@ -52,7 +58,7 @@ var Player	= function(opts){
 	})
 
 	// to get a mirror ball
-	if( opts.liveMirror ){
+	if( opts.liveMirror && false ){
 		// create the camera
 		var cubeCamera	= new THREE.CubeCamera( 0.001, 1000, 512 );
 		scene.add( cubeCamera )
@@ -68,8 +74,8 @@ var Player	= function(opts){
 
 	var body	= bodyx.body
 
-	body.angularDamping	= 0.9
-	// body.linearDamping	= 0.5
+	//body.angularDamping	= 0.9
+	body.linearDamping	= 0.5
 	
 	// ugly way to fix a missing 'onLoad()'
 	// FIXME possible now with the new webaudiox soundbank

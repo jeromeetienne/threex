@@ -1,17 +1,85 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src="../../../vendor/require.js/require.js"></script>
 <script src='js/threex.textureutils.js'></script>
 <script src='js/fartscroll.js'></script>
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+<script src='../../threex.nyancat/threex.nyancat.js'></script>
+<script src='../../threex.nyancat/threex.nyancatsound.js'></script>
+<script src='../../threex.nyancat/threex.nyancatstars.js'></script>
+<script src='../../threex.nyancat/threex.nyancatrainbow.js'></script>
+<body style='margin: 0px; background-color: #003366; overflow: hidden;'><script>
+require([ '../../threex.effectcomposer/package.require.js'
+], function(){
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setClearColor('black')
 	document.body.appendChild( renderer.domElement );
+	renderer.setClearColor('#003366')
+
 
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
 	camera.position.z = 3;
+
+	scene.fog = new THREE.FogExp2( 0x003366, 0.0095 );
+
+	var pointLight = new THREE.PointLight( 0xFFFFFF );
+	pointLight.position.z = 10;
+	scene.add(pointLight);
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var paused	= false;
+	
+	var nyanCat	= new THREEx.NyanCat()
+	nyanCat.container.scale.multiplyScalar(1/20)
+	scene.add( nyanCat.container )
+	updateFcts.push(function(delta, now){
+		if( paused )	return
+		nyanCat.update(delta, now)
+	})
+
+	// var sound	= new THREEx.NyanCatSound()
+	// document.body.addEventListener('mousedown', function(){
+	// 	paused	= paused ? false : true
+	// 	sound.toggle()
+	// })
+	
+	var nyanStars	= new THREEx.NyanCatStars()
+	nyanStars.container.scale.multiplyScalar(1/20)
+	scene.add( nyanStars.container )
+	updateFcts.push(function(delta, now){
+		if( paused )	return 
+		nyanStars.update(delta, now)
+	})
+
+	var nyanRainbow	= new THREEx.NyanCatRainbow()
+	nyanRainbow.container.scale.multiplyScalar(1/20)
+	window.nyanRainbow	= nyanRainbow
+	scene.add( nyanRainbow.container )
+	updateFcts.push(function(delta, now){
+		if( paused )	return
+		nyanRainbow.update(delta, now)
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*15 - camera.position.x) * 0.01
+		camera.position.y += (mouse.y*15 - camera.position.y) * 0.01
+		camera.lookAt( scene.position )
+	})
+
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -91,9 +159,12 @@
 			0.5,
 		];
 		var duration	= durations[soundIdx]
+		scene.remove( nyanRainbow.container )
+
 		setTimeout(function(){
 			console.log('stop emit', duration)
 			emitTrigger.stop()
+			scene.add( nyanRainbow.container )
 		}, duration*1000)
 	})
 
@@ -114,10 +185,10 @@
 			if( rate === 0 || now - lastEmit < 1/rate )	return;
 			lastEmit	= now;
 
-			var position	= new THREE.Vector3(-3,0,0)
-			//var position	= new THREE.Vector3(0,-1,-2)
-			var position	= new THREE.Vector3(-4,0,-3)
-			var velocity	= new THREE.Vector3(7, 0, 0)
+			var position	= new THREE.Vector3(0,0,0)
+			position.copy( nyanCat.container.position )
+			position.add(new THREE.Vector3(-0.2,0,0.05))
+			var velocity	= new THREE.Vector3(-7, 0, 0)
 			// var velocity	= new THREE.Vector3(0, 1, -6)
 			emitter.emit(position, velocity);
 		});
@@ -150,9 +221,21 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////
-	updateFcts.push(function(){
-		renderer.render( scene, camera );		
+	// updateFcts.push(function(){
+	// 	renderer.render( scene, camera );		
+	// })
+
+	var composer	= new THREEx.EffectComposer(renderer)
+		.renderPass(scene, camera)
+		// .film()
+		.motionBlur(0.7)
+		.vignette()
+		.copy()
+		.finish()
+	updateFcts.push(function(delta, now){
+		composer.update(delta);
 	})
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loop runner							//
@@ -290,6 +373,6 @@ function FlameThrower(texture, nTiles, container){
 		}
 	}
 }
-
+})
 
 </script></body>

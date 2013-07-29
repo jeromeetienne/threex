@@ -6,8 +6,19 @@ var Map02	= function(){
 			updateFct(delta, now)
 		})
 	}
+	// add a skymap	
+	if( GAME.profile.skymapEnabled ){
+		var mesh	= THREEx.createSkymap('mars')
+		scene.add( mesh )		
+	}
+	// init lighting
+	var lighting	= new LightingDefault()
+	this.lighting	= lighting
+	scene.add(lighting.object3d)
+
 	// add table
 	var table	= new MapTable()
+	this.table	= table;
 	scene.add(table.object3d)
 	updateFcts.push(function(delta, now){
 		table.update(delta, now)
@@ -15,6 +26,7 @@ var Map02	= function(){
 	
 	// add botGoal
 	var botGoal	= new BotGoal
+	table.object3d.add(botGoal.object3d)
 	updateFcts.push(function(delta, now){
 		botGoal.update(delta, now)
 	})
@@ -52,6 +64,18 @@ var Map02	= function(){
 		var botBall	= new BotBall({
 			texture	: THREE.ImageUtils.loadTexture('images/planets/venusmap.jpg')
 		})
+		updateFcts.push(function(delta, now){
+			botBall.update(delta, now)
+		})
+	})()
+
+	;(function(){
+		var botBall	= new BotBall({
+			texture	: THREE.ImageUtils.loadTexture('images/planets/plutomap1k.jpg')
+		})
+		botBall.object3d.material.bumpMap	= THREE.ImageUtils.loadTexture('images/planets/plutomap1k.jpg'),
+		botBall.object3d.material.bumpScale	= 0.01;
+
 		updateFcts.push(function(delta, now){
 			botBall.update(delta, now)
 		})

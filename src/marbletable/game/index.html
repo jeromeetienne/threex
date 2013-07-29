@@ -45,7 +45,8 @@ console.warn = console.error
 <script src="vendor/webaudiox/examples/vendor/jsfx/jsfx.js"></script>
 <script src="vendor/webaudiox/examples/vendor/jsfx/jsfxlib.js"></script>
 
-<script src='js/initlighting.js'></script>
+<script src='js/lighting-default.js'></script>
+<script src='js/lighting-sunset.js'></script>
 <script src='js/gametimer.js'></script>
 <script src='js/gamescore.js'></script>
 <script src='js/emitterbluetrail.js'></script>
@@ -326,25 +327,32 @@ require([ '../../threex.glow/package.require.js'
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	// init lighting
-	initLighting(renderer, scene)
-
 	// keep updating tween.js
 	updateFcts.push(function(delta, now){
 		TWEEN.update()	
 	})	
-
-	// add a skymap	
-	if( GAME.profile.skymapEnabled ){
-		var mesh	= THREEx.createSkymap('skybox')
-		scene.add( mesh )		
-	}
 
 	// // add gameTimer
 	// var gameTimer	= new GameTimer()
 	// updateFcts.push(function(delta, now){
 	// 	gameTimer.update(delta, now)
 	// })
+	
+	updateFcts.push(function(delta, now){
+		/**
+		 * issue with the pivot point
+		 * * the table pivot point is the ball
+		 */
+		var object3d	= map.table.object3d
+		var speed	= Math.PI/360
+		if( keyboard.pressed('j') )	object3d.rotation.z	+= speed
+		if( keyboard.pressed('l') )	object3d.rotation.z	-= speed
+		if( keyboard.pressed('k') )	object3d.rotation.x	+= speed
+		if( keyboard.pressed('i') )	object3d.rotation.x	-= speed
+			
+		object3d.rotation.x	*= 0.95
+		object3d.rotation.z	*= 0.95
+	})
 
 
 	//////////////////////////////////////////////////////////////////////////////////
