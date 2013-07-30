@@ -101,11 +101,6 @@ THREEx.ProceduralCity	= function(){
 		context.mozImageSmoothingEnabled	= false;
 		// then draw the image
 		context.drawImage( canvas, 0, 0, canvas2.width, canvas2.height );
-document.body.appendChild(canvas2)
-canvas2.style.zoom = '50%'
-document.body.appendChild(canvas)
-canvas.style.width	= '256px'
-canvas.style.height	= '512px'
 		// return the just built canvas2
 		return canvas2;
 	}

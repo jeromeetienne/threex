@@ -1,64 +1,41 @@
-
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<script src='../../../vendor/require.js/require.js'></script>
-<script src='../threex.noiseshadermaterial.js'></script>
-<body style='margin: 0px; background-color: #bb00bb; overflow: hidden;'><script>
-require([ '../../threex.skymap/package.require.js'
-	], function(){
-	var renderer	= new THREE.WebGLRenderer();
+<script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.CSS3DRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100000 );
 	camera.position.z = 3;
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		add an object and make it move					//
-	//////////////////////////////////////////////////////////////////////////////////
-	//
-;(function(){
-
-var fragmentShader	= [
-	THREEx.NoiseShaderMaterial.noiseFragmentShader,
-	'',
-	'',
-
-	'uniform float time;',
-	'varying vec2 vUv;',
-	'',
-'	float surface3( vec3 coord ){',
-'		float height	= 0.0;',
-'		height	+= abs(snoise(coord      )) * 1.0;',
-'		height	+= abs(snoise(coord * 2.0)) * 0.5;',
-'		height	+= abs(snoise(coord * 4.0)) * 0.25;',
-'		height	+= abs(snoise(coord * 8.0)) * 0.125;',
-'		return height;',
-'	}',
-'',
-'	void main( void ) {',
-'		float heightR	= surface3( vec3( vUv, time+2.0 ) );',
-'		float heightG	= surface3( vec3( vUv, time+1.0 ) );',
-'		float heightB	= surface3( vec3( vUv, time ) );',
-'		gl_FragColor	= vec4( vec3(heightR, heightG, heightB), 1.0 );',
-'	}',
-].join('\n')
-
-	var geometry	= new THREE.SphereGeometry( 0.5, 32, 32);
-	var geometry	= new THREE.PlaneGeometry(1,1);
-	var material	= new THREEx.NoiseShaderMaterial({
-		fragmentShader	: fragmentShader
-	})
-	var mesh	= new THREE.Mesh( geometry, material );
-
-	updateFcts.push(function(delta, now){
-		material.uniforms[ "time" ].value	+= delta/5;
-	})
 	
-	scene.add( mesh );
-})()
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// create the iframe to contain webpage
+	var element	= document.createElement('iframe')
+	element.src	= "../../../../index.html";
+	//element.src	= 'https://www.youtube.com/embed/0XPOCi6FJX0?html5=1';
+	element.style.border	= 'none'
+	// width of iframe in pixels
+	var elementWidth	= 1024;
+	// force iframe to have same relative dimensions as planeGeometry
+	var aspectRatio		= 4/ 3;
+	var elementHeight	= elementWidth * aspectRatio;
+	element.style.width	= elementWidth  + "px";
+	element.style.height	= elementHeight + "px";
+	
+	// create a CSS3DObject to display element
+	var object3d		= new THREE.CSS3DObject( element );
+	// resize object3d to same size as planeMesh (plus a border)
+	object3d.scale.x	/= elementWidth / 2;
+	object3d.scale.y	/= elementWidth / 2;
+	scene.add(object3d);
+
+	container.add(object3d)
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
@@ -73,7 +50,6 @@ var fragmentShader	= [
 		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
 		camera.lookAt( scene.position )
 	})
-
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
@@ -98,5 +74,4 @@ var fragmentShader	= [
 			updateFn(deltaMsec/1000, nowMsec/1000)
 		})
 	})
-})
 </script></body>

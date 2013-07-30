@@ -216,17 +216,17 @@ THREEx.Planets.createSaturnRing	= function(){
 	imageMap.src	= '../images/saturnringcolor.jpg';
 
 	
-	var geometry	= new THREE.RingGeometry(0.6, 1.5, 32, 3);
+	var geometry	= new THREE.RingGeometry(0.55, 0.75, 32, 3);
 	var material	= new THREE.MeshPhongMaterial({
-		//map		: new THREE.Texture(canvasResult),
-		map		: THREE.ImageUtils.loadTexture(THREEx.Planets.baseURL+'images/ash_uvgrid01.jpg'),
+		map		: new THREE.Texture(canvasResult),
+		// map		: THREE.ImageUtils.loadTexture(THREEx.Planets.baseURL+'images/ash_uvgrid01.jpg'),
 		side		: THREE.DoubleSide,
 		transparent	: true,
 		opacity		: 0.8,
 	})
 	var mesh	= new THREE.Mesh(geometry, material)
-	// mesh.rotation.x	= Math.PI/2
-	// mesh.rotation.y	= Math.PI/3
+	mesh.rotation.x	= -Math.PI/3
+	mesh.rotation.y	= -Math.PI/3
 	// mesh.rotation.z	= Math.PI/4
 	return mesh	
 }
