@@ -23,7 +23,6 @@ marble labyrinth with realistic physics
   * make the physics of the table to follow the 3d
   * ERROR the table doesnt move, the up vector is
 
-
 * Keep score between map
   * as the page is reloaded... how to do that ?
   * cookie ? sessionStorage ?

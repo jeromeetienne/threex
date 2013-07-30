@@ -5,10 +5,10 @@ THREEx.createSkymap	= function(opts){
 	opts		= opts			|| {}
 	if(typeof(opts) === 'string')	opts	= {textureCube: THREEx.createTextureCube(opts)}
 	// handle default arguments
-	var textureCube	= opts.textureCube	|| console.assert(false)
-	var cubeW	= opts.cubeW		|| 100
-	var cubeH	= opts.cubeH		|| 100
-	var cubeD	= opts.cubeD		|| 100
+	var textureCube	= opts.textureCube	|| console.assert(false, 'opts.textureCube MUST be provided')
+	var cubeW	= opts.cubeW		|| 500
+	var cubeH	= opts.cubeH		|| 500
+	var cubeD	= opts.cubeD		|| 500
 	// init material
 	var shader	= THREE.ShaderLib['cube']
 	var uniforms	= THREE.UniformsUtils.clone(shader.uniforms)

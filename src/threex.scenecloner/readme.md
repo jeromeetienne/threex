@@ -21,7 +21,7 @@ You can see a examples with threex.glow
 and its
 [source](https://github.com/jeromeetienne/threex/blob/master/src/threex.scenecloner/examples/glow.html).
 
-## Usage
+## How to Use It
 
 Here is a typical usage. First we init the scene mirror.
 

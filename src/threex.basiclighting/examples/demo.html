@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../threex.basiclighting.js'></script>
+<select style='position:absolute' onchange='switchLighting(this.value);'>
+	<option>SunSetLighting</option>
+	<option>ThreePointsLighting</option>
+</select>
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer({
 		antialias	: true
@@ -16,14 +21,18 @@
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var light	= new THREE.AmbientLight( 0x080808 )
-	scene.add( light )
-
-	var light	= new THREE.DirectionalLight( 'midnightblue', 1 )
-	light.position.set(5,1,0)
-	scene.add( light )
-	var light	= new THREE.DirectionalLight( 'darkred', 1.5 )
-	scene.add( light )
+	var lighting	= new THREEx.SunSetLighting();
+	scene.add(lighting) 	
+	function switchLighting(type){
+		scene.remove(lighting)
+		if( type === 'SunSetLighting' ){
+			lighting	= new THREEx.SunSetLighting();
+			scene.add(lighting) 	
+		}else if( type === 'ThreePointsLighting' ){
+			lighting	= new THREEx.ThreePointsLighting();
+			scene.add(lighting) 	
+		}else	console.assert(false)
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//

@@ -43,7 +43,7 @@ then you add that in your html
 ```
 
 
-## Usage
+## How to Use It
 
 here is a typical usage
 
