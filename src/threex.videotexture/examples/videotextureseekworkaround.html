@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<script src='../threex.poolball.js'></script>
+<script src='../threex.videotexture.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -11,100 +11,54 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
 
-	var light	= new THREE.AmbientLight( 0x444444 )
-	scene.add( light )
-
-	var light	= new THREE.DirectionalLight( 0xcccccc, 1 )
-	scene.add( light )
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////
-
-	var container	= new THREE.Object3D()
-	container.rotation.x	= Math.PI/2
-	container.position.z	= -2
-	scene.add(container)
-
-	// MIDDLE LINE 8 - 9 - 2
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '9',
-		stripped	: true
-	});
-	mesh.position.set(0,0,0)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
-
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '8',
-		stripped	: false
-	});
-	mesh.position.set(-1,0,0)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
-
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '3',
-		stripped	: false
-	});
-	mesh.position.set(1,0,0)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
-
-	// MIDDLE LINE 2 - 6 
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '2',
-		stripped	: false
-	});
-	mesh.position.set(-0.5,0,-1)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
-
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '6',
-		stripped	: false
-	});
-	mesh.position.set(0.5,0,-1)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
 	
-	// TOP LINE 4
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '4',
-		stripped	: false
-	});
-	mesh.position.set(0.0,0,-2)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
-
-
-	// MIDDLE LINE 2 - 6 
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '5',
-		stripped	: false
-	});
-	mesh.position.set(-0.5,0, 1)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
-
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '7',
-		stripped	: false
-	});
-	mesh.position.set(0.5,0, 1)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
+	// create the videoTexture
+	var videoTexture= new THREEx.VideoTexture('videos/sintel.ogv')
+	var video	= videoTexture.video
+	video.addEventListener('loadedmetadata', function(){
+		console.log('duration', video.duration, Date.now())
+		var currentTime	= Date.now()/1000 % video.duration
+		console.log('initial currentTime', currentTime)
+		video.currentTime	= currentTime;		
+	})
+	updateFcts.push(function(delta, now){
+		videoTexture.update(delta, now)
+	})
+	setInterval(function(){
+		console.log('currentTime', video.currentTime)
+	}, 1000)
 	
-	// TOP LINE 4
-	var mesh	= THREEx.createPoolBall({
-		ballDesc	: '1',
-		stripped	: false
+	/**
+	 * NOTE: require a ttp server which accept range
+	 * $ lighttpd -D -f lighttpd.conf
+	 * # see conf file below
+	 */
+/*
+server.document-root = "/Users/jeromeetienne/webwork/threex/"
+server.port = 8000
+ */
+	// setInterval(function(){
+	// 	var video	= videoTexture.video
+	// 	video.currentTime	= 5.0;
+	// 	console.log('seek to ', video.currentTime)
+	// }, 3000)
+	
+	
+	// use the texture in a THREE.Mesh
+	var geometry	= new THREE.CubeGeometry(1,1,1);
+	var material	= new THREE.MeshBasicMaterial({
+		map	: videoTexture.texture
 	});
-	mesh.position.set(0.0,0,2)
-	mesh.rotation.x	= -Math.PI/2
-	container.add( mesh );
-
-
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	updateFcts.push(function(delta, now){
+		mesh.rotation.x += 1 * delta;
+		mesh.rotation.y += 2 * delta;		
+	})
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////

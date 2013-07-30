@@ -17,6 +17,7 @@
 	
 	// create the videoTexture
 	var videoTexture= new THREEx.VideoTexture('videos/sintel.ogv')
+	var video	= videoTexture.video
 	updateFcts.push(function(delta, now){
 		videoTexture.update(delta, now)
 	})
