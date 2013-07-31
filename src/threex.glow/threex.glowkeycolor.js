@@ -125,6 +125,7 @@ THREEx.GlowKeyColor.ColorPassBandShader	= {
 		"varying vec2 vUv;",
 		'uniform vec3 minColor;',
 		'uniform vec3 maxColor;',
+		'uniform vec3 glowColor;',
 
 		"void main() {",
 			"vec4 texel = texture2D( tDiffuse, vUv );",
