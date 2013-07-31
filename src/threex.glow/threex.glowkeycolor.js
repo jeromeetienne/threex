@@ -5,8 +5,8 @@ THREEx.GlowKeyColor	= function(renderer, camera, renderTarget, scene){
 	this.scene	= scene
 	// setup the RenderTarget
 	if( renderTarget === undefined ){
-		var textureW	= Math.floor(renderer.domElement.offsetWidth /1)
-		var textureH	= Math.floor(renderer.domElement.offsetHeight/1)
+		var textureW	= Math.floor(renderer.domElement.offsetWidth /2)
+		var textureH	= Math.floor(renderer.domElement.offsetHeight/2)
 		renderTarget	= new THREE.WebGLRenderTarget(textureW, textureH, {
 			minFilter	: THREE.LinearFilter,
 			magFilter	: THREE.LinearFilter,
@@ -37,11 +37,12 @@ THREEx.GlowKeyColor	= function(renderer, camera, renderTarget, scene){
 })()
 
 	var effect	= new THREE.ShaderPass( THREEx.GlowKeyColor.ColorPassBandShader )
+	this.filterEffect	= effect
 	composer.addPass( effect )
 
 	// configuration 
-	var blurHLevel	= 0.003
-	var blurVLevel	= 0.006
+	var blurHLevel	= 0.001
+	var blurVLevel	= 0.002
 
 	console.assert( THREE.HorizontalBlurShader )
 	console.assert( THREE.VerticalBlurShader )
@@ -55,6 +56,24 @@ THREEx.GlowKeyColor	= function(renderer, camera, renderTarget, scene){
 	effect.uniforms[ 'v' ].value	= blurVLevel
 	composer.addPass( effect )
 
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+	effect.uniforms[ 'h' ].value	= blurHLevel 
+	composer.addPass( effect )
+	// add Vertical Pass
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+	effect.uniforms[ 'v' ].value	= blurVLevel
+	composer.addPass( effect )
+	
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+	effect.uniforms[ 'h' ].value	= blurHLevel 
+	composer.addPass( effect )
+	// add Vertical Pass
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+	effect.uniforms[ 'v' ].value	= blurVLevel
+	composer.addPass( effect )
+	
 	// add HorizontalBlur Pass
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= blurHLevel 
@@ -78,11 +97,11 @@ THREEx.GlowKeyColor.ColorPassBandShader	= {
 		},
 		minColor	: {
 			type	: "c",
-			value	: new THREE.Color().set(0xff0000)
+			value	: new THREE.Color().set('red')
 		},
 		maxColor	: {
 			type	: "c",
-			value	: new THREE.Color().set(0xff0000)
+			value	: new THREE.Color().set('red')
 		},
 	},
 
@@ -99,7 +118,7 @@ THREEx.GlowKeyColor.ColorPassBandShader	= {
 
 	].join("\n"),
 
-	fragmentShader: [
+	fragmentShader: [ 
 
 		"uniform sampler2D tDiffuse;",
 
@@ -110,10 +129,7 @@ THREEx.GlowKeyColor.ColorPassBandShader	= {
 		"void main() {",
 			"vec4 texel = texture2D( tDiffuse, vUv );",
 			"if( greaterThanEqual(texel.xyz, minColor) == bvec3(true)",
-			"	&& greaterThanEqual(texel.xyz, maxColor) == bvec3(true) ){",
-			// there is likely something better than that to compare 2 vector
-			// "if( texel.r >= minColor.r && texel.g >= minColor.g && texel.b >= minColor.b",
-			// 	"&& texel.r <= maxColor.r && texel.g <= maxColor.g && texel.b <= maxColor.b){",
+			"	&& lessThanEqual(texel.xyz, maxColor) == bvec3(true) ){",
 				"gl_FragColor = texel;",
 			"}else{",
 				"gl_FragColor = vec4(0,0,0,0);",

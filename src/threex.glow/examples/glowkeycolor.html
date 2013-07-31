@@ -29,13 +29,30 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.z	= 3;
 	
+	var glowKeyColor= new THREE.Color(0x88ccff)
+	var glowKeyColor= new THREE.Color('red')
+	
+	
 	var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15)
 	var material	= new THREE.MeshBasicMaterial({
-		color	: new THREE.Color('red')
+		color	: glowKeyColor.clone()
 	})
+	var material	= new THREE.MeshNormalMaterial()
 	var mesh	= new THREE.Mesh( geometry, material )
 	mesh.scale.set(1,1,1).multiplyScalar(2)
+	mesh.visible	= false
 	scene.add( mesh )
+	
+	var meshWire	= new THREE.Mesh(geometry.clone(), new THREE.MeshBasicMaterial({
+			color			: glowKeyColor.clone(),
+			// color			: new THREE.Color(0xfe0000),
+			wireframe		: true,
+			wireframeLinewidth	: 10,
+			transparent		: true
+		})
+	);
+	meshWire.scale.set(1,1,1).multiplyScalar(1.01)
+	mesh.add( meshWire )
 
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
 	var material	= new THREE.MeshNormalMaterial()
@@ -61,6 +78,10 @@
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var glow	= new THREEx.GlowKeyColor(renderer, camera, undefined, scene)
+
+	glow.filterEffect.uniforms.minColor.value.copy( glowKeyColor )
+	glow.filterEffect.uniforms.maxColor.value.copy( glowKeyColor )
+	// glow.composer.passes[1
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		blend main scene with glow.renderTexture			//
