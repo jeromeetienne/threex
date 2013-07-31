@@ -6,6 +6,7 @@
 	<button onclick='switchValue(this.innerText);'>Mercury</button>
 	<button onclick='switchValue(this.innerText);'>Venus</button>
 	<button onclick='switchValue(this.innerText);'>Earth</button>
+	<button onclick='switchValue(this.innerText);'>Moon</button>
 	<button onclick='switchValue(this.innerText);'>Mars</button>
 	<button onclick='switchValue(this.innerText);'>Jupiter</button>
 	<button onclick='switchValue(this.innerText);'>Saturn</button>
@@ -72,6 +73,8 @@
 			var mesh	= THREEx.Planets.createEarth()
 			var cloud	= THREEx.Planets.createEarthCloud()
 			mesh.add(cloud)
+		}else if( type === 'Moon' ){
+			var mesh	= THREEx.Planets.createMoon()
 		}else if( type === 'Mars' ){
 			var mesh	= THREEx.Planets.createMars()
 		}else if( type === 'Jupiter' ){

@@ -5,11 +5,12 @@
 <script src="../../../vendor/three.js/examples/js/postprocessing/RenderPass.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/ShaderPass.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/MaskPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/SavePass.js"></script>
 <script src="../../../vendor/three.js/examples/js/shaders/CopyShader.js"></script>
 <!-- includes for threex.glow -->
 <script src="../../../vendor/three.js/examples/js/shaders/HorizontalBlurShader.js"></script>
 <script src="../../../vendor/three.js/examples/js/shaders/VerticalBlurShader.js"></script>
-<script src="../threex.glow.js"></script>
+<script src="../threex.glowkeycolor.js"></script>
 <!-- include for threex.glowdatgui -->
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../threex.glowdatgui.js"></script>
@@ -29,11 +30,12 @@
 	camera.position.z	= 3;
 	
 	var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15)
-	var material	= new THREE.MeshNormalMaterial()
+	var material	= new THREE.MeshBasicMaterial({
+		color	: new THREE.Color('red')
+	})
 	var mesh	= new THREE.Mesh( geometry, material )
 	mesh.scale.set(1,1,1).multiplyScalar(2)
 	scene.add( mesh )
-	mesh.userData.domClasses	+= ' glowing'
 
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
 	var material	= new THREE.MeshNormalMaterial()
@@ -58,27 +60,24 @@
 	//		init glow							//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var materialOn	= new THREE.MeshBasicMaterial()
-	materialOn.color.set(0x88ccff)
-	var materialOff	= new THREE.MeshBasicMaterial()
-	materialOff.color.set('black')
-	var glow	= new THREEx.Glow(renderer, camera)
-	glow.copyScene(scene, function(srcObject){
-		var domClasses	= srcObject.userData.domClasses
-		var glowing	= domClasses && domClasses.match(/glowing/)
-		var material	= glowing ? materialOn	: materialOff
-		return material		
-	})
-	// add a DAT.gui for find tuning
-	new THREEx.addGlow2DatGui(glow)
+	var glow	= new THREEx.GlowKeyColor(renderer, camera, undefined, scene)
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		blend main scene with glow.renderTexture			//
 	//////////////////////////////////////////////////////////////////////////////////
-	
-	var composer	= new THREE.EffectComposer(renderer);
+
+	var composer	= new THREE.EffectComposer(renderer)
 	// add Render Pass
-	var effect	= new THREE.RenderPass(scene, camera);
-	composer.addPass( effect );
+	var effect	= new THREE.RenderPass(scene, camera)
+	composer.addPass( effect )
+
+	// experiment to have only one renderPass
+	// add Render Pass
+	// var effect	= new THREE.ShaderPass(THREE.CopyShader)
+	// effect.uniforms['tDiffuse' ].value	= glow.renderTarget
+	// // glow.composer.passes[1].renderTarget;
+	// composer.addPass( effect )
+
 	// add Blend Pass - to blend with glow.renderTarget
 	var effect	= new THREE.ShaderPass( THREE.BlendShader, 'tDiffuse1');
 	effect.uniforms['tDiffuse2' ].value	= glow.renderTarget;

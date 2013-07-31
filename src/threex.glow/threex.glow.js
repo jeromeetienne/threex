@@ -1,6 +1,7 @@
 var THREEx	= THREEx || {};
 
-THREEx.Glow	= function(renderer, camera, renderTarget){
+THREEx.Glow	= function(renderer, camera, renderTarget, scene){
+	scene	= scene	|| new THREE.Scene
 	// setup the RenderTarget
 	if( renderTarget === undefined ){
 		var textureW	= Math.floor(renderer.domElement.offsetWidth /4)
@@ -13,7 +14,6 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	}
 	this.renderTarget = renderTarget
 	
-	var scene	= new THREE.Scene
 	this.scene	= scene
 
 

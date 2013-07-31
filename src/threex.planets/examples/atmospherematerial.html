@@ -46,37 +46,15 @@
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var containerEarth	= new THREE.Object3D()
-	containerEarth.rotateZ(-23.4 * Math.PI/180)
-	containerEarth.position.z	= 0
-	scene.add(containerEarth)
 	var moonMesh	= THREEx.Planets.createMoon()
-	moonMesh.position.set(0.5,0.5,0.5)
-	moonMesh.scale.multiplyScalar(1/5)
-	moonMesh.receiveShadow	= true
-	moonMesh.castShadow	= true
-	containerEarth.add(moonMesh)
-	var earthMesh	= THREEx.Planets.createEarth()
-	earthMesh.receiveShadow	= true
-	earthMesh.castShadow	= true
-	containerEarth.add(earthMesh)
-	updateFcts.push(function(delta, now){
-		earthMesh.rotation.y += 1/32 * delta;		
-	})
+	scene.add(moonMesh)
 
 	var geometry	= new THREE.SphereGeometry(0.5, 32, 32)
 	var material	= THREEx.createAtmosphereMaterial()
 	var mesh	= new THREE.Mesh(geometry, material );
-	mesh.scale.multiplyScalar(1.01);
+	mesh.scale.multiplyScalar(1.3);
 	scene.add( mesh );
-	
-	var earthCloud	= THREEx.Planets.createEarthCloud()
-	earthCloud.receiveShadow	= true
-	earthCloud.castShadow	= true
-	containerEarth.add(earthCloud)
-	updateFcts.push(function(delta, now){
-		earthCloud.rotation.y += 1/8 * delta;		
-	})
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////

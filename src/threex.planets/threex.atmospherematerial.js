@@ -35,11 +35,17 @@ THREEx.createAtmosphereMaterial	= function(){
 	//   that is within specially labeled script tags
 	var material	= new THREE.ShaderMaterial({
 		uniforms: { 	
-			coeficient	:   { type: "f", value: 1.0 },
-			power		:   { type: "f", value: 2 },
+			coeficient	: {
+				type	: "f", 
+				value	: 1.0
+			},
+			power		: {
+				type	: "f",
+				value	: 2
+			},
 			glowColor	: {
 				type	: "c",
-				value	: new THREE.Color('cyan')
+				value	: new THREE.Color('blue')
 			},
 			viewVector	: {
 				type	: "v3",
