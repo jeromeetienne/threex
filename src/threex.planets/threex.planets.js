@@ -96,9 +96,9 @@ THREEx.Planets.createEarthCloud	= function(){
 			contextResult.putImageData(dataResult,0,0)	
 			material.map.needsUpdate = true;
 		})
-		imageTrans.src	= '../images/earthcloudmaptrans.jpg';
+		imageTrans.src	= THREEx.Planets.baseURL+'images/earthcloudmaptrans.jpg';
 	}, false);
-	imageMap.src	= '../images/earthcloudmap.jpg';
+	imageMap.src	= THREEx.Planets.baseURL+'images/earthcloudmap.jpg';
 
 	var geometry	= new THREE.SphereGeometry(0.51, 32, 32)
 	var material	= new THREE.MeshPhongMaterial({
@@ -166,7 +166,6 @@ THREEx.Planets.createSaturnRing	= function(){
 	canvasResult.width	= 915
 	canvasResult.height	= 64
 	var contextResult	= canvasResult.getContext('2d')	
-	document.body.appendChild(canvasResult)
 
 	// load earthcloudmap
 	var imageMap	= new Image();
@@ -204,11 +203,11 @@ THREEx.Planets.createSaturnRing	= function(){
 			contextResult.putImageData(dataResult,0,0)	
 			material.map.needsUpdate = true;
 		})
-		imageTrans.src	= '../images/saturnringpattern.gif';
+		imageTrans.src	= THREEx.Planets.baseURL+'images/saturnringpattern.gif';
 	}, false);
-	imageMap.src	= '../images/saturnringcolor.jpg';
+	imageMap.src	= THREEx.Planets.baseURL+'images/saturnringcolor.jpg';
 	
-	var geometry	= new THREEx.Planets.RingGeometry(0.55, 0.75, 64);
+	var geometry	= new THREEx.Planets._RingGeometry(0.55, 0.75, 64);
 	var material	= new THREE.MeshPhongMaterial({
 		map		: new THREE.Texture(canvasResult),
 		// map		: THREE.ImageUtils.loadTexture(THREEx.Planets.baseURL+'images/ash_uvgrid01.jpg'),
@@ -242,7 +241,6 @@ THREEx.Planets.createUranusRing	= function(){
 	canvasResult.width	= 1024
 	canvasResult.height	= 72
 	var contextResult	= canvasResult.getContext('2d')	
-	document.body.appendChild(canvasResult)
 
 	// load earthcloudmap
 	var imageMap	= new Image();
@@ -280,11 +278,11 @@ THREEx.Planets.createUranusRing	= function(){
 			contextResult.putImageData(dataResult,0,0)	
 			material.map.needsUpdate = true;
 		})
-		imageTrans.src	= '../images/uranusringtrans.gif';
+		imageTrans.src	= THREEx.Planets.baseURL+'images/uranusringtrans.gif';
 	}, false);
-	imageMap.src	= '../images/uranusringcolour.jpg';
+	imageMap.src	= THREEx.Planets.baseURL+'images/uranusringcolour.jpg';
 	
-	var geometry	= new THREEx.Planets.RingGeometry(0.55, 0.75, 64);
+	var geometry	= new THREEx.Planets._RingGeometry(0.55, 0.75, 64);
 	var material	= new THREE.MeshPhongMaterial({
 		map		: new THREE.Texture(canvasResult),
 		// map		: THREE.ImageUtils.loadTexture(THREEx.Planets.baseURL+'images/ash_uvgrid01.jpg'),
@@ -335,7 +333,7 @@ THREEx.Planets.createPluto	= function(){
  * @author Kaleb Murphy
  * @author jerome etienne
  */
-THREEx.Planets.RingGeometry = function ( innerRadius, outerRadius, thetaSegments ) {
+THREEx.Planets._RingGeometry = function ( innerRadius, outerRadius, thetaSegments ) {
 
 	THREE.Geometry.call( this )
 
@@ -382,6 +380,6 @@ THREEx.Planets.RingGeometry = function ( innerRadius, outerRadius, thetaSegments
 	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), outerRadius );
 
 };
-THREEx.Planets.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREEx.Planets._RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 

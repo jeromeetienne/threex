@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../threex.planets.js'></script>
+<div style='position:absolute'>
+	<button onclick='switchValue(this.innerText);'>Sun</button>
+	<button onclick='switchValue(this.innerText);'>Mercury</button>
+	<button onclick='switchValue(this.innerText);'>Venus</button>
+	<button onclick='switchValue(this.innerText);'>Earth</button>
+	<button onclick='switchValue(this.innerText);'>Mars</button>
+	<button onclick='switchValue(this.innerText);'>Jupiter</button>
+	<button onclick='switchValue(this.innerText);'>Saturn</button>
+	<button onclick='switchValue(this.innerText);'>Uranus</button>
+	<button onclick='switchValue(this.innerText);'>Neptune</button>
+	<button onclick='switchValue(this.innerText);'>Pluto</button>
+</div>
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer({
 		antialias	: true
@@ -12,7 +24,7 @@
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
-	camera.position.z = 3;
+	camera.position.z = 2;
 
 	var light	= new THREE.AmbientLight( 0x888888 )
 	scene.add( light )
@@ -42,53 +54,56 @@
 	light.shadowMapHeight	= 1024
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		add an object and make it move					//
+	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-	// var mesh	= THREEx.Planets.createSun()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createMercury()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createVenus()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createMoon()
-	// scene.add(mesh)
-	var earthMesh	= THREEx.Planets.createEarth()
-	scene.add(earthMesh)
-	var mesh	= THREEx.Planets.createEarthCloud()
-	scene.add(mesh)
-	updateFcts.push(function(delta, now){
-		mesh.rotation.y += 1/8 * delta;		
-	})
-	// var mesh	= THREEx.Planets.createMars()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createJupiter()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createSaturn()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createSaturnRing()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createUranus()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createUranusRing()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createNeptune()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createPluto()
-	// scene.add(mesh)
 	
-	updateFcts.push(function(delta, now){
-		//mesh.rotation.x += 1 * delta;
-		//mesh.rotation.y += 1/2 * delta;		
-	})
+	var currentMesh	= null
+	function switchValue(type){
+		currentMesh && scene.remove(currentMesh)
+		if( type === 'Sun' ){
+			var mesh	= THREEx.Planets.createSun()
+		}else if( type === 'Mercury' ){
+			var mesh	= THREEx.Planets.createMercury()
+		}else if( type === 'Venus' ){
+			var mesh	= THREEx.Planets.createVenus()
+		}else if( type === 'Moon' ){
+			var mesh	= THREEx.Planets.createMoon()
+		}else if( type === 'Earth' ){
+			var mesh	= THREEx.Planets.createEarth()
+			var cloud	= THREEx.Planets.createEarthCloud()
+			mesh.add(cloud)
+		}else if( type === 'Mars' ){
+			var mesh	= THREEx.Planets.createMars()
+		}else if( type === 'Jupiter' ){
+			var mesh	= THREEx.Planets.createJupiter()
+		}else if( type === 'Saturn' ){
+			var mesh	= THREEx.Planets.createSaturn()
+			mesh.receiveShadow	= true
+			mesh.castShadow		= true
+			var ring	= THREEx.Planets.createSaturnRing()
+			ring.receiveShadow	= true
+			ring.castShadow		= true
+			mesh.add(ring)
+		}else if( type === 'Uranus' ){
+			var mesh	= THREEx.Planets.createUranus()
+			mesh.receiveShadow	= true
+			mesh.castShadow		= true
+			var ring	= THREEx.Planets.createUranusRing()
+			ring.receiveShadow	= true
+			ring.castShadow		= true
+			mesh.add(ring)
+		}else if( type === 'Neptune' ){
+			var mesh	= THREEx.Planets.createNeptune()
+		}else if( type === 'Pluto' ){
+			var mesh	= THREEx.Planets.createPluto()
+		}else	console.assert(false)
+		scene.add(mesh)
+		currentMesh	= mesh
+	}
 	
+	switchValue('Earth')
+
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////

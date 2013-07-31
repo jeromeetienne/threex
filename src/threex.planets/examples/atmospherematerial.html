@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../threex.planets.js'></script>
+<script src='../threex.atmospherematerial.js'></script>
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer({
 		antialias	: true
@@ -12,7 +13,7 @@
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
-	camera.position.z = 3;
+	camera.position.z = 1.5;
 
 	var light	= new THREE.AmbientLight( 0x888888 )
 	scene.add( light )
@@ -44,51 +45,38 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////
-	// var mesh	= THREEx.Planets.createSun()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createMercury()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createVenus()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createMoon()
-	// scene.add(mesh)
+	
+	var containerEarth	= new THREE.Object3D()
+	containerEarth.rotateZ(-23.4 * Math.PI/180)
+	containerEarth.position.z	= 0
+	scene.add(containerEarth)
+	var moonMesh	= THREEx.Planets.createMoon()
+	moonMesh.position.set(0.5,0.5,0.5)
+	moonMesh.scale.multiplyScalar(1/5)
+	moonMesh.receiveShadow	= true
+	moonMesh.castShadow	= true
+	containerEarth.add(moonMesh)
 	var earthMesh	= THREEx.Planets.createEarth()
-	scene.add(earthMesh)
-	var mesh	= THREEx.Planets.createEarthCloud()
-	scene.add(mesh)
+	earthMesh.receiveShadow	= true
+	earthMesh.castShadow	= true
+	containerEarth.add(earthMesh)
 	updateFcts.push(function(delta, now){
-		mesh.rotation.y += 1/8 * delta;		
+		earthMesh.rotation.y += 1/32 * delta;		
 	})
-	// var mesh	= THREEx.Planets.createMars()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createJupiter()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createSaturn()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createSaturnRing()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createUranus()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createUranusRing()
-	// mesh.receiveShadow	= true
-	// mesh.castShadow		= true
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createNeptune()
-	// scene.add(mesh)
-	// var mesh	= THREEx.Planets.createPluto()
-	// scene.add(mesh)
+
+	var geometry	= new THREE.SphereGeometry(0.5, 32, 32)
+	var material	= THREEx.createAtmosphereMaterial()
+	var mesh	= new THREE.Mesh(geometry, material );
+	mesh.scale.multiplyScalar(1.01);
+	scene.add( mesh );
 	
+	var earthCloud	= THREEx.Planets.createEarthCloud()
+	earthCloud.receiveShadow	= true
+	earthCloud.castShadow	= true
+	containerEarth.add(earthCloud)
 	updateFcts.push(function(delta, now){
-		//mesh.rotation.x += 1 * delta;
-		//mesh.rotation.y += 1/2 * delta;		
+		earthCloud.rotation.y += 1/8 * delta;		
 	})
-	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
