@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../threex.planets.js'></script>
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+
+/**
+ * @author Kaleb Murphy
+ */
+
+THREE.RingGeometry2 = function ( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
+
+	THREE.Geometry.call( this );
+
+	innerRadius = innerRadius || 0;
+	outerRadius = outerRadius || 50;
+
+	thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+
+	thetaSegments = thetaSegments !== undefined ? Math.max( 3, thetaSegments ) : 3;
+	phiSegments = phiSegments !== undefined ? Math.max( 3, phiSegments ) : 3;
+
+thetaSegments	= 8
+phiSegments	= 1
+	var i, o, uvs = [], radius = innerRadius, radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
+
+	for ( i = 0; i <= phiSegments; i ++ ) { // concentric circles inside ring
+
+		for ( o = 0; o <= thetaSegments; o ++ ) { // number of segments per circle
+
+			var vertex = new THREE.Vector3();
+			var segment = thetaStart + o / thetaSegments * thetaLength;
+
+			vertex.x = radius * Math.cos( segment );
+			vertex.y = radius * Math.sin( segment );
+
+			this.vertices.push( vertex );
+			//uvs.push(new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ));
+			var uv	= new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) 
+			var uv	= new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, ( vertex.y / radius + 1 ) / 2 ) 
+			var uv	= new THREE.Vector2( 0.2, 0.1 ) 
+			uvs.push(uv);
+		}
+
+		radius += radiusStep;
+
+	}
+
+	var n = new THREE.Vector3( 0, 0, 1 );
+
+	for ( i = 0; i < phiSegments; i ++ ) { // concentric circles inside ring
+
+		var thetaSegment = i * thetaSegments;
+
+		for ( o = 0; o <= thetaSegments; o ++ ) { // number of segments per circle
+
+			var segment = o + thetaSegment;
+
+			var v1 = segment + i;
+			var v2 = segment + thetaSegments + i;
+			var v3 = segment + thetaSegments + 1 + i;
+
+			this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
+
+			v1 = segment + i;
+			v2 = segment + thetaSegments + 1 + i;
+			v3 = segment + 1 + i;
+
+			this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
+
+		}
+	}
+
+	this.computeCentroids();
+	this.computeFaceNormals();
+
+	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+
+};
+
+THREE.RingGeometry2.prototype = Object.create( THREE.Geometry.prototype );
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	renderer.shadowMapEnabled	= true
+	
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 2;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var geometry	= new THREE.RingGeometry2(0.5, 1);
+	var material	= new THREE.MeshBasicMaterial({
+		map		: THREE.ImageUtils.loadTexture(THREEx.Planets.baseURL+'images/ash_uvgrid01.jpg'),
+	})
+	var mesh	= new THREE.Mesh(geometry, material)
+	scene.add(mesh)
+
+	var geometry	= new THREE.RingGeometry2(0.5, 1);
+	var material	= new THREE.MeshBasicMaterial( { color: 'hotpink', wireframe: true } )
+	var mesh	= new THREE.Mesh(geometry, material)
+	scene.add(mesh)
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+</script></body>
