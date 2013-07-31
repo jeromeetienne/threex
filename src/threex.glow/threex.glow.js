@@ -36,7 +36,7 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= blurHLevel 
 	composer.addPass( effect )
-	// add HorizontalBlur Pass
+	// add Vertical Pass
 	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
 	effect.uniforms[ 'v' ].value	= blurVLevel
 	composer.addPass( effect )
@@ -45,13 +45,10 @@ THREEx.Glow	= function(renderer, camera, renderTarget){
 	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
 	effect.uniforms[ 'h' ].value	= blurHLevel 
 	composer.addPass( effect )
-	// add HorizontalBlur Pass
+	// add Vertical Pass
 	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
 	effect.uniforms[ 'v' ].value	= blurVLevel
 	composer.addPass( effect )
-
-	// // mark the last pass as ```renderToScreen```
-	// composer.passes[composer.passes.length-1].renderToScreen	= true;
 }
 
 THREEx.Glow.prototype.update = function(delta, now) {
