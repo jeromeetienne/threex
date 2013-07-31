@@ -15,8 +15,6 @@ THREEx.GlowKeyColor	= function(renderer, camera, renderTarget, scene){
 	}
 	this.renderTarget = renderTarget
 	
-
-
 	// create the composer
 	var composer	= new THREE.EffectComposer( renderer, renderTarget );
 	this.composer	= composer
@@ -88,6 +86,75 @@ THREEx.GlowKeyColor	= function(renderer, camera, renderTarget, scene){
 	}
 }
 
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * Blend two textures
+ */
+THREEx.GlowKeyColor.BlendShader = {
+
+	uniforms: {
+
+		"tDiffuse1"	: { type: "t", value: null },
+		"tDiffuse2"	: { type: "t", value: null },
+		"mixRatio"	: { type: "f", value: 0.5 },
+		"opacity"	: { type: "f", value: 1.0 },
+		keyColor	: {
+			type	: "c",
+			value	: new THREE.Color().set('red')
+		},
+		glowColor	: {
+			type	: "c",
+			value	: new THREE.Color().set('red')
+		},
+	},
+
+	vertexShader: [
+
+		"varying vec2 vUv;",
+
+		"void main() {",
+
+			"vUv = uv;",
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+
+		"}"
+
+	].join("\n"),
+
+	fragmentShader: [
+
+		"uniform float opacity;",
+		"uniform float mixRatio;",
+
+		"uniform sampler2D tDiffuse1;",
+		"uniform sampler2D tDiffuse2;",
+
+		"varying vec2 vUv;",
+		'uniform vec3 keyColor;',
+		'uniform vec3 glowColor;',
+
+		"void main() {",
+
+			"vec4 texel1 = texture2D( tDiffuse1, vUv );",
+			"vec4 texel2 = texture2D( tDiffuse2, vUv );",
+
+			"if( equal(texel1.xyz, keyColor) == bvec3(true) ){",
+				"texel1	= vec4(glowColor, 1);",
+			"}",
+			"gl_FragColor	= opacity * mix( texel1, texel2, mixRatio );",
+
+			// "if( equal(texel1.xyz, keyColor) == bvec3(true) ){",
+			// 	"gl_FragColor	= vec4(glowColor, 1);",
+			// "}else{",
+			// 	"gl_FragColor	= opacity * mix( texel1, texel2, mixRatio );",
+			// "}",
+
+		"}"
+
+	].join("\n")
+
+};
 
 THREEx.GlowKeyColor.ColorPassBandShader	= {
 	uniforms: {
@@ -95,11 +162,11 @@ THREEx.GlowKeyColor.ColorPassBandShader	= {
 			type	: "t",
 			value	: null
 		},
-		minColor	: {
+		keyColor	: {
 			type	: "c",
 			value	: new THREE.Color().set('red')
 		},
-		maxColor	: {
+		glowColor	: {
 			type	: "c",
 			value	: new THREE.Color().set('red')
 		},
@@ -123,15 +190,13 @@ THREEx.GlowKeyColor.ColorPassBandShader	= {
 		"uniform sampler2D tDiffuse;",
 
 		"varying vec2 vUv;",
-		'uniform vec3 minColor;',
-		'uniform vec3 maxColor;',
+		'uniform vec3 keyColor;',
 		'uniform vec3 glowColor;',
 
 		"void main() {",
 			"vec4 texel = texture2D( tDiffuse, vUv );",
-			"if( greaterThanEqual(texel.xyz, minColor) == bvec3(true)",
-			"	&& lessThanEqual(texel.xyz, maxColor) == bvec3(true) ){",
-				"gl_FragColor = texel;",
+			"if( equal(texel.xyz, keyColor) == bvec3(true) ){",
+				"gl_FragColor = vec4(glowColor, 0);",
 			"}else{",
 				"gl_FragColor = vec4(0,0,0,0);",
 			"}",

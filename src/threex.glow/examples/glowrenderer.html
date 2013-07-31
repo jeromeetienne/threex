@@ -11,6 +11,7 @@
 <script src="../../../vendor/three.js/examples/js/shaders/HorizontalBlurShader.js"></script>
 <script src="../../../vendor/three.js/examples/js/shaders/VerticalBlurShader.js"></script>
 <script src="../threex.glowkeycolor.js"></script>
+<script src="../threex.glowrenderer.js"></script>
 <!-- include for threex.glowdatgui -->
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../threex.glowdatgui.js"></script>
@@ -34,9 +35,9 @@
 	var glowColor	= new THREE.Color('blue')
 	var glowColor	= new THREE.Color('white')
 	var glowColor	= new THREE.Color('white')
-	
-	
-	var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15, 48, 16)
+		
+	var geometry	= new THREE.TorusGeometry( 0.5-0.15, 0.15, 32, 16)
+	var geometry	= new THREE.SphereGeometry( 0.5, 32, 16)
 	var material	= new THREE.MeshNormalMaterial()
 	// var material	= new THREE.MeshBasicMaterial({
 	// 	color	: keyColor
@@ -46,22 +47,6 @@
 	// mesh.visible	= false
 	scene.add( mesh )
 	
-	// var meshWire	= new THREE.Mesh(geometry.clone(), new THREE.MeshBasicMaterial({
-	// 		color			: keyColor,
-	// 		wireframe		: true,
-	// 		wireframeLinewidth	: 4,
-	// 	})
-	// )
-	// meshWire.scale.multiplyScalar(1.001)
-	// mesh.add( meshWire )
-
-	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
-	var material	= new THREE.MeshNormalMaterial()
-	var torus1	= new THREE.Mesh( geometry, material )
-	torus1.position.x	= 0.5;
-	torus1.scale.set(1,1,1).multiplyScalar(1/2)
-	mesh.add( torus1 )
-	
 	var meshWire	= new THREE.Mesh(geometry.clone(), new THREE.MeshBasicMaterial({
 			color			: keyColor,
 			wireframe		: true,
@@ -69,8 +54,14 @@
 		})
 	)
 	meshWire.scale.multiplyScalar(1.001)
-	torus1.add( meshWire )
+	mesh.add( meshWire )
 
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
+	var material	= new THREE.MeshNormalMaterial()
+	var torus1	= new THREE.Mesh( geometry, material )
+	torus1.position.x	= 0.5;
+	torus1.scale.set(1,1,1).multiplyScalar(1/2)
+	mesh.add( torus1 )
 
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
 	var material	= new THREE.MeshNormalMaterial()
@@ -88,44 +79,13 @@
 	//		init glow							//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	var glow	= new THREEx.GlowKeyColor(renderer, camera, undefined, scene)
-	glow.filterEffect.uniforms.keyColor.value.copy( keyColor )
-	glow.filterEffect.uniforms.glowColor.value.copy( glowColor )
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		blend main scene with glow.renderTexture			//
-	//////////////////////////////////////////////////////////////////////////////////
-
-	var composer	= new THREE.EffectComposer(renderer)
-	// add Render Pass
-	var effect	= new THREE.RenderPass(scene, camera)
-	composer.addPass( effect )
-
-	// experiment to have only one renderPass
-	// add Render Pass
-	// var effect	= new THREE.ShaderPass(THREE.CopyShader)
-	// effect.uniforms['tDiffuse' ].value	= glow.renderTarget
-	// // glow.composer.passes[1].renderTarget;
-	// composer.addPass( effect )
-
-	// add Blend Pass - to blend with glow.renderTarget
-	var effect	= new THREE.ShaderPass( THREEx.GlowKeyColor.BlendShader, 'tDiffuse1');
-	effect.uniforms['tDiffuse2' ].value	= glow.renderTarget;
-	effect.uniforms['mixRatio' ].value	= 0.5;
-	effect.uniforms['opacity' ].value	= 2;
-	effect.uniforms['keyColor' ].value	= keyColor;
-	effect.uniforms['glowColor' ].value	= glowColor;
-	composer.addPass( effect );	
-	// mark the last pass as ```renderToScreen```
-	composer.passes[composer.passes.length-1].renderToScreen	= true;
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		render the scene						//
-	//////////////////////////////////////////////////////////////////////////////////
+	var glowRenderer	= new THREEx.GlowRenderer(renderer, camera, scene, keyColor, glowColor)
 	updateFcts.push(function(delta, now){
-		glow.update(delta)
-		composer.render(delta);
+		glowRenderer.update(delta, now)
 	})
+	// updateFcts.push(function(delta, now){
+	// 	renderer.render(scene,camera)
+	// })
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loop runner							//
