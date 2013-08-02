@@ -33,7 +33,7 @@ THREEx.addAtmosphereMaterial2DatGui	= function(material, datGui){
 	// config datGui
 	datGui.add( options, 'coeficient'	, 0.0 , 2)
 		.listen().onChange( onChange )
-	datGui.add( options, 'power'		, 0.0 , 30)
+	datGui.add( options, 'power'		, 0.0 , 5)
 		.listen().onChange( onChange )
 	datGui.addColor( options, 'glowColor' )
 		.listen().onChange( onChange )

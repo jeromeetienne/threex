@@ -6,6 +6,8 @@
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../threex.atmospheredatgui.js"></script>
 
+<script src="../threex.geometricglowmesh.js"></script>
+
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -16,47 +18,38 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
 
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	/////////////////////////////////////////////////////////////////////////////////
 
-	var datGUI	= new dat.GUI()
-	var glowColor	= new THREE.Color('cyan')
-
-	var geometry	= new THREE.TorusGeometry(1-0.25, 0.25, 32, 32);
+	// var geometry	= new THREE.TorusGeometry(1-0.25, 0.25, 32, 32);
 	var geometry	= new THREE.TorusKnotGeometry(1-0.25, 0.25, 32*3, 32);
 	// var geometry	= new THREE.CubeGeometry(1,1,1, 5, 5, 5);
 	// var geometry	= new THREE.SphereGeometry(1, 32, 32)
-	geometry.computeVertexNormals();
+	// geometry.computeVertexNormals();
 	var material	= new THREE.MeshNormalMaterial();
+	var material	= new THREE.MeshBasicMaterial({
+		color	: new THREE.Color('gray')
+	})
 	var mesh	= new THREE.Mesh( geometry, material );
 	// mesh.visible	= false
 	scene.add( mesh );
 	
-	var geometry	= mesh.geometry.clone()
-	THREEx.dilateGeometry(geometry, 0.001)
-	var material	= THREEx.createAtmosphereMaterial()
-	material.uniforms.glowColor.value	= glowColor
-	material.uniforms.coeficient.value	= 1.1
-	material.uniforms.power.value		= 0.7
-	// material.side	= THREE.DoubleSide
-	var meshGlowIn	= new THREE.Mesh(geometry, material );
-	scene.add( meshGlowIn );
+	// create a glowMesh
+	var glowMesh	= new THREEx.GeometricGlowMesh(mesh)
+	mesh.add(glowMesh.object3d)
 
-	new THREEx.addAtmosphereMaterial2DatGui(material, datGUI)	
+	// setup a datGUI for it
+	var datGUI	= new dat.GUI()
+	new THREEx.addAtmosphereMaterial2DatGui(glowMesh.insideMesh.material, datGUI)	
+	new THREEx.addAtmosphereMaterial2DatGui(glowMesh.outsideMesh.material, datGUI)	
 
-	var geometry	= mesh.geometry.clone()
-	// THREEx.dilateGeometry(geometry, 0.1)
-	var material	= THREEx.createAtmosphereMaterial()
-	material.uniforms.glowColor.value	= glowColor
-	material.uniforms.coeficient.value	= 0.2
-	material.uniforms.power.value		= 2.0
-	material.side	= THREE.BackSide
-	var meshGlowOut	= new THREE.Mesh( geometry, material );
-	meshGlowOut.scale.multiplyScalar(1.2)
-	scene.add( meshGlowOut );
-
-	new THREEx.addAtmosphereMaterial2DatGui(material, datGUI)
+	//glowMesh.insideMesh.material.uniforms.glowColor.value
+	// var insideUniforms	= glowMesh.insideMesh.material.uniforms
+	// insideUniforms.glowColor.value.set('hotpink')
+	// var outsideUniforms	= glowMesh.outsideMesh.material.uniforms
+	// outsideUniforms.glowColor.value.set('hotpink')
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
