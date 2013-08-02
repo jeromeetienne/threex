@@ -6,6 +6,18 @@ It is a selective glow, so it is possible to have some glowing objects
 along with non glowing objects on the same scene.
 
 
+IDEA: make glow at geometry level
+* algo
+  1. dilate geometrie
+  2. show back face
+  3. atmosphere shader
+* PRO single render pass
+* may be interesting with soft sprite shader
+* PRO glow is per color
+* PRO fix the blending issue. underlying texture isnt burned by additive blend
+* PRO glow level is affected by distance
+  * glow in screenspace got single level
+
 **TODO** see dev master blog to get various implementation of the blending
 
 ## Algorithm

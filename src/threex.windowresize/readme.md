@@ -9,14 +9,14 @@ threex.windowresize is a three.js extension to help you handle window resize.
 You just have to instanciate the object. Then whenever you resize the window,
 it will resize the renderer canvas and adjust the camera accordingly.
 
-```
+```javascript
 var winResize	= new THREEx.WindowResize(renderer, camera)
 ```
 
 If you need to destroy it at one point, just do ```winResize.destroy();```.
 It fit well with devicePixelRatio, see an example below
 
-```
+```javascript
 renderer.devicePixelRatio	= 1/4
 winResize.trigger()
 ```
