@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -61,11 +61,11 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 		'void main(){',
 		'	float intensity;',
 
-		'	intensity	= distance(vWorldPosition, origin)/4.0;',
+		'	intensity	= distance(vWorldPosition, origin)/3.0;',
 		'	intensity	= clamp(intensity, 0.0, 1.0) / 1.0;',
 		'	intensity	= 1.0 - intensity;',
 
-		'	float angleIntensity	= pow( dot(vNormal, vec3(0.0, 0.0, 1.0)), 1.0 );',
+		'	float angleIntensity	= pow( dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0 );',
 		'	intensity	= intensity * angleIntensity;',
 		// '	intensity	= angleIntensity;',
 		// '	intensity	= 1.0;',
@@ -77,10 +77,8 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 		// '	gl_FragColor = vec4(z, z, z, 1.0);',
 // http://www.txutxi.com/?p=182
 
-			'float depthU	= gl_FragCoord.x/screenWidth;',
-			'float depthV	= gl_FragCoord.y/screenHeight;',
-			// 'float sceneDepth= texture2D( tDepth, vec2(depthU, 1.0 - depthV) ).x;',
-			'float sceneDepth= texture2D( tDepth, vec2(depthU, depthV) ).x;',
+			'vec2 depthUV		= vec2(gl_FragCoord.x/screenWidth,gl_FragCoord.y/screenHeight);',
+			'float sceneDepth	= texture2D( tDepth, depthUV ).x;',
 
 			// 'gl_FragColor	= vec4( vec3(sceneDepth), 1.0);',
 			
@@ -88,10 +86,10 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 			'fragDepth	= 1.0 - smoothstep(cameraNear, cameraFar, fragDepth);',
 			// 'gl_FragColor	= vec4( vec3(fragDepth), 1.0);',
 
-			'float fade	= clamp(abs(sceneDepth-fragDepth) * 10.0, 0.0, 1.0);',
-			// // 'fade = 1.0;',
-			// 'gl_FragColor	= vec4( vec3(1,1,1), fade);',
-			'gl_FragColor	= vec4( vec3(1,1,1), fade*intensity);',
+			'float fade	= clamp(abs(sceneDepth-fragDepth) * 50.0, 0.0, 1.0);',
+			'intensity	= intensity * fade;',
+
+			'gl_FragColor	= vec4( lightColor, intensity);',
 			
 			// 1.0 - smoothstep( mNear, mFar, depth )
 			
@@ -138,7 +136,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 			},
 			lightColor	: {
 				type	: "c",
-				value	: new THREE.Color('white')
+				value	: new THREE.Color('cyan')
 			},
 		},
 		vertexShader	: vertexShader,
@@ -163,7 +161,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 		color	: new THREE.Color('red')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
-	mesh.position.set(0,geometry.height/2,0)
+	mesh.position.set(0,-geometry.height/2,0)
 	scene.add( mesh );
 	
 	// add a cube
@@ -194,8 +192,8 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	scene.add( mesh );
 
 	// add spot light
-	var geometry	= new THREE.CylinderGeometry( 0.01, 1, 4, 32, 10, true);
-	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -4/2, 0 ) );
+	var geometry	= new THREE.CylinderGeometry( 0.1, 2, 5, 32, 10, true);
+	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -geometry.height/2, 0 ) );
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2 ) );
 	// var geometry	= new THREE.CubeGeometry( 3, 1, 3 );	
 	var material	= new THREE.MeshNormalMaterial({
@@ -238,10 +236,17 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	}, false)
 	updateFcts.push(function(delta, now){
 		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - camera.position.y + 4) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y + 2) * (delta*3)
 		camera.lookAt( scene.position )
 	})
 
+	var target	= new THREE.Vector3(0,0,0)
+	updateFcts.push(function(delta, now){
+		var angle	= 0.2 * Math.PI*2*now
+		camera.position.x	= 3*Math.cos(angle)
+		camera.position.z	= 3*Math.sin(angle)
+		mesh.lookAt(new THREE.Vector3(0,0,0) )
+	})
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
