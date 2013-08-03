@@ -13,7 +13,6 @@ THREEx.GeometricGlowMesh	= function(mesh){
 	var insideMesh	= new THREE.Mesh(geometry, material );
 	object3d.add( insideMesh );
 
-	// new THREEx.addAtmosphereMaterial2DatGui(material, datGUI)	
 
 	var geometry	= mesh.geometry.clone()
 	THREEx.dilateGeometry(geometry, 0.1)
@@ -26,6 +25,7 @@ THREEx.GeometricGlowMesh	= function(mesh){
 	outsideMesh.scale.multiplyScalar(1.2)
 	object3d.add( outsideMesh );
 
+	// expose a few variable
 	this.object3d	= object3d
 	this.insideMesh	= insideMesh
 	this.outsideMesh= outsideMesh
