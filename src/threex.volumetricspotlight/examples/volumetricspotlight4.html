@@ -228,7 +228,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 			},
 			lightColor	: {
 				type	: "c",
-				value	: new THREE.Color('white')
+				value	: new THREE.Color('cyan')
 			},
 		},
 		vertexShader	: vertexShader,
@@ -250,7 +250,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	// add ground
 	var geometry	= new THREE.CubeGeometry( 20, 0.1, 20, 20, 1, 20 );
 	var material	= new THREE.MeshPhongMaterial({
-		color	: new THREE.Color('red')
+		color	: new THREE.Color('gray')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
 	mesh.receiveShadow	= true
@@ -262,6 +262,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	var material	= new THREE.MeshBasicMaterial({
 		wireframe		: true,
 		wireframeLinewidth	: 4,
+		color			: new THREE.Color('black'),
 	});
 	var mesh	= new THREE.Mesh( geometry.clone(), material );
 	mesh.receiveShadow	= true
@@ -271,9 +272,9 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	scene.add( mesh );
 	
 	// add a cube
-	var geometry	= new THREE.CubeGeometry( 0.3, 2, 0.3 );
+	var geometry	= new THREE.CubeGeometry( 0.3, 1.5, 0.3 );
 	var material	= new THREE.MeshPhongMaterial({
-		color	: new THREE.Color('green')
+		color	: new THREE.Color('gray')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
 	mesh.receiveShadow	= true
@@ -282,12 +283,12 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	scene.add( mesh );
 
 	// add a cube
-	var geometry	= new THREE.CubeGeometry( 0.3, 1, 0.3 );
+	var geometry	= new THREE.CubeGeometry( 0.3, 0.3, 0.3 );
 	var material	= new THREE.MeshPhongMaterial({
-		color	: new THREE.Color('green')
+		color	: new THREE.Color('gray')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
-	mesh.position.set(0,geometry.height/2,0)
+	mesh.position.set(0.2,geometry.height/2,0.5)
 	mesh.receiveShadow	= true
 	mesh.castShadow		= true
 	scene.add( mesh );
@@ -295,7 +296,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	// add a sphere
 	var geometry	= new THREE.SphereGeometry( 0.3, 16, 8 );
 	var material	= new THREE.MeshPhongMaterial({
-		color	: new THREE.Color('green')
+		color	: new THREE.Color('gray')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
 	mesh.receiveShadow	= true
@@ -354,7 +355,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var spotLight	= new THREE.SpotLight()
-	spotLight.position	= mesh.position 
+	spotLight.position	= mesh.position
 	spotLight.color		= mesh.material.uniforms.lightColor.value
 	spotLight.exponent	= 20;
 	spotLight.intensity	= 3;
