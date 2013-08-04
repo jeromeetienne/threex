@@ -140,7 +140,10 @@ console.warn = console.error
 }
 </style>
 <div id='osdCenterColumn'>
-	<div id="gameStartOsd" class='osdFont' style='display:none'>Ready ?</div>
+	<div id="gameStartOsd" class='osdFont' style='display:none'>
+		<span class='mapName'>Unknown</span> Level<br/>
+		Ready ?
+	</div>
 	<div id="gameLostOsd" class='osdFont' style='display:none'>Game Over</div>
 	<div id="gameWonOsd" class='osdFont' style='display:none'>Game Won</div>
 	<div id="gameCompletedOsd" class='osdFont' style='display:none'>Game Completed</div>
@@ -157,10 +160,36 @@ require([ '../../threex.glow/package.require.js'
 	GAME.tileW	= 0.2
 	GAME.nLives	= 3;
 	document.querySelector('#livesCounter').innerHTML	= GAME.nLives
-	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
 
 	var onMobile	= 'ontouchstart' in window ? true : false
 	GAME.profile	= new RenderingProfile(onMobile ? 'mobile' : 'normal')
+
+	var mapConfigs	= {
+		'01'	: {
+			humanName	: 'Dev'
+		}, 
+		'02'	: {
+			humanName	: 'Planets'
+		}, 
+		'03'	: {
+			humanName	: 'Pool'
+		}, 
+		'04'	: {
+			humanName	: 'Sport'
+		},
+	};
+
+	var mapIds	= Object.keys(mapConfigs)
+	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
+	if( sessionStorage.getItem('nextMapId') !== GAME.mapId && GAME.mapId !== '01' ){
+		console.error('nextMapId is', sessionStorage.getItem('nextMapId'), 'and should be', GAME.mapId)
+		// // put nextMapId in location
+		// location.href	= './#'+'01'
+		// // reload the page				
+		// location.reload()		
+	}
+	console.assert( mapIds.indexOf(GAME.mapId) !== -1 )
+	sessionStorage.setItem('nextMapId', mapIds[mapIds.indexOf(GAME.mapId)+1])
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -360,7 +389,6 @@ require([ '../../threex.glow/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var gameScore	= new GameScore()
-	// 
 	if( GAME.mapId  === '01' ){
 		// if first level, start with a zero score
 		gameScore.score(0)
@@ -375,7 +403,7 @@ require([ '../../threex.glow/package.require.js'
 	yeller.addEventListener('increaseScore', function(amount){
 		// store score in sessionStorage to keep track between map
 		sessionStorage.setItem("currentScore", gameScore.score());
-	}
+	});
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		ball								//
@@ -408,6 +436,8 @@ require([ '../../threex.glow/package.require.js'
 
 	yeller.addEventListener('gameStart', function(){
 		Flow().seq(function(next){
+			var mapName	= mapConfigs[GAME.mapId].humanName;
+			document.querySelector('#gameStartOsd .mapName').innerHTML	= mapName
 			document.querySelector('#gameStartOsd').style.display	= 'block'
 			playerControls.disable	= true
 			physicsWorld.stop()
@@ -501,7 +531,6 @@ require([ '../../threex.glow/package.require.js'
 		playerControls.disable	= true
 
 		// find out nextMapId
-		var mapIds	= ['01', '02', '03', '04']
 		var index	= mapIds.indexOf(GAME.mapId)
 		var nextMapId	= mapIds[index+1]
 		console.assert( index !== -1 )

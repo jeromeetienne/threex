@@ -23,7 +23,15 @@ marble labyrinth with realistic physics
   * make the physics of the table to follow the 3d
   * ERROR the table doesnt move, the up vector is
 
-* Keep score between map
+* Make sure it is starting to level one and up
+  * onLoad, 
+    * sessionStorage.nextMapId  !== GAME.mapId && GAME.mapId !== '01', reload to level 0
+    * sessionStorage.nextMapId  = GAME.mapId
+  
+
+* give a name to level
+
+* DONE Keep score between map
   * as the page is reloaded... how to do that ?
   * cookie ? sessionStorage ?
   * who write in it ? who remove ?
@@ -32,14 +40,6 @@ marble labyrinth with realistic physics
     * if mapId !== '01', read score in sessionStorage
     * at every score modification, add it in sessionStorage
 
-* Make sure it is starting to level one and up
-  * sessionStorage.lastPlayedLevelIdx
-  * onLoad, 
-    * sessionStorage.nextLevel  !== currentLevel, reload to level 0
-    * sessionStorage.nextLevel  = lastPlayedLevelIdx
-  
-
-* give a name to level
 
 ## notes
 * research on marble

@@ -8,8 +8,13 @@ var Map02	= function(){
 	}
 	// add a skymap	
 	if( GAME.profile.skymapEnabled ){
-		var mesh	= THREEx.createSkymap('mars')
-		scene.add( mesh )		
+		var geometry	= new THREE.SphereGeometry(90, 32, 32)
+		var material	= new THREE.MeshBasicMaterial({
+			map	: THREE.ImageUtils.loadTexture('images/galaxy_starfield.png'),
+			side	: THREE.BackSide
+		})
+		var starSphere	= new THREE.Mesh(geometry, material)
+		scene.add(starSphere)
 	}
 	// init lighting
 	var lighting	= new LightingDefault()
