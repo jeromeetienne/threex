@@ -1,18 +1,27 @@
 var GameScore	= function(){
-	var domElement	= document.querySelector('#score')
-	var score	= 0
+	var _score	= 0
 
 	yeller.addEventListener('increaseScore', function(amount){
-		score	+= amount		
-		domElement.innerHTML	= stringPadder(score, 5, '0')
-		
-		sounds.playScoreup()
-	})
+		_score	+= amount
+		this.update();
+	}.bind(this))
 
-	yeller.dispatchEvent('increaseScore', 0)
-
-	function stringPadder(value, width, padChar){
-		var maxPadded	= Array(width+1).join(padChar) + value;
-		return maxPadded.substr(maxPadded.length-width);
+	this.score	= function(value){
+		if( value === undefined )	return _score
+		_score	= value;
+		this.update();
 	}
+
+	var domElement	= document.querySelector('#score')
+	this.update	= function(){
+		domElement.innerHTML	= stringPadder(_score, 5, '0')
+		sounds.playScoreup()		
+
+		function stringPadder(value, width, padChar){
+			var maxPadded	= Array(width+1).join(padChar) + value;
+			return maxPadded.substr(maxPadded.length-width);
+		}
+	}
+
+	this.score(0)
 }

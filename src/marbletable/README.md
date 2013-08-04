@@ -27,7 +27,19 @@ marble labyrinth with realistic physics
   * as the page is reloaded... how to do that ?
   * cookie ? sessionStorage ?
   * who write in it ? who remove ?
+  * onLoad 
+    * if mapId === '01', set score to 0
+    * if mapId !== '01', read score in sessionStorage
+    * at every score modification, add it in sessionStorage
 
+* Make sure it is starting to level one and up
+  * sessionStorage.lastPlayedLevelIdx
+  * onLoad, 
+    * sessionStorage.nextLevel  !== currentLevel, reload to level 0
+    * sessionStorage.nextLevel  = lastPlayedLevelIdx
+  
+
+* give a name to level
 
 ## notes
 * research on marble

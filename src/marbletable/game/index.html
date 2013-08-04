@@ -175,7 +175,7 @@ require([ '../../threex.glow/package.require.js'
 
 	var updateFcts	= []
 	var scene	= new THREE.Scene()
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100)
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 600)
 	camera.position.x	= 0
 	camera.position.y	= 5
 	camera.position.z	= 6
@@ -356,12 +356,26 @@ require([ '../../threex.glow/package.require.js'
 
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
+	//		Hangle Score							//
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var gameScore	= new GameScore()
-	// to init score display at 0
-	yeller.dispatchEvent('increaseScore', 0)
+	// 
+	if( GAME.mapId  === '01' ){
+		// if first level, start with a zero score
+		gameScore.score(0)
+		// store score in sessionStorage to keep track between map
+		sessionStorage.setItem("currentScore", gameScore.score());
+	}else{
+		// get score from sessionStorage
+		console.assert(sessionStorage.getItem("currentScore") !== null)
+		var score	= parseFloat(sessionStorage.getItem("currentScore"), 10);
+		gameScore.score(score)
+	}
+	yeller.addEventListener('increaseScore', function(amount){
+		// store score in sessionStorage to keep track between map
+		sessionStorage.setItem("currentScore", gameScore.score());
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		ball								//
