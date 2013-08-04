@@ -3,12 +3,15 @@
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	// renderer.shadowMapEnabled	= true
 	document.body.appendChild( renderer.domElement );
 
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 6);
-	camera.position.z = 3;
+	scene.fog	= new THREE.FogExp2( 0x000000, 0.1 );
+
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
+	camera.position.z = 5;
 
 
 	// add a ambient light
@@ -31,7 +34,7 @@ var config	= {
 	edgeConstrast	: 'LINEAR',	// LINEAR or SMOOTH
 
 	// shaderDepth	: 'R8G8B8A8',	// R8 or R8G8B8A8
-	edgeConstrast	: 'SMOOTH',	// LINEAR or SMOOTH
+	// edgeConstrast	: 'SMOOTH',	// LINEAR or SMOOTH
 }
 
 /**
@@ -196,7 +199,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 						: console.assert(false)))						
 			},
 			edgeConstractPower	: (config.edgeConstrast === 'SMOOTH' ? {
-				type	: "f",
+				type	: "f", 
 				value	: 1.5
 			} : undefined),
 			cameraNear	: {
@@ -225,7 +228,7 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 			},
 			lightColor	: {
 				type	: "c",
-				value	: new THREE.Color('white')
+				value	: new THREE.Color('cyan')
 			},
 		},
 		vertexShader	: vertexShader,
@@ -245,11 +248,25 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	//////////////////////////////////////////////////////////////////////////////////	
 
 	// add ground
-	var geometry	= new THREE.CubeGeometry( 20, 0.1, 20 );
+	var geometry	= new THREE.CubeGeometry( 20, 0.1, 20, 20, 1, 20 );
 	var material	= new THREE.MeshPhongMaterial({
 		color	: new THREE.Color('red')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.position.set( 0, -geometry.height/2, 0)
+	scene.add( mesh );
+
+	// add ground
+	var material	= new THREE.MeshBasicMaterial({
+		wireframe		: true,
+		wireframeLinewidth	: 4,
+	});
+	var mesh	= new THREE.Mesh( geometry.clone(), material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.scale.multiplyScalar(1.01)
 	mesh.position.set( 0, -geometry.height/2, 0)
 	scene.add( mesh );
 	
@@ -259,6 +276,8 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 		color	: new THREE.Color('green')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
 	mesh.position.set(0,geometry.height/2,0)
 	scene.add( mesh );
 
@@ -269,6 +288,8 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
 	mesh.position.set(0,geometry.height/2,0)
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
 	scene.add( mesh );
 
 	// add a sphere
@@ -277,6 +298,8 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 		color	: new THREE.Color('green')
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
 	mesh.position.set(0.5,geometry.radius,0)
 	scene.add( mesh );
 
@@ -298,14 +321,13 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 	mesh.position.set(1.5,2,0)
 	mesh.lookAt(new THREE.Vector3(0,0, 0))
 	material.uniforms.spotPosition.value	= mesh.position	
-	scene.add( mesh );
+	//scene.add( mesh );
 
-	// var target	= new THREE.Vector3(0,0,0)
 	// updateFcts.push(function(delta, now){
-	// 	var angle	= 0.2 * Math.PI*2*now
-	// 	target.x	= 3*Math.cos(angle)
-	// 	target.z	= 3*Math.sin(angle)
+	// 	var angle	= 0.1 * Math.PI*2*now
+	// 	var target	= new THREE.Vector3(1*Math.cos(angle),0,1*Math.sin(angle))
 	// 	mesh.lookAt(target)
+	// 	spotLight.target.position.copy(target)
 	// })
 
 	if( config.shaderDepth === 'R8' ){
@@ -326,6 +348,37 @@ THREEx.VolumetricSpotLightMaterial	= function(){
 		format		: THREE.RGBFormat
 	});
 	material.uniforms.tDepth.value	= rtTextureDepth;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// var light	= new THREE.SpotLight('white', 0.75)
+	// light.position.set(-0.5, -0.5, -2)
+	// scene.add( light )
+
+	var spotLight	= new THREE.SpotLight('white', 30)
+	spotLight.position	= mesh.position
+	spotLight.color		= mesh.material.uniforms.lightColor.value
+	scene.add( spotLight )
+
+	// spotLight.castShadow	= true
+	// spotLight.onlyShadow	= true
+	spotLight.shadowCameraNear	= 0.01
+	spotLight.shadowCameraFar	= 15
+	spotLight.shadowCameraFov	= 45
+
+	spotLight.shadowCameraLeft	= -2
+	spotLight.shadowCameraRight	=  2
+	spotLight.shadowCameraTop	=  2
+	spotLight.shadowCameraBottom	= -2
+	spotLight.shadowCameraVisible	= true
+
+	// spotLight.shadowBias		= 0.001
+	spotLight.shadowDarkness	= 0.8
+
+	spotLight.shadowMapWidth	= 1024
+	spotLight.shadowMapHeight	= 1024
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
