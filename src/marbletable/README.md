@@ -23,7 +23,7 @@ marble labyrinth with realistic physics
   * make the physics of the table to follow the 3d
   * ERROR the table doesnt move, the up vector is
 
-* Make sure it is starting to level one and up
+* DONE Make sure it is starting to level one and up
   * onLoad, 
     * sessionStorage.nextMapId  !== GAME.mapId && GAME.mapId !== '01', reload to level 0
     * sessionStorage.nextMapId  = GAME.mapId

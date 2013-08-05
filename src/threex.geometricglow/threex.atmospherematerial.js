@@ -6,24 +6,31 @@ var THREEx = THREEx || {}
  */
 THREEx.createAtmosphereMaterial	= function(){
 	var vertexShader	= [
-		'varying vec3 vNormal;',
+		'uniform float	coeficient;',
+		'uniform float	power;',
+
+		'varying float	intensity;',
+
 		'void main(){',
 		'	// compute intensity',
-		'	vNormal		= normalize( normalMatrix * normal );',
+		'	vec3 vNormal	= normalize(normalMatrix * normal);',
+
+		// '	vec3 camPosition= normalize(normalMatrix * cameraPosition);',
+		// '	intensity	= pow( coeficient - dot(vNormal, camPosition), power );',
+
+		'	intensity	= pow( coeficient - dot(vNormal, vec3(0.0,0.0,1.0)), power );',
 		'	// set gl_Position',
 		'	gl_Position	= projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 		'}',
 	].join('\n')
 	var fragmentShader	= [
-		'uniform float coeficient;',
-		'uniform float power;',
-		'uniform vec3  glowColor;',
+		'uniform vec3	glowColor;',
 
-		'varying vec3  vNormal;',
+		'varying float	intensity;',
 
 		'void main(){',
-		'	float intensity	= pow( coeficient - dot(vNormal, vec3(0.0, 0.0, 1.0)), power );',
-		'	gl_FragColor	= vec4( glowColor * intensity, intensity );',
+		'	gl_FragColor	= vec4(glowColor*intensity, intensity);',
+		// '	gl_FragColor	= vec4(glowColor, intensity);',
 		'}',
 	].join('\n')
 
@@ -46,10 +53,10 @@ THREEx.createAtmosphereMaterial	= function(){
 		},
 		vertexShader	: vertexShader,
 		fragmentShader	: fragmentShader,
-		side		: THREE.FrontSide,
+		// side		: THREE.FrontSide,
 		blending	: THREE.AdditiveBlending,
 		transparent	: true,
-		depthWrite: false,
+		depthWrite	: false,
 	});
 	return material
 }

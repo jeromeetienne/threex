@@ -182,7 +182,7 @@ require([ '../../threex.glow/package.require.js'
 	var mapIds	= Object.keys(mapConfigs)
 	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
 	if( sessionStorage.getItem('nextMapId') !== GAME.mapId && GAME.mapId !== '01' ){
-		console.error('nextMapId is', sessionStorage.getItem('nextMapId'), 'and should be', GAME.mapId)
+		console.error('nextMapId is', sessionStorage.getItem('nextMapId'), 'and should be', GAME.mapId, 'Should reset to map 01')
 		// // put nextMapId in location
 		// location.href	= './#'+'01'
 		// // reload the page				

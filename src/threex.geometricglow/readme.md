@@ -1,7 +1,7 @@
 threex.geometricglow
 ====================
 
-threex.geometricglow is a three.js extension to make any object glow.
+threex.geometricglow is a three.js extension to make any object glow at geometric level.
 It is done at the geometry level. An important feature which provide 
 multiple advantages.
 
