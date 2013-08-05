@@ -6,6 +6,8 @@
 <script src='../threex.volumetricspotlightmaterialdatgui.js'></script>
 
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+
+
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	// renderer.shadowMapEnabled	= true
@@ -19,6 +21,87 @@
 	camera.position.set(0,2,5)
 	camera.lookAt(scene.position)
 
+// Depth encoding into RGBA texture
+// 	based on SpiderGL shadow map example
+// 		http://spidergl.org/example.php?id=6
+// 	originally from
+//		http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/page__whichpage__1%25EF%25BF%25BD
+// 	see also here:
+//		http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+THREE.ShaderLib['depthRGBA2']	= {
+		uniforms: {
+			cameraNear	: {
+				type	: "f",
+				value	: camera.near
+			},
+			cameraFar	: {
+				type	: "f",
+				value	: camera.far
+			},
+		},
+
+		vertexShader: [
+
+			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+
+			"void main() {",
+
+				THREE.ShaderChunk[ "skinbase_vertex" ],
+				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
+				THREE.ShaderChunk[ "default_vertex" ],
+
+			"}"
+
+		].join("\n"),
+		fragmentShader: [
+
+			// from THREE.ShaderLib['depthRGBA']
+			// "vec4 pack_depth( const in float depth ) {",
+
+			// 	"const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
+			// 	"const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+			// 	"vec4 res = fract( depth * bit_shift );",
+			// 	"res -= res.xxyz * bit_mask;",
+			// 	"return res;",
+			// 	// "return vec4(depth);",
+
+			// "}",
+
+			// packing formula from http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+			'float unpackDepth( vec4 rgba ) {',
+			'	return dot( rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/160581375.0) );',
+			'}',
+			'vec4 pack_depth( float v ) {',
+			'	vec4 enc = vec4(1.0, 255.0, 65025.0, 160581375.0) * v;',
+			'	enc = fract(enc);',
+			'	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);',
+			'	return enc;',
+			'}',
+
+			'uniform float 		cameraNear;',
+			'uniform float 		cameraFar;',
+
+			"void main() {",
+				'float fragDepth= gl_FragCoord.z / gl_FragCoord.w;',
+				'fragDepth	= 1.0 - smoothstep(cameraNear, cameraFar, fragDepth);',
+				'gl_FragColor	= pack_depth(fragDepth);',
+
+				'gl_FragColor	= pack_depth(0.5);',
+				// 'gl_FragColor	= pack_depth(1.0);',
+				// 'gl_FragColor	= vec4(vec3(fragDepth), 1.0);',
+				// 'gl_FragColor	= vec4(vec3(0.5), 1.0);',
+
+				// "gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );",
+				// "gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z / gl_FragCoord.w );",
+				//"float z = ( ( gl_FragCoord.z / gl_FragCoord.w ) - 3.0 ) / ( 4000.0 - 3.0 );",
+				//"gl_FragData[ 0 ] = pack_depth( z );",
+				//"gl_FragData[ 0 ] = vec4( z, z, z, 1.0 );",
+
+			"}"
+		].join("\n")
+	}
 
 	// add a ambient light
 	var light	= new THREE.AmbientLight( 0x020202 )
@@ -36,6 +119,35 @@
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 
+	// add back wall
+	var geometry	= new THREE.CubeGeometry( 20, 0.1, 20, 20, 1, 20 );
+	var material	= new THREE.MeshPhongMaterial({
+		color	: new THREE.Color('gray')
+	});
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.rotateX(Math.PI/2)
+	mesh.position.set( 0, -geometry.height/2, -1)
+	scene.add( mesh );
+	// add back wall - wireframe
+	var material	= new THREE.MeshBasicMaterial({
+		wireframe		: true,
+		wireframeLinewidth	: 2,
+		color			: new THREE.Color('black'),
+	});
+	var mesh	= new THREE.Mesh( geometry.clone(), material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.scale.multiplyScalar(1.01)
+	mesh.rotateX(Math.PI/2)
+	mesh.position.set( 0, -geometry.height/2, -1)
+	scene.add( mesh );
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	// add ground
 	var geometry	= new THREE.CubeGeometry( 20, 0.1, 20, 20, 1, 20 );
 	var material	= new THREE.MeshPhongMaterial({
@@ -47,7 +159,7 @@
 	mesh.position.set( 0, -geometry.height/2, 0)
 	scene.add( mesh );
 
-	// add ground
+	// add ground - wireframe
 	var material	= new THREE.MeshBasicMaterial({
 		wireframe		: true,
 		wireframeLinewidth	: 2,
@@ -146,13 +258,14 @@
 	if( config.shaderDepth === 'R8' ){
 		// depthMaterial WITHOUT depth packing
 		var depthMaterial	= new THREE.MeshDepthMaterial();
+// TODO what if i put a shaderMaterial here ?
 	}else if( config.shaderDepth === 'R8G8B8A8' ){
 		// depthMaterial WITH depth packing
 		var depthMaterial	= new THREE.ShaderMaterial({
 // TODO make your own shader
-			uniforms	: THREE.UniformsUtils.clone( THREE.ShaderLib['depthRGBA'].uniforms ),
-			vertexShader	: THREE.ShaderLib['depthRGBA'].vertexShader,
-			fragmentShader	: THREE.ShaderLib['depthRGBA'].fragmentShader,
+			uniforms	: THREE.UniformsUtils.clone( THREE.ShaderLib['depthRGBA2'].uniforms ),
+			vertexShader	: THREE.ShaderLib['depthRGBA2'].vertexShader,
+			fragmentShader	: THREE.ShaderLib['depthRGBA2'].fragmentShader,
 		});
 	}else{	console.assert(false) }
 
@@ -198,15 +311,23 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////
+
+
+	// renderer.autoClear = false;
+	// renderer.clear();
+
 	updateFcts.push(function(){
+
+	renderer.clear();
 mesh.visible	= false
 // TODO to replace by shaderLib['depthRGBA']
 		// Render depth into texture
 		scene.overrideMaterial	= depthMaterial;
-		renderer.render(scene, camera, rtTextureDepth, true);
+		renderer.render(scene, camera, rtTextureDepth, false);
 		scene.overrideMaterial	= null;
 mesh.visible	= true
 
+	// renderer.clear();
 		renderer.render( scene, camera );		
 	})
 	

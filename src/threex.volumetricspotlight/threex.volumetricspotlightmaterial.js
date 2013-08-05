@@ -54,20 +54,30 @@ THREEx.VolumetricSpotLightMaterial	= function(opts){
 		'uniform float 		cameraFar;',
 		
 		'#ifdef DEPTH_R8G8B8A8',
-			"float cameraFarPlusNear	= cameraFar + cameraNear;",
-			"float cameraFarMinusNear	= cameraFar - cameraNear;",
-			"float cameraCoef		= 2.0 * cameraNear;",		
-
-			// RGBA depth
-			'float unpackDepth( const in vec4 rgba_depth ) {',
-				'const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );',
-				'float depth = dot( rgba_depth, bit_shift );',
-				'return depth;',
+			// from THREE.ShaderLib['depthRGBA']
+			// "float unpackDepth( const in vec4 rgba_depth ) {",
+			// 	"const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
+			// 	"float depth = dot( rgba_depth, bit_shift );",
+			// 	"return depth;",
+			// "}",
+			// "vec4 pack_depth( const in float depth ) {",
+			// 	"const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
+			// 	"const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+			// 	"vec4 res = fract( depth * bit_shift );",
+			// 	"res -= res.xxyz * bit_mask;",
+			// 	"return res;",
+			// "}",
+	
+			// packing formula from http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+			'float unpackDepth( vec4 rgba ) {',
+			'	return dot( rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/160581375.0) );',
 			'}',
-			"float readDepth( const in vec2 coord ) {",
-				// "return ( 2.0 * cameraNear ) / ( cameraFar + cameraNear - unpackDepth( texture2D( tDepth, coord ) ) * ( cameraFar - cameraNear ) );",
-				"return cameraCoef / ( cameraFarPlusNear - unpackDepth( texture2D( tDepth, coord ) ) * cameraFarMinusNear );",
-			"}",
+			'vec4 pack_depth( float v ) {',
+			'	vec4 enc = vec4(1.0, 255.0, 65025.0, 160581375.0) * v;',
+			'	enc = fract(enc);',
+			'	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);',
+			'	return enc;',
+			'}',
 		'#endif',
 
 
@@ -100,6 +110,7 @@ THREEx.VolumetricSpotLightMaterial	= function(opts){
 				'fragDepth		= 1.0 - smoothstep(cameraNear, cameraFar, fragDepth);',
 	
 				'float deltaDepth	= abs(sceneDepth-fragDepth)*edgeScale;',
+				// 'gl_FragColor	= vec4(vec3(sceneDepth), 1.0);',
 			'#endif',
 
 			// for depth packed in texel
@@ -118,13 +129,27 @@ THREEx.VolumetricSpotLightMaterial	= function(opts){
 
 
 				'float sceneDepth	= unpackDepth( texture2D( tDepth, depthUV ) );',
-
-				'sceneDepth		= sceneDepth / gl_FragCoord.w;',
-				'sceneDepth		= 1.0 - smoothstep(cameraNear, cameraFar, sceneDepth);',
 				'float fragDepth	= gl_FragCoord.z / gl_FragCoord.w;',
 				'fragDepth		= 1.0 - smoothstep(cameraNear, cameraFar, fragDepth);',
 	
 				'float deltaDepth	= abs(sceneDepth-fragDepth)*edgeScale;',
+
+			// 'gl_FragColor	= vec4(vec3(sceneDepth), 1.0);',
+			// 'gl_FragColor	= vec4(vec3(texture2D( tDepth, depthUV ).x), 1.0);',
+			// 'gl_FragColor	= vec4(vec3(unpackDepth(texture2D( tDepth, depthUV ))), 1.0);',
+			// 'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+
+				// 'if( texture2D( tDepth, depthUV ).x - 0.2 < 0.01 ){',
+				// 	'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+				// '}else{',
+				// 	'gl_FragColor	= vec4(vec3(0.2), 1.0);',
+				// '}',
+
+				// 'if(unpackDepth(pack_depth(2.0)) - 2.0 < 0.01 ){',
+				// 	'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+				// '}else{',
+				// 	'gl_FragColor	= vec4(vec3(0.2), 1.0);',
+				// '}',
 			'#endif',
 
 			// 'gl_FragColor		= vec4( vec3(deltaDepth), 1.0);',
