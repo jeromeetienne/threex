@@ -1,6 +1,9 @@
 var THREEx = THREEx || {}
 
-
+/**
+ * build a classic 3 points lighting
+ * @return {THREE.Object3D} container for the 3 lights
+ */
 THREEx.ThreePointsLighting	= function(){
 	var object3d	= new THREE.Object3D()
 	// add a ambient light
@@ -18,6 +21,10 @@ THREEx.ThreePointsLighting	= function(){
 	return object3d
 }
 
+/**
+ * build a sunset lighting
+ * @return {THREE.Object3D} container for the 3 lights
+ */
 THREEx.SunSetLighting	= function(){
 	var object3d	= new THREE.Object3D()
 	var light	= new THREE.AmbientLight( 0x080808 )
