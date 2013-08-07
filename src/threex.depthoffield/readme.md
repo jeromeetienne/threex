@@ -21,5 +21,3 @@ depthOfField.render(scene, camera)
 Becareful with the camera far distance... it greatly affects the precision of the
 ```THREE.MeshDepthMaterial``` rendering. Keep it close to the minimum.
 
-## TODO
-* put dat.gui from basic in threex.depthoffield.datgui.js
