@@ -2,6 +2,7 @@ var THREEx = THREEx || {}
 
 /**
  * @todo  make a .update() for scale ?
+ * 
  * @param  {[type]} domElement [description]
  * @return {[type]}            [description]
  */
@@ -38,13 +39,19 @@ THREEx.HtmlmixerPlane	= function(domElement, opts){
 	this.objectCSS		= objectCSS
 	// synchronize objectCSS position/rotation with planeMesh position/rotation 
 	objectCSS.position	= object3d.position
-	objectCSS.rotation	= object3d.rotation
 	objectCSS.quaternion	= object3d.quaternion
 	// resize this.objectCSS to same size as this.object3d
 	objectCSS.scale.x	/= opts.elementW / opts.planeW
 	objectCSS.scale.y	/= opts.elementW / opts.planeW
 }
 
+/**
+ * create a THREEx.HtmlmixedPlane for an iframe
+ * 
+ * @param  {String} url  the url for the iframe
+ * @param  {Object} opts the options for THREEx.HtmlmixerPlane constructor
+ * @return {THREEx.HtmlmixerPlane}      the object just created
+ */
 THREEx.HtmlmixerPlane.createFromIframe	= function(url, opts){
 	// create the iframe element
 	var domElement	= document.createElement('iframe')

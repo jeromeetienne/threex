@@ -19,19 +19,3 @@ TODO
   * What about rewriting the 'depth' shader... would that fix my issue ?
   * if so it isnt in the packDepth function
   * it is in the init/rendering of the depthPass
-
-```
-float packColor(vec3 color) {
-   return color.r + color.g * 256.0 + color.b * 256.0 * 256.0;
-}
-
-vec3 unpackColor(float f) {
-	vec3 color;
-	color.b = floor(f / 256.0 / 256.0);
-	color.g = floor((f - color.b * 256.0 * 256.0) / 256.0);
-	color.r = floor(f - color.b * 256.0 * 256.0 - color.g * 256.0);
-	// now we have a vec3 with the 3 components in range [0..256]. Let's normalize it!
-	return color / 256.0;
-}
-
-```

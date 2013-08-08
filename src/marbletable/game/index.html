@@ -23,9 +23,6 @@ console.warn = console.error
 <script src="../../threex.keyboardstate/threex.keyboardstate.js"></script>
 <!-- include threex.windowresize -->
 <script src="../../threex.windowresize/threex.windowresize.js"></script>
-<!-- include for threex.glowdatgui -->
-<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
-<script src="../../threex.glow/threex.glowdatgui.js"></script>
 <!-- include for threex.mirrorball -->
 <script src='../../threex.mirrorball/threex.mirrorball.js'></script>
 
@@ -150,8 +147,7 @@ console.warn = console.error
 	<div id="killPlayerOsd" class='osdFont' style='display:none'>You die!</div>
 </div>
 <script>
-require([ '../../threex.glow/package.require.js'
-	, '../../threex.skymap/package.require.js'
+require([ '../../threex.skymap/package.require.js'
 ], function(){
 	window.cache	= new Microcache()
 	window.yeller	= MicroeventMixin({});
