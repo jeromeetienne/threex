@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
+<script src='../threex.htmlmixerrenderer.js'></script>
+<script src='../threex.htmlmixerplane.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
+	camera.position.z = 300;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.CubeGeometry( 100, 100, 100)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh( geometry, material )
+	scene.add( mesh );
+	
+	updateFcts.push(function(delta, now){
+		var angle	= now * Math.PI * 2 * 0.1
+		mesh.position.x	= Math.cos(angle)* 200
+		mesh.position.z	= Math.sin(angle)* 200
+	})
+	
+;(function(){
+	var geometry	= new THREE.CubeGeometry( 400, 400, 100)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh( geometry, material )
+	mesh.position.z	= -200
+	scene.add( mesh )
+})();
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mixerRenderer	= new THREEx.HtmlmixerRenderer(renderer)
+	var cssScene	= new THREE.Scene()
+
+	var url		= '../../../../index.html'
+	var mixerPlane	= THREEx.HtmlmixerPlane.createFromIframe(url)
+	scene.add( mixerPlane.object3d )
+	cssScene.add( mixerPlane.objectCSS )
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	updateFcts.push(function(delta, now){
+		var object3d		= mixerPlane.object3d
+		object3d.rotation.y	= now * Math.PI*2 * 0.1
+	})
+	updateFcts.push(function(delta, now){
+		// var angle		= now * Math.PI*2 * 0.1
+		// planeMesh.position.x	= Math.cos(angle) * 400
+		// planeMesh.position.z	= Math.sin(angle) * 200
+	})
+
+	updateFcts.push(function(){
+		mixerRenderer.render( cssScene, camera )
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera )
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

@@ -196,7 +196,7 @@ require([ '../../threex.skymap/package.require.js'
 		antialias	: GAME.profile.rendererAntialias
 	})
 	renderer.setSize( window.innerWidth, window.innerHeight )
-	document.body.appendChild( renderer.domElement )
+	document.body.insertBefore( renderer.domElement, document.body.firstChild)
 
 	var updateFcts	= []
 	var scene	= new THREE.Scene()
@@ -432,9 +432,13 @@ require([ '../../threex.skymap/package.require.js'
 
 	yeller.addEventListener('gameStart', function(){
 		Flow().seq(function(next){
+			renderer.domElement.style.webkitFilter	= 'blur(5px)';
+
 			var mapName	= mapConfigs[GAME.mapId].humanName;
 			document.querySelector('#gameStartOsd .mapName').innerHTML	= mapName
 			document.querySelector('#gameStartOsd').style.display	= 'block'
+			
+
 			playerControls.disable	= true
 			physicsWorld.stop()
 
@@ -442,6 +446,8 @@ require([ '../../threex.skymap/package.require.js'
 				next()
 			}, 1000)		
 		}).seq(function(next){
+			renderer.domElement.style.webkitFilter	= '';
+
 			document.querySelector('#gameStartOsd').style.display	= 'none'
 			yeller.dispatchEvent('spawnPlayer')
 		})
