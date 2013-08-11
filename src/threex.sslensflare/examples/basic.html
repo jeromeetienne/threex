@@ -45,8 +45,13 @@
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var mouse	= {x : 0, y : 0}
+	var controlsShift	= false
 	document.addEventListener('mousemove', function(event){
-		if(event.shiftKey === false) return
+		// first time the shift key is pressed, it enabled the 'non free' mode
+		// after that, shift key MUST be pressed to make the controls move
+		if(controlsShift && event.shiftKey === false) return
+		controlsShift	= controlsShift	|| event.shiftKey
+	
 		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
 	}, false)

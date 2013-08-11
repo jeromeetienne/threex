@@ -62,13 +62,14 @@ TODO
 ====
 * rotationZ for diffraction starburst
   * with a rotationZ based on camera position 
-* put blur params in dat.gui
 * blending formula is too complex
   * opacity for tDiffuse + lensScale ? 
 * in blendShader
   * dirtScale
   * stardustScale
   * diffuseScale
+* DONE put blur params in dat.gui
+* DONE preset 'lens only'
 
 * DONE downsampling first pass
   * how ?
