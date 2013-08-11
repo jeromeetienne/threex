@@ -1,5 +1,13 @@
 var THREEx	= THREEx	|| {}
 
+/**
+ * Do a screen space pseudo lens flare based on john chapman algo.
+ * For details see http://john-chapman-graphics.blogspot.fr/2013/02/pseudo-lens-flare.html
+ *
+ * @param  {THREE.WebGLRender}		renderer          instance of webgl renderer
+ * @param  {THREE.WebGLRenderTarget}	colorRenderTarget the render target containing color rendering
+ * @return {THREEx.SsLensFlare}		the instanced object
+ */
 THREEx.SsLensFlare	= function(renderer, colorRenderTarget){
 
 	var lensRenderTarget	= new THREE.WebGLRenderTarget(colorRenderTarget.width/2, colorRenderTarget.height/2, {
@@ -10,21 +18,22 @@ THREEx.SsLensFlare	= function(renderer, colorRenderTarget){
 	this.lensRenderTarget	= lensRenderTarget
 
 
-	var composer	= new THREE.EffectComposer(renderer, lensRenderTarget);
+	var composer	= new THREE.EffectComposer(renderer, lensRenderTarget)
+	this.composer	= composer
 
 	// copy color + downsample
-	var effect	= new THREE.TexturePass(colorRenderTarget);
-	composer.addPass( effect );
+	var effect	= new THREE.TexturePass(colorRenderTarget)
+	composer.addPass( effect )
 
 	// ThresholdShader
-	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.ThresholdShader);
-	composer.addPass( effect );
+	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.ThresholdShader)
+	composer.addPass( effect )
 	
 	// FeatureGenerationShader
-	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.FeatureGenerationShader);
-	effect.uniforms['tLensColor' ].value	= THREE.ImageUtils.loadTexture( "../images/lenscolor.png" );
+	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.FeatureGenerationShader)
+	effect.uniforms['tLensColor' ].value	= THREE.ImageUtils.loadTexture( "../images/lenscolor.png" )
 	effect.uniforms['textureSize' ].value.set(lensRenderTarget.width, lensRenderTarget.height)
-	composer.addPass( effect );	
+	composer.addPass( effect )
 
 	
 	// add HorizontalBlur Pass
@@ -47,8 +56,8 @@ THREEx.SsLensFlare	= function(renderer, colorRenderTarget){
 	effect.uniforms[ 'v' ].value	= 0.006
 	composer.addPass( effect )
 
-	this.update	= function(delta, now){
-		composer.render(delta);
+	this.render	= function(delta){
+		composer.render(delta)
 	}
 }
 
@@ -60,15 +69,15 @@ THREEx.SsLensFlare	= function(renderer, colorRenderTarget){
 
 THREEx.SsLensFlare.ThresholdShader = {
 	uniforms: {
-		tDiffuse	: { type : 't'	, value	: null },
-		uScale		: { type : 'v4'	, value	: new THREE.Vector4( 5, 5, 5, 1 ) },
-		uBias		: { type : 'v4'	, value	: new THREE.Vector4( -0.8, -0.8, -0.8, 0 ) },
+		tDiffuse: { type : 't'	, value	: null },
+		uScale	: { type : 'v4'	, value	: new THREE.Vector4( 5, 5, 5, 1 ) },
+		uBias	: { type : 'v4'	, value	: new THREE.Vector4( -0.8, -0.8, -0.8, 0 ) },
 
-		uScale		: { type : 'v4'	, value	: new THREE.Vector4( 10, 10, 10, 1 ) },
-		uBias		: { type : 'v4'	, value	: new THREE.Vector4( -0.9, -0.9, -0.9, 0 ) },
+		uScale	: { type : 'v4'	, value	: new THREE.Vector4( 10, 10, 10, 1 ) },
+		uBias	: { type : 'v4'	, value	: new THREE.Vector4( -0.9, -0.9, -0.9, 0 ) },
 
-		// uScale		: { type : 'v4'	, value	: new THREE.Vector4( 1, 1, 1, 1 ) },
-		// uBias		: { type : 'v4'	, value	: new THREE.Vector4( 0, 0, 0, 0 ) },
+		// uScale	: { type : 'v4'	, value	: new THREE.Vector4( 1, 1, 1, 1 ) },
+		// uBias	: { type : 'v4'	, value	: new THREE.Vector4( 0, 0, 0, 0 ) },
 	},
 	vertexShader	: [
 		'varying vec2 vUv;',
@@ -121,26 +130,26 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 		'uniform sampler2D tDiffuse;',
 		'uniform sampler2D tLensColor;',
 		
-		'varying vec2 vUv;',
+		'varying vec2	vUv;',
 
 		'uniform vec2	textureSize;',
 		'uniform int	uGhosts;',
 		'uniform float	uGhostDispersal;',
 
-		'uniform float uHaloWidth;',
-		'uniform float uDistortion;',
+		'uniform float	uHaloWidth;',
+		'uniform float	uDistortion;',
 
 		/*----------------------------------------------------------------------------*/
 		'vec4 textureDistorted(',
-		'	in sampler2D tex, ',
-		'	in vec2 texcoord, ',
-		'	in vec2 direction,',
-		'	in vec3 distortion ',
+		'	in sampler2D	texture,',
+		'	in vec2		uv,',
+		'	in vec2		direction,',
+		'	in vec3		distortion ',
 		') {',
 		'	return vec4(',
-		'		texture2D(tex, texcoord + direction * distortion.r).r,',
-		'		texture2D(tex, texcoord + direction * distortion.g).g,',
-		'		texture2D(tex, texcoord + direction * distortion.b).b,',
+		'		texture2D(texture, uv + direction * distortion.r).r,',
+		'		texture2D(texture, uv + direction * distortion.g).g,',
+		'		texture2D(texture, uv + direction * distortion.b).b,',
 		'		1.0',
 		'	);',
 		'}',
@@ -199,6 +208,8 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 THREEx.SsLensFlare.BlendShader = {
 	uniforms: {
 		scale		: { type : 'f'	, value	: 4 },
+		mixRatio	: { type : "f"  , value : 0.5 },
+		opacity		: { type : "f"  , value : 2.0 },
 		tDiffuse	: { type : 't'	, value	: null },
 		tLensDirt	: { type : 't'	, value	: null },
 		tLensStar	: { type : 't'	, value	: null },
@@ -219,20 +230,23 @@ THREEx.SsLensFlare.BlendShader = {
 		'uniform sampler2D tLensDirt;',
 		'uniform sampler2D tLensStar;',
 		'uniform sampler2D tLensColor;',
+
 		'uniform float	scale;',
-		'varying vec2 vUv;',
+		"uniform float	opacity;",
+		"uniform float	mixRatio;",
+
+		'varying vec2	vUv;',
 		
 		'void main() {',
 			'vec4 lensColor	= texture2D(tLensDirt, vUv);',
-
 			'lensColor	+= texture2D(tLensStar, vUv);',
-			
 			'lensColor	*= vec4(vec3(scale), 1.0);',
 
-			'vec4 lensFlare	= texture2D(tLensColor, vUv) * lensColor;',
 
-			'gl_FragColor	= texture2D(tDiffuse, vUv) + lensFlare;',
-			// 'gl_FragColor	= texture2D(tLensColor, vUv);',
+			'vec4 texelLens		= texture2D(tLensColor, vUv) * lensColor;',
+			'vec4 texelDiffuse	= texture2D(tDiffuse, vUv);',
+			'gl_FragColor		= opacity * mix(texelDiffuse, texelLens, mixRatio );',
+
 		'}'
 	].join('\n')
 };

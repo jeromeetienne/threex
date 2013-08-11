@@ -57,10 +57,18 @@ updateFcts.push(function(delta, now){
 	composer.render(delta);
 })	
 ```
+
 TODO
 ====
 * rotationZ for diffraction starburst
   * with a rotationZ based on camera position 
+* put blur params in dat.gui
+* blending formula is too complex
+  * opacity for tDiffuse + lensScale ? 
+* in blendShader
+  * dirtScale
+  * stardustScale
+  * diffuseScale
 
 * DONE downsampling first pass
   * how ?

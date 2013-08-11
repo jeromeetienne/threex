@@ -17,6 +17,11 @@
 
 <script src='../threex.sslensflare.js'></script>
 
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
+<script src='../threex.sslensflaredatgui.js'></script>
+
+<script src='../../../vendor/three.js/examples/js/controls/FirstPersonControls.js'></script>
+
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -41,6 +46,7 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	var mouse	= {x : 0, y : 0}
 	document.addEventListener('mousemove', function(event){
+		if(event.shiftKey === false) return
 		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
 	}, false)
@@ -49,7 +55,6 @@
 		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
 		camera.lookAt( scene.position )
 	})
-
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render Color							//
@@ -70,7 +75,7 @@
 
 	var ssLensFlare	= new THREEx.SsLensFlare(renderer, colorRenderTarget)
 	updateFcts.push(function(delta, now){
-		ssLensFlare.update(delta, now)
+		ssLensFlare.render(delta)
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -79,20 +84,25 @@
 	
 	var composer	= new THREE.EffectComposer(renderer);
 
-	// add Render Pass
+	// add Texture Pass
 	var effect	= new THREE.TexturePass(colorRenderTarget);
 	composer.addPass( effect );
 
-	// add blend with lensflare
-	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.BlendShader);
-	effect.uniforms['tLensDirt' ].value	= THREE.ImageUtils.loadTexture( "../images/lensdirt.png" )
-	effect.uniforms['tLensStar' ].value	= THREE.ImageUtils.loadTexture( "../images/lensstar.png" )
-	effect.uniforms['tLensColor' ].value	= ssLensFlare.lensRenderTarget
-	composer.addPass( effect );	
+	// add blend with lensRenderTarget 
+	// + a full-resolution texture of lens dirt
+	// + full resolution of lens startdust
+	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.BlendShader)
+	effect.uniforms['tLensDirt'].value	= THREE.ImageUtils.loadTexture('../images/lensdirt.png')
+	effect.uniforms['tLensStar'].value	= THREE.ImageUtils.loadTexture('../images/lensstar.png')
+	effect.uniforms['tLensColor'].value	= ssLensFlare.lensRenderTarget
+	composer.addPass(effect)
+
+	new THREEx.addSsLensFlare2DatGui(ssLensFlare, effect)
+
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
-	
+	// actually render it
 	updateFcts.push(function(delta, now){
 		composer.render(delta);
 	})	
