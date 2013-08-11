@@ -5,6 +5,7 @@
 <script src="../../../vendor/three.js/examples/js/postprocessing/RenderPass.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/ShaderPass.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/MaskPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/TexturePass.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/SavePass.js"></script>
 <script src="../../../vendor/three.js/examples/js/shaders/CopyShader.js"></script>
 <!-- includes for threex.glow -->
@@ -47,7 +48,7 @@
 		mesh.position.x	= (Math.random()-0.5)*2
 		mesh.position.y	= (Math.random()-0.5)*2
 		mesh.position.z	= (Math.random()-0.5)*2
-		// scene.add( mesh );	
+		//scene.add( mesh );	
 	}	
 })()
 		
@@ -210,6 +211,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 
 THREEx.SsLensFlare.BlendShader = {
 	uniforms: {
+		scale		: { type : 'f'	, value	: 10 },
 		tDiffuse	: { type : 't'	, value	: null },
 		tLensDirt	: { type : 't'	, value	: null },
 		tLensStar	: { type : 't'	, value	: null },
@@ -230,11 +232,16 @@ THREEx.SsLensFlare.BlendShader = {
 		'uniform sampler2D tLensDirt;',
 		'uniform sampler2D tLensStar;',
 		'uniform sampler2D tSource;',
+		'uniform float	scale;',
 		'varying vec2 vUv;',
+		
 		'void main() {',
 			'vec4 lensColor	= texture2D(tLensDirt, vUv);',
+
 			'lensColor	+= texture2D(tLensStar, vUv);',
-			'lensColor	*= vec4(vec3(10.0), 1.0);',
+			
+			'lensColor	*= vec4(vec3(scale), 1.0);',
+
 			'vec4 lensFlare	= texture2D(tDiffuse, vUv) * lensColor;',
 
 			'gl_FragColor	= texture2D(tSource, vUv) + lensFlare;',
@@ -246,88 +253,61 @@ THREEx.SsLensFlare.BlendShader = {
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 
-
-	var composer	= new THREE.EffectComposer(renderer);
-	// add Render Pass
-	var effect	= new THREE.RenderPass(scene, camera);
-	composer.addPass( effect );
-	
-
-
-	var renderTarget	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+	var colorRenderTarget	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
 		minFilter	: THREE.LinearFilter,
 		magFilter	: THREE.LinearFilter,
 		format		: THREE.RGBFormat,
 	});
-	var effect	= new THREE.SavePass(renderTarget);
+	updateFcts.push(function(){
+		renderer.render( scene, camera, colorRenderTarget );		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+;(function(){
+	var lensRenderTarget	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+		minFilter	: THREE.LinearFilter,
+		magFilter	: THREE.LinearFilter,
+		format		: THREE.RGBFormat,
+	});
+
+	var composer	= new THREE.EffectComposer(renderer, lensRenderTarget);
+	// add Render Pass
+	var effect	= new THREE.TexturePass(colorRenderTarget);
 	composer.addPass( effect );
 	
-
-	// add Blend Pass - to blend with glow.renderTarget
-	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.ThresholdShader);
-	composer.addPass( effect );	
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	
-	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.FeatureGenerationShader);
-	effect.uniforms['tLensColor' ].value	= THREE.ImageUtils.loadTexture( "../images/lenscolor.png" );
-	composer.addPass( effect );	
-
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		Blur								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-if( true ){
-	// configuration 
-	var blurHLevel	= 0.002
-	var blurVLevel	= 0.006
-
-	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-	effect.uniforms[ 'h' ].value	= blurHLevel 
+	var effect	= new THREE.ShaderPass( THREE.CopyShader )
 	composer.addPass( effect )
-	// add VerticalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-	effect.uniforms[ 'v' ].value	= blurVLevel
-	composer.addPass( effect )
-
-	// add HorizontalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
-	effect.uniforms[ 'h' ].value	= blurHLevel 
-	composer.addPass( effect )
-	// add VerticalBlur Pass
-	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
-	effect.uniforms[ 'v' ].value	= blurVLevel
-	composer.addPass( effect )
-	
-}
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-
-	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.BlendShader);
-	effect.uniforms['tLensDirt' ].value	= THREE.ImageUtils.loadTexture( "../images/lensdirt.png" )
-	effect.uniforms['tLensStar' ].value	= THREE.ImageUtils.loadTexture( "../images/lensstar.png" )
-	effect.uniforms['tSource' ].value	= renderTarget
-	composer.addPass( effect );	
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
 
 	updateFcts.push(function(delta, now){
 		composer.render(delta);
-	})
+	})	
+})()
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+;(function(){
+	var composer	= new THREE.EffectComposer(renderer);
+	// add Render Pass
+	var effect	= new THREE.TexturePass(colorRenderTarget);
+	composer.addPass( effect );
+	
+	var effect	= new THREE.ShaderPass( THREE.CopyShader )
+	composer.addPass( effect )
+
+	// mark the last pass as ```renderToScreen```
+	composer.passes[composer.passes.length-1].renderToScreen	= true;
+
+	updateFcts.push(function(delta, now){
+		composer.render(delta);
+	})	
+})()
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//

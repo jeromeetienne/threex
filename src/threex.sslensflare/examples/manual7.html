@@ -210,6 +210,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 
 THREEx.SsLensFlare.BlendShader = {
 	uniforms: {
+		scale		: { type : 'f'	, value	: 10 },
 		tDiffuse	: { type : 't'	, value	: null },
 		tLensDirt	: { type : 't'	, value	: null },
 		tLensStar	: { type : 't'	, value	: null },
@@ -230,11 +231,16 @@ THREEx.SsLensFlare.BlendShader = {
 		'uniform sampler2D tLensDirt;',
 		'uniform sampler2D tLensStar;',
 		'uniform sampler2D tSource;',
+		'uniform float	scale;',
 		'varying vec2 vUv;',
+		
 		'void main() {',
 			'vec4 lensColor	= texture2D(tLensDirt, vUv);',
+
 			'lensColor	+= texture2D(tLensStar, vUv);',
-			'lensColor	*= vec4(vec3(10.0), 1.0);',
+			
+			'lensColor	*= vec4(vec3(scale), 1.0);',
+
 			'vec4 lensFlare	= texture2D(tDiffuse, vUv) * lensColor;',
 
 			'gl_FragColor	= texture2D(tSource, vUv) + lensFlare;',

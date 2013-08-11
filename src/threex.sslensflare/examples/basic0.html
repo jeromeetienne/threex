@@ -28,14 +28,31 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
 	camera.position.z = 4;
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//		add skymap							//
-	//////////////////////////////////////////////////////////////////////////////////
-
 	THREEx.TextureCube.initWellKnownUrls('../../threex.skymap/')
 	var mesh	= THREEx.createSkymap('swedishroyalcastle')
+	// var mesh	= THREEx.createSkymap('mars')
+	// var mesh	= THREEx.createSkymap('skybox')
 	scene.add( mesh );
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+;(function(){
+	for(var i = 0; i < 20; i++){
+		var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+		var material	= new THREE.MeshNormalMaterial();
+		var material	= new THREE.MeshBasicMaterial({
+			color	: 'white'
+		});
+		var mesh	= new THREE.Mesh( geometry, material );
+		mesh.scale.multiplyScalar(1/10)
+		mesh.position.x	= (Math.random()-0.5)*2
+		mesh.position.y	= (Math.random()-0.5)*2
+		mesh.position.z	= (Math.random()-0.5)*2
+		//scene.add( mesh );	
+	}	
+})()
+		
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -51,9 +68,9 @@
 	})
 
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//		render Color							//
-	//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
 
 	var colorRenderTarget	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
 		minFilter	: THREE.LinearFilter,
@@ -65,18 +82,62 @@
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		render ssLensFlare						//
-	//////////////////////////////////////////////////////////////////////////////////
-
-	var ssLensFlare	= new THREEx.SsLensFlare(renderer, colorRenderTarget)
-	updateFcts.push(function(delta, now){
-		ssLensFlare.update(delta, now)
-	})
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		blend Color with ssLensFlare					//
+	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
+	var lensRenderTarget	= new THREE.WebGLRenderTarget(colorRenderTarget.width/2, colorRenderTarget.height/2, {
+		minFilter	: THREE.LinearFilter,
+		magFilter	: THREE.LinearFilter,
+		format		: THREE.RGBFormat,
+	});
+;(function(){
+
+	var composer	= new THREE.EffectComposer(renderer, lensRenderTarget);
+
+	// copy color + downsample
+	var effect	= new THREE.TexturePass(colorRenderTarget);
+	composer.addPass( effect );
+
+	// ThresholdShader
+	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.ThresholdShader);
+	composer.addPass( effect );
+	
+	// FeatureGenerationShader
+	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.FeatureGenerationShader);
+	effect.uniforms['tLensColor' ].value	= THREE.ImageUtils.loadTexture( "../images/lenscolor.png" );
+	composer.addPass( effect );	
+
+	
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+	effect.uniforms[ 'h' ].value	= 0.002 
+	composer.addPass( effect )
+
+	// add VerticalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+	effect.uniforms[ 'v' ].value	= 0.006
+	composer.addPass( effect )
+
+	// add HorizontalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.HorizontalBlurShader )
+	effect.uniforms[ 'h' ].value	= 0.002 
+	composer.addPass( effect )
+
+	// add VerticalBlur Pass
+	var effect	= new THREE.ShaderPass( THREE.VerticalBlurShader )
+	effect.uniforms[ 'v' ].value	= 0.006
+	composer.addPass( effect )
+
+	updateFcts.push(function(delta, now){
+		composer.render(delta);
+	})	
+})()
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+;(function(){
 	var composer	= new THREE.EffectComposer(renderer);
 
 	// add Render Pass
@@ -87,16 +148,23 @@
 	var effect	= new THREE.ShaderPass(THREEx.SsLensFlare.BlendShader);
 	effect.uniforms['tLensDirt' ].value	= THREE.ImageUtils.loadTexture( "../images/lensdirt.png" )
 	effect.uniforms['tLensStar' ].value	= THREE.ImageUtils.loadTexture( "../images/lensstar.png" )
-	effect.uniforms['tLensColor' ].value	= ssLensFlare.lensRenderTarget
+	effect.uniforms['tLensColor' ].value	= lensRenderTarget
 	composer.addPass( effect );	
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
-	
+
 	updateFcts.push(function(delta, now){
 		composer.render(delta);
 	})	
+})()
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	// updateFcts.push(function(){
+	// 	renderer.render( scene, camera );		
+	// })
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loop runner							//

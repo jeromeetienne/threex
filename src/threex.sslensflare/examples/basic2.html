@@ -28,14 +28,31 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
 	camera.position.z = 4;
 
-	//////////////////////////////////////////////////////////////////////////////////
-	//		add skymap							//
-	//////////////////////////////////////////////////////////////////////////////////
-
 	THREEx.TextureCube.initWellKnownUrls('../../threex.skymap/')
 	var mesh	= THREEx.createSkymap('swedishroyalcastle')
+	// var mesh	= THREEx.createSkymap('mars')
+	// var mesh	= THREEx.createSkymap('skybox')
 	scene.add( mesh );
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+;(function(){
+	for(var i = 0; i < 20; i++){
+		var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+		var material	= new THREE.MeshNormalMaterial();
+		var material	= new THREE.MeshBasicMaterial({
+			color	: 'white'
+		});
+		var mesh	= new THREE.Mesh( geometry, material );
+		mesh.scale.multiplyScalar(1/10)
+		mesh.position.x	= (Math.random()-0.5)*2
+		mesh.position.y	= (Math.random()-0.5)*2
+		mesh.position.z	= (Math.random()-0.5)*2
+		//scene.add( mesh );	
+	}	
+})()
+		
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -68,6 +85,7 @@
 	//		render ssLensFlare						//
 	//////////////////////////////////////////////////////////////////////////////////
 
+
 	var ssLensFlare	= new THREEx.SsLensFlare(renderer, colorRenderTarget)
 	updateFcts.push(function(delta, now){
 		ssLensFlare.update(delta, now)
@@ -77,6 +95,7 @@
 	//		blend Color with ssLensFlare					//
 	//////////////////////////////////////////////////////////////////////////////////
 	
+;(function(){
 	var composer	= new THREE.EffectComposer(renderer);
 
 	// add Render Pass
@@ -92,11 +111,18 @@
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
-	
+
 	updateFcts.push(function(delta, now){
 		composer.render(delta);
 	})	
+})()
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	// updateFcts.push(function(){
+	// 	renderer.render( scene, camera );		
+	// })
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		loop runner							//
