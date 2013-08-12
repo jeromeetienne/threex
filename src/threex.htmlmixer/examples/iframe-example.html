@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
+<script src='../threex.htmlmixer.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
+	camera.position.z = 2;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	// var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	// var material	= new THREE.MeshNormalMaterial();
+	// var mesh	= new THREE.Mesh( geometry, material );
+	// scene.add( mesh );
+	
+	// updateFcts.push(function(delta, now){
+	// 	// mesh.rotation.x += 1 * delta;
+	// 	// mesh.rotation.y += 2 * delta;		
+	// })
+
+	var htmlmixer	= new THREEx.Htmlmixer(renderer, scene, camera)
+	updateFcts.push(function(delta, now){
+		htmlmixer.update(delta, now)
+	})
+	
+;(function(){	
+	var url		= '../../../../index.html';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url)
+	scene.add(mixerPlane.object3d)
+	updateFcts.push(function(delta, now){
+		mixerPlane.object3d.rotation.y += Math.PI * 2 * delta * 0.1;
+	})
+})()
+
+	
+;(function(){	
+return;
+	var url		= 'http://player.vimeo.com/video/14641555?portrait=0&color=333';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url)
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = 1;
+})()
+
+;(function(){	
+return
+	var url		= 'http:////www.youtube.com/embed/1Dfj0xuGuhM?webm=1&html5=1';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url)
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+return
+	var url		= 'http://i.imgur.com/RJQc7Qy.gif';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromImage(htmlmixer, url)
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+return;
+	var content	= '<a href="http://imgur.com/RJQc7Qy"><img width="100%" src="http://i.imgur.com/RJQc7Qy.gif" title="Hosted by imgur.com" /></a>';
+	var url		= "data:text/html;base64,"+window.btoa(content);
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url)
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url)
+	var mixerPlane	= new THREEx.Htmlmixer.Plane(htmlmixer, domElement)
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+return
+	var url		= 'http://threejs.org/';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url)
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = 1;
+})()
+
+;(function(){
+// return;
+	var url		= 'http://githubbadge.appspot.com/badge/jeromeetienne';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url, {
+		elementW	: 200
+	})
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = 1;
+})()
+
+
+
+;(function(){	
+return
+	var url		= 'http://127.0.0.1:8000/src/threex.htmlmixer/examples/twitteriframe.html';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url, {
+		elementW	: 512
+	})
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+return
+	var url		= 'http://www.dailymotion.com/embed/video/x12pd0r_betisier-ce-qui-se-passe-entre-les-prises_fun?html=1';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url, {
+		elementW	: 512
+	})
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+return
+	var url		= 'http://embed.ted.com/talks/derek_paravicini_and_adam_ockelford_in_the_key_of_genius.html';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url, {
+		elementW	: 512
+	})
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+return
+	var url		= 'http://blip.tv/play/AYOT%2BBUC.x?p=1';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url, {
+		elementW	: 512
+	})
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+// return
+	var url		= 'http://instagram.com/p/b7dRvqnUxT/embed/';
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url, {
+		elementW	: 512
+	})
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+;(function(){	
+return
+	var content	= [
+		'<html><body>',
+			'<blockquote class="twitter-tweet"><p>im working on screen space lens flare.. and i found hal :) <a href="http://t.co/Rmwgbm2Lxu">http://t.co/Rmwgbm2Lxu</a> <a href="http://t.co/s9LNMOymws">pic.twitter.com/s9LNMOymws</a></p>&mdash; Jerome Etienne (@jerome_etienne) <a href="https://twitter.com/jerome_etienne/statuses/366299880697757696">August 10, 2013</a></blockquote>',
+		'	<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"><\/script>',
+		'</body></html>',
+	].join('\n');
+	var url		= "data:text/html;base64,"+window.btoa(content);
+	var mixerPlane	= THREEx.Htmlmixer.createPlaneFromIframe(htmlmixer, url)
+	var object3d	= mixerPlane.object3d
+	scene.add(object3d)
+	object3d.position.x = -1;
+})()
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
