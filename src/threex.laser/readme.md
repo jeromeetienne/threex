@@ -1,5 +1,5 @@
-TODO
-====
+IDEAS
+=====
 * make light vary random for realism
 * leave a mark on the wall
   * multimaterialobejct
