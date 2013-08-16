@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<script src='vendor/three.js/build/three.min.js'></script>
+<script src='../vendor/cannon.js/build/cannon.min.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+	var geometry	= new THREE.SphereGeometry( 1 );
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+
+/**
+ * Find a good API
+ * 
+ */
+// THREEx.CannonBodyFromMesh(mesh)
+	
+	// physics world init
+	var physicsWorld	= new CANNON.World()
+	physicsWorld.broadphase	= new CANNON.NaiveBroadphase()
+	physicsWorld.gravity.set(0,0,0)
+	physicsWorld.solver.iterations = 10
+	// update world
+	var period	= 1/60
+	setInterval(function(){
+        	physicsWorld.step(period);		
+	}, period*1000)
+
+	// create the body for this object3d	
+	var radius	= 1
+	var shape	= new CANNON.Sphere(radius)
+	var mass	= 1
+	var body	= new CANNON.RigidBody(mass, shape)
+
+	updateFcts.push(function(delta, now){
+		body.position.copy(mesh.position);
+		body.quaternion.copy(mesh.quaternion);
+	});
+	physicsWorld.add(body);
+	
+	body.angularVelocity.set(0,2,0);
+	body.angularDamping	= 0.5;
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

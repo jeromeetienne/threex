@@ -1,0 +1,3 @@
+define( [ './threex.windowresize',
+	], function(){
+});

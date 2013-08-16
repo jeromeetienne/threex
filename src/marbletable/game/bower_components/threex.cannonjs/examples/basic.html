@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<script>
+console.warn = console.error
+</script>
+<script src='vendor/three.js/build/three.min.js'></script>
+<script src='../vendor/cannon.js/build/cannon.min.js'></script>
+<script src='../threex.cannonworld.js'></script>
+<script src='../threex.cannonbody.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 3;
+
+	var worldx	= new THREEx.CannonWorld().start();
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var stoneMaterial	= new CANNON.Material('stone');
+	worldx.world.addContactMaterial(new CANNON.ContactMaterial(
+		stoneMaterial,
+		stoneMaterial,
+		0.3,	// friction
+		0.1	// Restitution
+	))
+
+;(function(){
+	var geometry	= new THREE.SphereGeometry(0.5)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh(geometry, material)
+	mesh.position.y	= 3
+	mesh.name	= 'ball'
+	scene.add( mesh )
+	var bodyx	= new THREEx.CannonBody({
+		mesh	: mesh,
+		material: stoneMaterial,
+	}).addTo(worldx)
+	updateFcts.push(function(delta, now){
+		bodyx.update(delta, now)
+	})
+
+	bodyx.body.angularVelocity.set(0,0,20)
+
+//	bodyx.body.angularDamping	= 0.0;
+//	bodyx.body.linearDamping	= 0.0;
+})()
+
+;(function(){
+	var geometry	= new THREE.CubeGeometry(10, 0.1, 10);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh(geometry, material);
+	mesh.position.y	= -1
+	mesh.position.z	= -3
+	scene.add( mesh );
+	// init physics
+	var bodyx	= new THREEx.CannonBody({
+		mesh	: mesh,
+		material: stoneMaterial,
+		mass	: 0
+	}).addTo(worldx)
+	updateFcts.push(function(delta, now){
+		bodyx.update(delta, now)
+	});	
+})()	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

@@ -1,0 +1,12 @@
+{
+  "name": "threex.windowresize",
+  "homepage": "https://github.com/jeromeetienne/threex.windowresize",
+  "_release": "98e05ece0d",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "98e05ece0de1cc0473268d563b89c0c01f1d54ae"
+  },
+  "_source": "git://github.com/jeromeetienne/threex.windowresize.git",
+  "_target": "*"
+}

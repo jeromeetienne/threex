@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>cannon.js - convex hull demo</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css" type="text/css"/>
+  </head>
+  <body>
+    <script src="../build/cannon.js"></script>
+    <script src="../build/cannon.demo.js"></script>
+    <script src="../libs/dat.gui.js"></script>
+    <script src="../libs/Three.js"></script>
+    <script src="../libs/Detector.js"></script>
+    <script src="../libs/Stats.js"></script>
+    <script src="../libs/smoothie.js"></script>
+    <script>
+
+      /**
+       * Experiment for testing ConvexPolyhedrons.
+       */
+      var demo = new CANNON.Demo();
+      
+      function createTetra(){
+            var verts = [new CANNON.Vec3(0,0,0),
+                         new CANNON.Vec3(2,0,0),
+                         new CANNON.Vec3(0,2,0),
+                         new CANNON.Vec3(0,0,2)];
+            var offset = -0.35;
+            for(var i=0; i<verts.length; i++){
+                var v = verts[i];
+                v.x += offset;
+                v.y += offset;
+                v.z += offset;
+            }
+            return new CANNON.ConvexPolyhedron(verts,
+                                                [
+                                                    [0,3,2], // -x
+                                                    [0,1,3], // -y
+                                                    [0,2,1], // -z
+                                                    [1,2,3], // +xyz
+                                                ],
+                                                [new CANNON.Vec3(-1, 0, 0),
+                                                 new CANNON.Vec3( 0,-1, 0),
+                                                 new CANNON.Vec3( 0, 0,-1),
+                                                 new CANNON.Vec3( 1, 1, 1)]);
+      }
+
+      function createBoxPolyhedron(size){
+          size = size || 1;
+          var vertices = [new CANNON.Vec3(-size,-size,-size),
+                          new CANNON.Vec3( size,-size,-size),
+                          new CANNON.Vec3( size, size,-size),
+                          new CANNON.Vec3(-size, size,-size),
+                          new CANNON.Vec3(-size,-size, size),
+                          new CANNON.Vec3( size,-size, size),
+                          new CANNON.Vec3( size, size, size),
+                          new CANNON.Vec3(-size, size, size)];
+          var faces =[[3,2,1,0], // -z
+                      [4,5,6,7], // +z
+                      [5,4,1,0], // -y
+                      [2,3,6,7], // +y
+                      [0,4,7,3 /*0,3,4,7*/ ], // -x
+                      [1,2,5,6], // +x
+                      ];
+          var faceNormals =   [new CANNON.Vec3( 0, 0,-1),
+                               new CANNON.Vec3( 0, 0, 1),
+                               new CANNON.Vec3( 0,-1, 0),
+                               new CANNON.Vec3( 0, 1, 0),
+                               new CANNON.Vec3(-1, 0, 0),
+                               new CANNON.Vec3( 1, 0, 0)];
+          var boxShape = new CANNON.ConvexPolyhedron(vertices,
+                                                     faces,
+                                                     faceNormals);
+          return boxShape;
+      }
+
+      // Just 1 box on a plane
+      demo.addScene("Hull on plane",function(){
+          var world = setupWorld(demo);
+          // ConvexPolyhedron box shape
+          var size = 2;
+          var hullShape = createBoxPolyhedron(size);
+          // At the moment one must provide vertices, faces and normals..
+          var mass = 10;
+          var boxbody1 = new CANNON.RigidBody(mass,hullShape);
+          boxbody1.position.set(0,0,size*2);
+          boxbody1.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0),Math.PI/4);
+          world.add(boxbody1);
+          demo.addVisual(boxbody1);
+        });
+      
+      
+
+      // Various shapes
+      demo.addScene("various",function(){
+          var world = setupWorld(demo);
+          // ConvexPolyhedron box shape
+          var size = 0.5;
+          var hullShape = createBoxPolyhedron(size);
+          var mass = 10;
+          var boxbody = new CANNON.RigidBody(mass,hullShape);
+          boxbody.position.set(1,0,size+1);
+          world.add(boxbody);
+          demo.addVisual(boxbody);
+      
+          // ConvexPolyhedron tetra shape
+          var tetraShape = createTetra();
+          var tetraBody = new CANNON.RigidBody(mass,tetraShape);
+          tetraBody.position.set(5,-3,size+1);
+          world.add(tetraBody);
+          demo.addVisual(tetraBody);
+      
+          // ConvexPolyhedron cylinder shape
+          // Yes, the Cylinder is actually a ConvexPolyhedron.
+          var num = 20;
+          var verts = [];
+          var normals = [];
+          var faces = [];
+          var bottomface = [];
+          var topface = [];
+          var L = 2, R = 0.5;
+          var cylinderShape = new CANNON.Cylinder(R,R,L,num);
+          var cylinderBody = new CANNON.RigidBody(mass,cylinderShape);
+          cylinderBody.position.set(0,0,size*4+1);
+          cylinderBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0),Math.PI/3);
+          world.add(cylinderBody);
+          demo.addVisual(cylinderBody);
+      
+        });
+
+
+      // Box on box tilting over
+      demo.addScene("Hull on hull",function(){
+          var world = setupWorld(demo);
+          // ConvexPolyhedron box shape
+          var size = 2;
+          var hullShape = createBoxPolyhedron(size);
+          var mass = 10;
+          var boxbody1 = new CANNON.RigidBody(mass,hullShape);
+          var boxbody2 = new CANNON.RigidBody(mass,hullShape);
+          boxbody1.position.set(0,0,size+1);
+          boxbody2.position.set(1.5,0,4*size+1);
+          world.add(boxbody1);
+          world.add(boxbody2);
+          demo.addVisual(boxbody1);
+          demo.addVisual(boxbody2);
+        });
+      
+      // Pile of boxes
+      demo.addScene("Hull wall",function(){
+          var world = setupWorld(demo);
+          // ConvexPolyhedron box shape
+          var size = 1;
+          var hullShape = createBoxPolyhedron(size);
+          var mass = 10;
+          for(var i=0; i<3; i++){
+          for(var j=0; j<3; j++){
+              var boxbody = new CANNON.RigidBody(mass,hullShape);
+              boxbody.position.set(2*size*i+0.01,0,2*size*j + size*1.2);
+              world.add(boxbody);
+              demo.addVisual(boxbody);
+          }
+          }
+        });
+            
+      function setupWorld(demo){
+        var world = demo.getWorld();
+        world.gravity.set(0,0,-30);
+        world.broadphase = new CANNON.NaiveBroadphase();
+        world.solver.iterations = 10;
+
+        world.defaultContactMaterial.contactEquationStiffness = 5e6;
+        world.defaultContactMaterial.contactEquationRegularizationTime = 3;
+
+        // ground plane
+        var n = new CANNON.Vec3(0,0,1);
+        n.normalize();
+        var groundShape = new CANNON.Plane(n);
+        var groundBody = new CANNON.RigidBody(0,groundShape);
+        groundBody.position.set(-10,0,0);
+        world.add(groundBody);
+        demo.addVisual(groundBody);
+      
+        return world;
+      };
+      
+      demo.start();
+      
+    </script>
+  </body>
+</html>

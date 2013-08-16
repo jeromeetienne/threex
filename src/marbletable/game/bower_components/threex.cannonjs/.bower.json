@@ -1,0 +1,12 @@
+{
+  "name": "threex.cannonjs",
+  "homepage": "https://github.com/jeromeetienne/threex.cannonjs",
+  "_release": "994e12a146",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "994e12a146f5626fb0c5d5e26e58bda4306e0a81"
+  },
+  "_source": "git://github.com/jeromeetienne/threex.cannonjs.git",
+  "_target": "*"
+}
