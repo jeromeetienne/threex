@@ -16,6 +16,16 @@ var Player	= function(opts){
 		// var texture	= THREEx.createPoolBall.ballTexture('0', true, "#ffffff", opts.textureW);
 		return texture
 	})
+	var material		= opts.material || cache.getSet('player.material', function(){
+		var texture	= THREEx.createPoolBall.ballTexture('9', true, "#FDD017", 1024);
+		var material	= new THREE.MeshPhongMaterial({
+			map		: texture,
+			bumpMap		: texture,
+			bumpScale	: 0.02,
+		})
+		return material
+	})
+
 	// handle updateFcts for sounds
 	var updateFcts	= [];
 	this.update	= function(delta, now){
@@ -24,21 +34,13 @@ var Player	= function(opts){
 		})
 	}
 
-	var radius	= 1.5 * GAME.tileW
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 
+	var radius	= 1.5 * GAME.tileW
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
-	var material	= new THREE.MeshPhongMaterial({
-		map	: texture,
-		bumpMap	: texture,
-		bumpScale: 0.02,
-		// color	: 'cyan',
-	})
-	// var material	= new THREE.MeshPhongMaterial({
-	// 	color	: 'silver',
-	// 	metal	: true,
-	// 	shininess: 150,
-	// 	opacity	: 0.1,
-	// })
 	var mesh	= new THREE.Mesh(geometry, material)
 	this.mesh	= mesh
 
@@ -49,6 +51,11 @@ var Player	= function(opts){
 
 	mesh.name	= (mesh.name || ' ') + 'player ';
 
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: mesh,
 		material: pMaterialPlayer,
@@ -58,7 +65,7 @@ var Player	= function(opts){
 	})
 
 	// to get a mirror ball
-	if( opts.liveMirror && false ){
+	if( opts.liveMirror ){
 		// create the camera
 		var cubeCamera	= new THREE.CubeCamera( 0.001, 1000, 512 );
 		scene.add( cubeCamera )

@@ -55,14 +55,18 @@ console.warn = console.error
 <script src='js/player.js'></script>
 <script src='js/botenemy.js'></script>
 <script src='js/botball.js'></script>
+<script src='js/botball2.js'></script>
 <script src='js/botbouncer.js'></script>
 <script src='js/botgoal.js'></script>
 <script src='js/playercontrols.js'></script>
+
 <script src='js/maptable.js'></script>
+<script src='js/map-sport-1.js'></script>
 <script src='js/map01.js'></script>
 <script src='js/map02.js'></script>
 <script src='js/map03.js'></script>
 <script src='js/map04.js'></script>
+
 <script src='js/renderingprofile.js'></script>
 <script src='js/threex.smoothholdercontrols.js'></script>
 <script src='js/threex.lingeringcontrols.js'></script>
@@ -161,24 +165,33 @@ require([ '../../threex.skymap/package.require.js'
 	GAME.profile	= new RenderingProfile(onMobile ? 'mobile' : 'normal')
 
 	var mapConfigs	= {
+		'sport-1'	: {
+			humanName	: 'Sport Round 1',
+			constructor	: MapSport1,
+		}, 
 		'01'	: {
-			humanName	: 'Dev'
+			humanName	: 'Dev',
+			constructor	: Map01,
 		}, 
 		'02'	: {
-			humanName	: 'Planets'
+			humanName	: 'Planets',
+			constructor	: Map02,
 		}, 
 		'03'	: {
-			humanName	: 'Pool'
+			humanName	: 'Pool',
+			constructor	: Map03,
 		}, 
 		'04'	: {
-			humanName	: 'Sport'
+			humanName	: 'Sport',
+			constructor	: Map04,
 		},
 	};
 
 	var mapIds	= Object.keys(mapConfigs)
-	GAME.mapId	= location.hash ? location.hash.substr(1) : '01'
-	if( sessionStorage.getItem('nextMapId') !== GAME.mapId && GAME.mapId !== '01' ){
-		console.error('nextMapId is', sessionStorage.getItem('nextMapId'), 'and should be', GAME.mapId, 'Should reset to map 01')
+	var firstMapId	= Object.keys(mapConfigs)[0]
+	GAME.mapId	= location.hash ? location.hash.substr(1) : firstMapId
+	if( sessionStorage.getItem('nextMapId') !== GAME.mapId && GAME.mapId !== firstMapId ){
+		console.error('nextMapId is', sessionStorage.getItem('nextMapId'), 'and should be', GAME.mapId, 'Should reset to map', firstMapId)
 		// // put nextMapId in location
 		// location.href	= './#'+'01'
 		// // reload the page				
@@ -632,16 +645,9 @@ require([ '../../threex.skymap/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-
-	if( GAME.mapId === '01' ){
-		var map		= new Map01()
-	}else if( GAME.mapId === '02' ){
-		var map		= new Map02()
-	}else if( GAME.mapId === '03' ){
-		var map		= new Map03()
-	}else if( GAME.mapId === '04' ){
-		var map		= new Map04()
-	}else	console.assert(false)
+	
+	console.assert(mapConfigs[GAME.mapId].constructor)
+	var map	= new mapConfigs[GAME.mapId].constructor()
 	scene.add(map.object3d)
 	updateFcts.push(function(delta, now){
 		map.update(delta, now);		

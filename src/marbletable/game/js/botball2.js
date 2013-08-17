@@ -1,12 +1,14 @@
-var BotBall	= function(opts){
+var BotBall2	= function(opts){
 	opts	= opts	|| {}
 	var ballAttraction	= opts.ballAttraction !== undefined ? opts.ballAttraction : 0.1
-	var texture	= opts.texture || cache.getSet('texture.botball', function(){
+	var material		= opts.material || cache.getSet('botball.material', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg');
-		var texture	= THREE.ImageUtils.loadTexture('images/sports/Footballrealisticsmall.jpgf0067587-1f18-410c-8650-63532bd9370fLarge.jpg')
-		var texture	= THREE.ImageUtils.loadTexture('images/sports/Footballballfree.jpg59a2a1dc-64c8-4bc3-83ef-1257c9147fd1Large.jpg')
-		var texture	= THREE.ImageUtils.loadTexture('images/sports/Basketball texture small.jpgb0270bdb-8751-473f-86c6-0c72ca7480b9Large.jpg')
-		return texture
+		var material	= new THREE.MeshPhongMaterial({
+			map	: texture,
+			// bumpMap	: texture,
+			// bumpScale: 0.05,
+		})
+		return material
 	})
 	
 	// handle updateFcts for sounds
@@ -16,22 +18,25 @@ var BotBall	= function(opts){
 			updateFct(delta, now)
 		})
 	}
-	// create THREE.Object3d
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		create THREE.Object3D						//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	var radius	= 1.5 * GAME.tileW
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
-	var material	= new THREE.MeshPhongMaterial({
-		map	: texture,
-		// bumpMap	: texture,
-		// bumpScale: 0.05,
-	})
 	var object3d	= new THREE.Mesh(geometry, material)
 	this.object3d	= object3d
 	object3d.name	= (object3d.name || ' ') + 'ball ';
-
 	object3d.receiveShadow	= true
 	object3d.castShadow	= true
 	scene.add( object3d )
 
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add physics							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	var bodyx	= new THREEx.CannonBody({
 		mesh	: object3d,
 		material: pMaterialEnemy,
@@ -89,17 +94,7 @@ var BotBall	= function(opts){
 		// emit a sound
 		sounds.playExplosion()
 
-		// scorePoints based on ballIntensity.intensity()
-		var scorePoints	= 10;
-		if( ballIntensity.intensity() < 0.3){
-			var scorePoints	= 100;
-		}else if( ballIntensity.intensity() < 0.6){
-			var scorePoints	= 200;
-		}else if( ballIntensity.intensity() < 0.85){
-			var scorePoints	= 600;
-		}else{
-			var scorePoints	= 1000;
-		}
+		var scorePoints	= 1000;
 		// increase score
 		yeller.dispatchEvent('increaseScore', scorePoints)
 		// emit a score
@@ -117,27 +112,5 @@ var BotBall	= function(opts){
 	this.destroy	= function(){
 		physicsWorld.bodiesToRemove.push(body)
 		scene.remove( object3d )
-		scene.remove( ballIntensity.object3d )
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	var ballIntensity	= new JuiceIntensityBall();	
-	scene.add( ballIntensity.object3d )
-	updateFcts.push(function(delta, now){
-		ballIntensity.update(delta, now)
-	})
-	updateFcts.push(function(delta, now){
-		ballIntensity.object3d.position.copy(object3d.position)
-	})
-	
-	// kill player if touching the goal
-	body.addEventListener("collide",function(event){
-		var collidedObj	= event.with.userData.object3d
-		var isPlayer	= / player /.test(collidedObj.name) ? true : false
-		if( !isPlayer )	return
-		ballIntensity.intensity( ballIntensity.intensity() + 0.1 )
-	})
 }

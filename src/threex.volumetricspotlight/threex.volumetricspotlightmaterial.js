@@ -52,32 +52,23 @@ THREEx.VolumetricSpotLightMaterial	= function(opts){
 
 		'uniform float 		cameraNear;',
 		'uniform float 		cameraFar;',
-		
+
 		'#ifdef DEPTH_R8G8B8A8',
+
 			// from THREE.ShaderLib['depthRGBA']
-			// "float unpackDepth( const in vec4 rgba_depth ) {",
-			// 	"const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
-			// 	"float depth = dot( rgba_depth, bit_shift );",
-			// 	"return depth;",
-			// "}",
-			// "vec4 pack_depth( const in float depth ) {",
-			// 	"const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
-			// 	"const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
-			// 	"vec4 res = fract( depth * bit_shift );",
-			// 	"res -= res.xxyz * bit_mask;",
-			// 	"return res;",
-			// "}",
-	
-			// packing formula from http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
-			'float unpackDepth( vec4 rgba ) {',
-			'	return dot( rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/160581375.0) );',
-			'}',
-			'vec4 pack_depth( float v ) {',
-			'	vec4 enc = vec4(1.0, 255.0, 65025.0, 160581375.0) * v;',
-			'	enc = fract(enc);',
-			'	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);',
-			'	return enc;',
-			'}',
+			"float unpackDepth( const in vec4 rgba_depth ) {",
+				"const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );",
+				"float depth = dot( rgba_depth, bit_shift );",
+				"return depth;",
+			"}",
+
+			"vec4 pack_depth( const in float depth ) {",
+				"const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
+				"const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+				"vec4 res = fract( depth * bit_shift );",
+				"res -= res.xxyz * bit_mask;",
+				"return res;",
+			"}",
 		'#endif',
 
 
@@ -110,7 +101,7 @@ THREEx.VolumetricSpotLightMaterial	= function(opts){
 				'fragDepth		= 1.0 - smoothstep(cameraNear, cameraFar, fragDepth);',
 	
 				'float deltaDepth	= abs(sceneDepth-fragDepth)*edgeScale;',
-				// 'gl_FragColor	= vec4(vec3(sceneDepth), 1.0);',
+				'gl_FragColor	= vec4(vec3(sceneDepth), 1.0);',
 			'#endif',
 
 			// for depth packed in texel
@@ -127,29 +118,53 @@ THREEx.VolumetricSpotLightMaterial	= function(opts){
 
 				// 'gl_FragColor	= vec4( vec3(fragDepth), 0.5);',
 
-
 				'float sceneDepth	= unpackDepth( texture2D( tDepth, depthUV ) );',
+
 				'float fragDepth	= gl_FragCoord.z / gl_FragCoord.w;',
 				'fragDepth		= 1.0 - smoothstep(cameraNear, cameraFar, fragDepth);',
-	
+
 				'float deltaDepth	= abs(sceneDepth-fragDepth)*edgeScale;',
 
-			// 'gl_FragColor	= vec4(vec3(sceneDepth), 1.0);',
-			// 'gl_FragColor	= vec4(vec3(texture2D( tDepth, depthUV ).x), 1.0);',
-			// 'gl_FragColor	= vec4(vec3(unpackDepth(texture2D( tDepth, depthUV ))), 1.0);',
-			// 'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+
+				'gl_FragColor		= vec4(vec3(texture2D(tDepth, depthUV).r), 1.0);',
+				// 'gl_FragColor		= vec4(vec3(0.0), 1.0);',
+				// 'gl_FragColor		= vec4(vec3(texture2D(tDepth, depthUV)), 1.0);',
+
+				// 'sceneDepth	= unpackDepth(texture2D(tDepth, depthUV));',
+				// 'gl_FragColor	= vec4(vec3(sceneDepth), 1.0);',
+
+				// 'if( abs(sceneDepth - 1.0) <= 0.01 ){',
+				// 	'gl_FragColor	= vec4(vec3(0.5), 1.0);',
+				// '}else{',
+				// 	'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+				// '}',
+
+				// 'gl_FragColor	= vec4(vec3(texture2D( tDepth, depthUV ).x), 1.0);',
+				// 'gl_FragColor	= vec4(vec3(unpackDepth(texture2D( tDepth, depthUV ))), 1.0);',
+				// 'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+
+				// 'if( unpackDepth(texture2D( tDepth, depthUV )) - 0.2 < 0.01 ){',
+				// 	'gl_FragColor	= vec4(vec3(0.0, 1.0, 0.0), 1.0);',
+				// '}else{',
+				// 	'gl_FragColor	= vec4(vec3(1.0, 0.0, 0.0), 1.0);',
+				// '}',
 
 				// 'if( texture2D( tDepth, depthUV ).x - 0.2 < 0.01 ){',
-				// 	'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+				// 	'gl_FragColor	= vec4(vec3(0.0, 1.0, 0.0), 1.0);',
 				// '}else{',
-				// 	'gl_FragColor	= vec4(vec3(0.2), 1.0);',
+				// 	'gl_FragColor	= vec4(vec3(1.0, 0.0, 0.0), 1.0);',
 				// '}',
 
-				// 'if(unpackDepth(pack_depth(2.0)) - 2.0 < 0.01 ){',
-				// 	'gl_FragColor	= vec4(vec3(1.0), 1.0);',
+				// // test that pack_depth and unpackDepth works
+				// 'float originalDepth	= 0.6;',
+				// 'vec4 packedDepth	= pack_depth(originalDepth);',
+				// 'float unpackedDepth	= unpackDepth(packedDepth);',
+				// 'if( unpackedDepth == originalDepth ){',
+				// '	gl_FragColor	= vec4(vec3(1.0,0.0,0.0), 1.0);',
 				// '}else{',
-				// 	'gl_FragColor	= vec4(vec3(0.2), 1.0);',
+				// '	gl_FragColor	= vec4(vec3(0.0,1.0,0.0), 1.0);',
 				// '}',
+				
 			'#endif',
 
 			// 'gl_FragColor		= vec4( vec3(deltaDepth), 1.0);',
