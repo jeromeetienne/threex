@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.js'></script>
+<script src='../threex.volumetricspotlightmaterial.js'></script>
+<!-- include for threex.glowdatgui -->
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
+<script src='../threex.volumetricspotlightmaterialdatgui.js'></script>
+
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+
+
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+	renderer.setClearColor('black', 0 );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	scene.fog	= new THREE.FogExp2( 0x000000, 0.1 );
+
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
+	camera.position.set(0,2,5)
+	camera.lookAt(scene.position)
+
+// Depth encoding into RGBA texture
+// 	based on SpiderGL shadow map example
+// 		http://spidergl.org/example.php?id=6
+// 	originally from
+//		http://www.gamedev.net/topic/442138-packing-a-float-into-a-a8r8g8b8-texture-shader/page__whichpage__1%25EF%25BF%25BD
+// 	see also here:
+//		http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+THREE.ShaderLib['depthRGBA2']	= {
+		uniforms: {
+			cameraNear	: {
+				type	: "f",
+				value	: camera.near
+			},
+			cameraFar	: {
+				type	: "f",
+				value	: camera.far
+			},
+		},
+
+		vertexShader: [
+
+			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
+
+			"void main() {",
+
+				THREE.ShaderChunk[ "skinbase_vertex" ],
+				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
+				THREE.ShaderChunk[ "default_vertex" ],
+
+			"}"
+
+		].join("\n"),
+		fragmentShader: [
+
+			// from THREE.ShaderLib['depthRGBA']
+			"vec4 pack_depth( const in float depth ) {",
+
+				"const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );",
+				"const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );",
+				"vec4 res = fract( depth * bit_shift );",
+				"res -= res.xxyz * bit_mask;",
+				"return res;",
+				// "return vec4(depth);",
+
+			"}",
+
+			// "vec4 pack_depth2( const in float depth ) {",
+
+			// 	"return vec4( vec3( depth ), 1.0 );",
+
+			// "}",
+			"vec4 pack_depth2( const in float depth ){",
+				'vec4 packedDepth	= vec4(1.0, 1.0, 1.0, 1.0);',
+				'packedDepth.r		= depth*255.0 / 256.0;',
+				'packedDepth.g		= 0.0;',
+				'packedDepth.b		= 0.0;',
+				// 'packedDepth.xyz	= vec3( depth );',
+				'return vec4(1.0, 1.0, depth, depth);',
+			"}",
+
+			// packing formula from http://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/
+			// 'float unpackDepth( vec4 rgba ) {',
+			// '	return dot( rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/160581375.0) );',
+			// '}',
+			// 'vec4 pack_depth( float v ) {',
+			// '	vec4 enc = vec4(1.0, 255.0, 65025.0, 160581375.0) * v;',
+			// '	enc = fract(enc);',
+			// '	enc -= enc.yzww * vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);',
+			// '	return enc;',
+			// '}',
+
+			'uniform float 		cameraNear;',
+			'uniform float 		cameraFar;',
+
+			"void main() {",
+				'float fragDepth= gl_FragCoord.z / gl_FragCoord.w;',
+				'fragDepth	= 1.0 - smoothstep(cameraNear, cameraFar, fragDepth);',
+				'gl_FragColor	= pack_depth(fragDepth);',
+				// 'gl_FragColor	= vec4( vec3( fragDepth ), 1.0 );',
+
+				'gl_FragColor	= pack_depth(0.05);',
+				// 'gl_FragColor	= pack_depth(1.0);',
+				// 'gl_FragColor	= vec4(vec3(fragDepth), 1.0);',
+				// 'gl_FragColor	= vec4(vec3(0.3), 1.0);',
+
+				// "gl_FragColor	= pack_depth( gl_FragCoord.z );",
+				// "gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z / gl_FragCoord.w );",
+				//"float z = ( ( gl_FragCoord.z / gl_FragCoord.w ) - 3.0 ) / ( 4000.0 - 3.0 );",
+				//"gl_FragData[ 0 ] = pack_depth( z );",
+				//"gl_FragData[ 0 ] = vec4( z, z, z, 1.0 );",
+
+			"}"
+		].join("\n")
+	}
+
+	// add a ambient light
+	// var light	= new THREE.AmbientLight( 0x020202 )
+	// scene.add( light )
+	// add a light in front
+	// var light	= new THREE.DirectionalLight('white', 1)
+	// light.position.set(0.5, 0.5, 2)
+	// scene.add( light )
+	// add a light behind
+	// var light	= new THREE.DirectionalLight('white', 0.75)
+	// light.position.set(-0.5, -0.5, -2)
+	// scene.add( light )
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+
+	// add back wall
+	var geometry	= new THREE.CubeGeometry( 20, 0.1, 20, 20, 1, 20 );
+	var material	= new THREE.MeshPhongMaterial({
+		color	: new THREE.Color('gray')
+	});
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.rotateX(Math.PI/2)
+	mesh.position.set( 0, -geometry.height/2, -1)
+	scene.add( mesh );
+	// add back wall - wireframe
+	var material	= new THREE.MeshBasicMaterial({
+		wireframe		: true,
+		wireframeLinewidth	: 2,
+		color			: new THREE.Color('black'),
+	});
+	var mesh	= new THREE.Mesh( geometry.clone(), material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.scale.multiplyScalar(1.01)
+	mesh.rotateX(Math.PI/2)
+	mesh.position.set( 0, -geometry.height/2, -1)
+	scene.add( mesh );
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// add ground
+	var geometry	= new THREE.CubeGeometry( 20, 0.1, 20, 20, 1, 20 );
+	var material	= new THREE.MeshPhongMaterial({
+		color	: new THREE.Color('gray')
+	});
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.position.set( 0, -geometry.height/2, 0)
+	scene.add( mesh );
+
+	// add ground - wireframe
+	var material	= new THREE.MeshBasicMaterial({
+		wireframe		: true,
+		wireframeLinewidth	: 2,
+		color			: new THREE.Color('black'),
+	});
+	var mesh	= new THREE.Mesh( geometry.clone(), material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.scale.multiplyScalar(1.01)
+	mesh.position.set( 0, -geometry.height/2, 0)
+	scene.add( mesh );
+	
+	// add a cube
+	var geometry	= new THREE.CubeGeometry( 0.3, 2, 0.3 );
+	var material	= new THREE.MeshPhongMaterial({
+		color	: new THREE.Color('gray')
+	});
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.position.set(0,geometry.height/2,0)
+	scene.add( mesh );
+
+	// add a cube
+	var geometry	= new THREE.CubeGeometry( 0.3, 0.3, 0.3 );
+	var material	= new THREE.MeshPhongMaterial({
+		color	: new THREE.Color('gray')
+	});
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.position.set(0.2,geometry.height/2,0.5)
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	scene.add( mesh );
+
+	// add a sphere
+	var geometry	= new THREE.SphereGeometry( 0.3, 16, 8 );
+	var material	= new THREE.MeshPhongMaterial({
+		color		: new THREE.Color('gray'),
+	});
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.receiveShadow	= true
+	mesh.castShadow		= true
+	mesh.position.set(0.5,geometry.radius,0)
+	scene.add( mesh );
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	var config	= {
+		shaderDepth	: 'R8',		// R8 or R8G8B8A8
+		// edgeConstrast	: 'LINEAR',	// LINEAR or SMOOTH
+
+		// shaderDepth	: 'R8G8B8A8',	// R8 or R8G8B8A8
+		edgeConstrast	: 'SMOOTH',	// LINEAR or SMOOTH
+	}
+
+	
+	
+
+	// add spot light
+	var geometry	= new THREE.CylinderGeometry( 0.1, 1.5, 5, 32*2, 20, true);
+	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -geometry.height/2, 0 ) );
+	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( -Math.PI / 2 ) );
+	// geometry.computeVertexNormals()
+	// var geometry	= new THREE.CubeGeometry( 3, 1, 3 );	
+	// var material	= new THREE.MeshNormalMaterial({
+	// 	side	: THREE.DoubleSide
+	// });
+	// var material	= new THREE.MeshBasicMaterial({
+	// 	color		: 0x000000,
+	// 	wireframe	: true,
+	// })
+	var material	= new THREEx.VolumetricSpotLightMaterial({
+		shaderDepth	: config.shaderDepth,
+		edgeConstrast	: config.edgeContrast,
+	})
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.position.set(1.5,2,0)
+	mesh.lookAt(new THREE.Vector3(0,0, 0))
+	material.uniforms.lightColor.value.set('white')
+	material.uniforms.spotPosition.value	= mesh.position	
+	scene.add( mesh );
+
+	new THREEx.addVolumetricSpotlightMaterial2DatGui(material)
+
+	updateFcts.push(function(delta, now){
+		var angle	= 0.1 * Math.PI*2*now
+		var target	= new THREE.Vector3(1*Math.cos(angle),0,1*Math.sin(angle))
+		mesh.lookAt(target)
+		spotLight.target.position.copy(target)
+	})
+
+	if( config.shaderDepth === 'R8' ){
+		// depthMaterial WITHOUT depth packing
+		var depthMaterial	= new THREE.MeshDepthMaterial();
+// TODO what if i put a shaderMaterial here ?
+	}else if( config.shaderDepth === 'R8G8B8A8' ){
+		// depthMaterial WITH depth packing
+		var depthMaterial	= new THREE.ShaderMaterial({
+// TODO make your own shader
+			uniforms	: THREE.UniformsUtils.clone( THREE.ShaderLib['depthRGBA2'].uniforms ),
+			vertexShader	: THREE.ShaderLib['depthRGBA2'].vertexShader,
+			fragmentShader	: THREE.ShaderLib['depthRGBA2'].fragmentShader,
+		});
+	}else{	console.assert(false) }
+
+	var rtTextureDepth	= new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+		minFilter	: THREE.LinearFilter,
+		magFilter	: THREE.LinearFilter,
+		// format		: THREE.RGBAFormat,
+		// stencilBuffer	: false
+	});
+	material.uniforms.tDepth.value	= rtTextureDepth;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var spotLight	= new THREE.SpotLight()
+	spotLight.position	= mesh.position
+	spotLight.color		= mesh.material.uniforms.lightColor.value
+	spotLight.exponent	= 30
+	spotLight.angle		= Math.PI/3;
+	spotLight.intensity	= 10
+	scene.add( spotLight )
+	// renderer.shadowMapEnabled	= true
+
+	// doesnt seems to work - not moving with the spotLight
+	// var helper	= new THREE.SpotLightHelper(spotLight)
+	// scene.add(helper)
+	// updateFcts.push(function(delta, now){
+	// 	helper.update()
+	// })
+
+
+	var light	= spotLight
+	light.castShadow	= true
+	light.shadowCameraNear	= 0.01
+	light.shadowCameraFar	= 15
+	light.shadowCameraFov	= 45
+
+	light.shadowCameraLeft	= -8
+	light.shadowCameraRight	=  8
+	light.shadowCameraTop	=  8
+	light.shadowCameraBottom= -8
+
+	light.shadowCameraVisible = true
+
+	light.shadowBias	= -0.00008
+	light.shadowDarkness	= 0.5
+
+	light.shadowMapWidth	= 1024
+	light.shadowMapHeight	= 1024
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	// updateFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y + 2) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
+
+	// updateFcts.push(function(delta, now){
+	// 	var angle	= 0.2 * Math.PI*2*now
+	// 	camera.position.x	= 3*Math.cos(angle)
+	// 	camera.position.z	= 3*Math.sin(angle)
+	// 	mesh.lookAt(new THREE.Vector3(0,0,0) )
+	// })
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+
+
+	// renderer.autoClear = false;
+	// renderer.clear();
+
+	updateFcts.push(function(){
+
+	renderer.clear();
+	// renderer.clearTarget( rtTextureDepth, true, true, false );
+
+mesh.visible	= false
+// TODO to replace by shaderLib['depthRGBA']
+		// Render depth into texture
+		scene.overrideMaterial	= depthMaterial;
+		renderer.render(scene, camera, rtTextureDepth, false);
+		scene.overrideMaterial	= null;
+mesh.visible	= true
+
+	// renderer.clear(false, false, false);
+	// renderer.clear(true, true, false);
+		renderer.render( scene, camera, undefined, true);		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

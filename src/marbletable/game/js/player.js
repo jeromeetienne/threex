@@ -109,7 +109,7 @@ var Player	= function(opts){
 		if( !sounds )	return;
 		var speed	= body.velocity.norm();
 		var volume	= speed/5;
-		//sounds.playKick(volume);
+		sounds.playKick(volume);
 	})
 	// particke of collision
 	body.addEventListener("collide",function(event){
