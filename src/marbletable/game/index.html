@@ -19,8 +19,6 @@ console.warn = console.error
 <script src='bower_components/threex.cannonjs/vendor/cannon.js/build/cannon.min.js'></script>
 <script src='bower_components/threex.cannonjs/threex.cannonworld.js'></script>
 <script src='bower_components/threex.cannonjs/threex.cannonbody.js'></script>
-<!-- include threex.keyboardstate -->
-<script src="../../threex.keyboardstate/threex.keyboardstate.js"></script>
 <!-- include threex.windowresize -->
 <script src="bower_components/threex.windowresize/threex.windowresize.js"></script>
 <!-- include for threex.mirrorball -->
@@ -36,11 +34,11 @@ console.warn = console.error
 
 <script src="vendor/Tween.js"></script>
 <!-- include for threex.mirrorball -->
-<script src='vendor/webaudiox/build/webaudiox-bundle.js'></script>
+<script src='bower_components/webaudiox/build/webaudiox-bundle.js'></script>
 <!-- include the .js files for jsfx.js -->
-<script src="vendor/webaudiox/examples/vendor/jsfx/audio.js"></script>
-<script src="vendor/webaudiox/examples/vendor/jsfx/jsfx.js"></script>
-<script src="vendor/webaudiox/examples/vendor/jsfx/jsfxlib.js"></script>
+<script src="bower_components/webaudiox/examples/vendor/jsfx/audio.js"></script>
+<script src="bower_components/webaudiox/examples/vendor/jsfx/jsfx.js"></script>
+<script src="bower_components/webaudiox/examples/vendor/jsfx/jsfxlib.js"></script>
 
 <script src='js/lighting-default.js'></script>
 <script src='js/lighting-sunset.js'></script>
@@ -156,6 +154,7 @@ console.warn = console.error
 </div>
 <script>
 require([ '../../threex.skymap/package.require.js'
+	, 'bower_components/threex.keyboardstate/package.require.js'
 ], function(){
 	window.cache	= new Microcache()
 	window.yeller	= MicroeventMixin({});
