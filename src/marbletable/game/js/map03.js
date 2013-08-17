@@ -36,6 +36,25 @@ var Map03	= function(){
 	body.position.set(24*GAME.tileW, 3 * GAME.tileW/2, 0*GAME.tileW)
 
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		init Player								//
+	//////////////////////////////////////////////////////////////////////////////////
+	;(function(){
+		var texture	= THREE.ImageUtils.loadTexture('images/sports/Footballballfree.jpg59a2a1dc-64c8-4bc3-83ef-1257c9147fd1Large.jpg')
+		var player	= new Player()
+		GAME.ball	= player.mesh
+		updateFcts.push(function(delta, now){
+			player.update(delta, now)
+		})
+		var body	= GAME.ball.userData.cannonBody.body
+		body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)	
+	})()
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
 	var groundMesh	= null
 	table.object3d.traverse(function(object3d){
 		if( / ground /.test(object3d.name) === false )	return

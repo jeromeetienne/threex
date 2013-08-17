@@ -1,4 +1,4 @@
-var MapSport1	= function(){
+var MapPlanets1	= function(){
 	// handle updateFcts for sounds
 	var updateFcts	= [];
 	this.update	= function(delta, now){
@@ -14,9 +14,15 @@ var MapSport1	= function(){
 	
 	// add a skymap	
 	if( GAME.profile.skymapEnabled ){
-		var mesh	= THREEx.createSkymap('skybox')
-		scene.add( mesh )		
+		var geometry	= new THREE.SphereGeometry(90, 32, 32)
+		var material	= new THREE.MeshBasicMaterial({
+			map	: THREE.ImageUtils.loadTexture('images/galaxy_starfield.png'),
+			side	: THREE.BackSide
+		})
+		var starSphere	= new THREE.Mesh(geometry, material)
+		scene.add(starSphere)
 	}
+
 	// init lighting
 	var lighting	= new LightingDefault()
 	this.lighting	= lighting
@@ -45,13 +51,17 @@ var MapSport1	= function(){
 	//		init Player								//
 	//////////////////////////////////////////////////////////////////////////////////
 	;(function(){
-		var texture	= THREE.ImageUtils.loadTexture('images/sports/Footballballfree.jpg59a2a1dc-64c8-4bc3-83ef-1257c9147fd1Large.jpg')
+		var textureColor= THREE.ImageUtils.loadTexture('images/planets/earthmap1k.jpg')
+		var textureBump	= THREE.ImageUtils.loadTexture('images/planets/earthbump1k.jpg')
+		var textureSpec	= THREE.ImageUtils.loadTexture('images/planets/earthspec1k.jpg')
 		var player	= new Player({
 			liveMirror	: false,
 			material	: new THREE.MeshPhongMaterial({
-				map	: texture,
-				bumpMap	: texture,
-				bumpScale: 0.01,
+				map		: textureColor,
+				bumpMap		: textureBump,
+				bumpScale	: 0.02,
+				specularMap	: textureSpec,
+				specular	: new THREE.Color('grey'),
 			}),
 		})
 		GAME.ball	= player.mesh
@@ -67,9 +77,9 @@ var MapSport1	= function(){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		BasketBall							//
 	//////////////////////////////////////////////////////////////////////////////////
-	
+		
 	;(function(){
-		var texture	= THREE.ImageUtils.loadTexture('images/ballTextures/BasketballColor.jpg')
+		var texture	= THREE.ImageUtils.loadTexture('images/planets/jupitermap.jpg')
 		var botBall	= new BotBall2({
 			ballAttraction	: 0.0,
 			material	: new THREE.MeshPhongMaterial({
@@ -80,20 +90,25 @@ var MapSport1	= function(){
 			botBall.update(delta, now)
 		})
 	})()
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		SoftBall							//
-	//////////////////////////////////////////////////////////////////////////////////
-	
 	;(function(){
-		var textureColor= THREE.ImageUtils.loadTexture('images/ballTextures/SoftBallColor.jpg')
-		var textureBump	= THREE.ImageUtils.loadTexture('images/ballTextures/SoftBallBump.jpg')
+		var texture	= THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg')
 		var botBall	= new BotBall2({
 			ballAttraction	: 0.0,
 			material	: new THREE.MeshPhongMaterial({
-				map	: textureColor,
-				bumpMap	: textureBump,
-				bumpScale: 0.02,
+				map	: texture,
+			}),
+		})
+		updateFcts.push(function(delta, now){
+			botBall.update(delta, now)
+		})
+	})()
+	;(function(){
+		var texture	= THREE.ImageUtils.loadTexture('images/planets/neptunemap.jpg')
+		var botBall	= new BotBall2({
+			radius		: 3 * GAME.tileW,
+			ballAttraction	: 0.0,
+			material	: new THREE.MeshPhongMaterial({
+				map	: texture,
 			}),
 		})
 		updateFcts.push(function(delta, now){
@@ -101,24 +116,4 @@ var MapSport1	= function(){
 		})
 	})()
 
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		Tennis								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	;(function(){
-		var textureColor= THREE.ImageUtils.loadTexture('images/ballTextures/NewTennisBallColor.jpg')
-		var textureBump	= THREE.ImageUtils.loadTexture('images/ballTextures/TennisBallBump.jpg')
-		var botBall	= new BotBall2({
-			ballAttraction	: 0.0,
-			material	: new THREE.MeshPhongMaterial({
-				map	: textureColor,
-				bumpMap	: textureBump,
-				bumpScale: 0.02,
-			}),
-		})
-		updateFcts.push(function(delta, now){
-			botBall.update(delta, now)
-		})
-	})()
 }

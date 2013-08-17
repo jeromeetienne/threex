@@ -61,7 +61,11 @@ console.warn = console.error
 <script src='js/playercontrols.js'></script>
 
 <script src='js/maptable.js'></script>
+
+<script src='js/map-pool-1.js'></script>
 <script src='js/map-sport-1.js'></script>
+<script src='js/map-planets-1.js'></script>
+
 <script src='js/map01.js'></script>
 <script src='js/map02.js'></script>
 <script src='js/map03.js'></script>
@@ -165,8 +169,16 @@ require([ '../../threex.skymap/package.require.js'
 	GAME.profile	= new RenderingProfile(onMobile ? 'mobile' : 'normal')
 
 	var mapConfigs	= {
+		'pool-1'	: {
+			humanName	: 'Pool 1',
+			constructor	: MapPool1,
+		}, 
+		'planets-1'	: {
+			humanName	: 'Planets 1',
+			constructor	: MapPlanets1,
+		}, 
 		'sport-1'	: {
-			humanName	: 'Sport Round 1',
+			humanName	: 'Sport 1',
 			constructor	: MapSport1,
 		}, 
 		'01'	: {
@@ -398,7 +410,7 @@ require([ '../../threex.skymap/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var gameScore	= new GameScore()
-	if( GAME.mapId  === '01' ){
+	if( GAME.mapId  === firstMapId ){
 		// if first level, start with a zero score
 		gameScore.score(0)
 		// store score in sessionStorage to keep track between map
@@ -414,9 +426,24 @@ require([ '../../threex.skymap/package.require.js'
 		sessionStorage.setItem("currentScore", gameScore.score());
 	});
 
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		init Map							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	
+	console.assert(mapConfigs[GAME.mapId].constructor)
+	var map	= new mapConfigs[GAME.mapId].constructor()
+	scene.add(map.object3d)
+	updateFcts.push(function(delta, now){
+		map.update(delta, now);		
+	})
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		ball								//
 	//////////////////////////////////////////////////////////////////////////////////
+;(function(){
+return;
 	var player	= new Player({
 		liveMirror	: GAME.profile.playerLiveMirror
 	})
@@ -425,7 +452,8 @@ require([ '../../threex.skymap/package.require.js'
 		player.update(delta, now)
 	})
 	var body	= GAME.ball.userData.cannonBody.body
-	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)
+	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)	
+})()
 
 	//////////////////////////////////////////////////////////////////////////
 	//		User Controls						//
@@ -645,13 +673,6 @@ require([ '../../threex.skymap/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-	
-	console.assert(mapConfigs[GAME.mapId].constructor)
-	var map	= new mapConfigs[GAME.mapId].constructor()
-	scene.add(map.object3d)
-	updateFcts.push(function(delta, now){
-		map.update(delta, now);		
-	})
 	
 	// spawn new player
 	yeller.dispatchEvent('gameStart')

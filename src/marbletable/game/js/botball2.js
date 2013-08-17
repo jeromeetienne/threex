@@ -1,6 +1,11 @@
 var BotBall2	= function(opts){
+	//////////////////////////////////////////////////////////////////////////////////
+	//		options								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	opts	= opts	|| {}
 	var ballAttraction	= opts.ballAttraction !== undefined ? opts.ballAttraction : 0.1
+	var radius		= opts.radius !== undefined ? opts.radius : 1.5*GAME.tileW
 	var material		= opts.material || cache.getSet('botball.material', function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg');
 		var material	= new THREE.MeshPhongMaterial({
@@ -11,7 +16,11 @@ var BotBall2	= function(opts){
 		return material
 	})
 	
-	// handle updateFcts for sounds
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		update function							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	var updateFcts	= [];
 	this.update	= function(delta, now){
 		updateFcts.forEach(function(updateFct){
@@ -23,7 +32,6 @@ var BotBall2	= function(opts){
 	//		create THREE.Object3D						//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var radius	= 1.5 * GAME.tileW
 	var geometry	= new THREE.SphereGeometry(radius, 32, 32)
 	var object3d	= new THREE.Mesh(geometry, material)
 	this.object3d	= object3d
