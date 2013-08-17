@@ -9,12 +9,80 @@
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
 	camera.position.z = 3;
-
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		lights								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// add a ambient light
+	var light	= new THREE.AmbientLight( 0x020202 )
+	scene.add( light )
+	// add a light in front
+	var light	= new THREE.DirectionalLight('white', 1)
+	light.position.set(0.5, 0.5, 2)
+	scene.add( light )
+	// add a light behind
+	var light	= new THREE.DirectionalLight('white', 0.75)
+	light.position.set(-0.5, -0.5, -2)
+	scene.add( light )
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
+
+	var vertexShader	= (function(){ /*
+	varying vec3 vNormal;
+	#ifdef USE_MORPHTARGETS
+	#ifndef USE_MORPHNORMALS
+	uniform float morphTargetInfluences[ 8 ];
+	#else
+	uniform float morphTargetInfluences[ 4 ];
+	#endif
+	#endif
+	void main() {
+	vNormal = normalize( normalMatrix * normal );
+	#ifdef USE_MORPHTARGETS
+	vec3 morphed = vec3( 0.0 );
+	morphed += ( morphTarget0 - position ) * morphTargetInfluences[ 0 ];
+	morphed += ( morphTarget1 - position ) * morphTargetInfluences[ 1 ];
+	morphed += ( morphTarget2 - position ) * morphTargetInfluences[ 2 ];
+	morphed += ( morphTarget3 - position ) * morphTargetInfluences[ 3 ];
+	#ifndef USE_MORPHNORMALS
+	morphed += ( morphTarget4 - position ) * morphTargetInfluences[ 4 ];
+	morphed += ( morphTarget5 - position ) * morphTargetInfluences[ 5 ];
+	morphed += ( morphTarget6 - position ) * morphTargetInfluences[ 6 ];
+	morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];
+	#endif
+	morphed += position;
+	#endif
+	vec4 mvPosition;
+	#ifdef USE_SKINNING
+	mvPosition = modelViewMatrix * skinned;
+	#endif
+	#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )
+	mvPosition = modelViewMatrix * vec4( morphed, 1.0 );
+	#endif
+	#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )
+	mvPosition = modelViewMatrix * vec4( position, 1.0 );
+	mvPosition = modelViewMatrix * vec4( position*2.0, 1.0 );
+	#endif
+	gl_Position = projectionMatrix * mvPosition;
+	}	
+	*/}).toString().split('\n').slice(1, -1).join('\n')
+
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
 	var material	= new THREE.MeshNormalMaterial();
+	// var material	= new THREE.MeshBasicMaterial()
+	var shader	= THREE.ShaderLib.normal;
+	var shader	= THREE.ShaderLib.basic;
+	// var shader	= THREE.ShaderLib.lambert;
+	// var shader	= THREE.ShaderLib.phong;
+	var material	= new THREE.ShaderMaterial({
+		uniforms	: shader.uniforms,
+		vertexShader	: shader.vertexShader,
+		fragmentShader	: shader.fragmentShader,
+	})
+
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 	
