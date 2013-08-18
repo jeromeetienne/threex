@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.z = 3;
+
+	var camera	= new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / - 2, -10, 10000 );
+	camera.position.z = 3000;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	// var geometry	= new THREE.CubeGeometry( 100, 100, 100);
+	// var material	= new THREE.MeshNormalMaterial();
+	// var mesh	= new THREE.Mesh( geometry, material );
+	// scene.add( mesh );
+	
+	// updateFcts.push(function(delta, now){
+	// 	// mesh.rotation.x += 1 * delta;
+	// 	// mesh.rotation.y += 2 * delta;		
+	// })
+	
+	var texture	= THREE.ImageUtils.loadTexture( "images/sprite.png" );	
+
+;(function(){
+	var material	= new THREE.MeshBasicMaterial({
+		map	: texture,
+	})
+	var geometry	= new THREE.PlaneGeometry(1,1)
+	var mesh	= new THREE.Mesh(geometry, material)
+	scene.add(mesh)
+	mesh.scale.set(1,1,1).multiplyScalar(20)
+	updateFcts.push(function(delta, now){
+		mesh.lookAt(camera.position)
+	})	
+})()
+
+;(function(){
+	var material	= new THREE.MeshBasicMaterial({
+		map	: texture,
+	})
+	var geometry	= new THREE.PlaneGeometry(1,1)
+	var mesh	= new THREE.Mesh(geometry, material)
+	scene.add(mesh)
+	mesh.scale.set(1,1,1).multiplyScalar(20)
+	updateFcts.push(function(delta, now){
+		mesh.lookAt(camera.position)
+	})	
+})()
+
+;(function(){
+	var material	= new THREE.MeshBasicMaterial({
+		map	: texture,
+	})
+	var geometry	= new THREE.PlaneGeometry(1,1)
+	var mesh	= new THREE.Mesh(geometry, material)
+	scene.add(mesh)
+	mesh.scale.set(1,1,1).multiplyScalar(20)
+	updateFcts.push(function(delta, now){
+		mesh.lookAt(camera.position)
+	})	
+})()
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	updateFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
