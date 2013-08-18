@@ -1,56 +1,16 @@
 <!DOCTYPE html>
-<script>
-var tQuery = {}
-tQuery.extend = function(obj, base, deep){
-	// handle parameter polymorphism
-	deep		= deep !== undefined ? deep	: true;
-	var extendFn	= deep ? deepExtend : shallowExtend;
-	var result	= {};
-	base	&& extendFn(result, base);
-	obj	&& extendFn(result, obj);
-	return result;
-	
-	function shallowExtend(dst, src){
-		Object.keys(src).forEach(function(key){
-			dst[key]	= src[key];
-		})
-	};
-	// from http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
-	function deepExtend(dst, src){
-		for (var property in src) {
-			if (src[property] && src[property].constructor && src[property].constructor === Object) {
-				dst[property] = dst[property] || {};
-				arguments.callee(dst[property], src[property]);
-			} else {
-				dst[property] = src[property];
-			}
-		}
-		return dst;
-	};
-};
-tQuery.inherit	= function(childClass, parentClass){
-	// trick to avoid calling parentClass constructor
-	var tempFn		= function() {};
-	tempFn.prototype	= parentClass.prototype;
-	childClass.prototype	= new tempFn();
-
-
-	childClass.parent	= parentClass.prototype;
-	childClass.prototype.constructor= childClass;	
-};
-</script>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../threex.minecraft.js'></script>
 <script src='../threex.animation.js'></script>
 <script src='../threex.animations.js'></script>
 <script src='../threex.minecraftcharheadanim.js'></script>
-<script src='../threex.minecraftcharanim.js'></script>
+<script src='../threex.minecraftcharbodyanim.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 <div>
 	<strong>Body Animations</strong>
-	<button onclick='switchBodyValue(this.innerText);'>run</button>
-	<button onclick='switchBodyValue(this.innerText);'>walk</button>
 	<button onclick='switchBodyValue(this.innerText);'>stand</button>
+	<button onclick='switchBodyValue(this.innerText);'>walk</button>
+	<button onclick='switchBodyValue(this.innerText);'>run</button>
 	<button onclick='switchBodyValue(this.innerText);'>wave</button>
 	<button onclick='switchBodyValue(this.innerText);'>hiwave</button>
 	<button onclick='switchBodyValue(this.innerText);'>circularPunch</button>
@@ -59,8 +19,8 @@ tQuery.inherit	= function(childClass, parentClass){
 <div>
 	<strong>Head Animations</strong>
 	<button onclick='switchHeadValue(this.innerText);'>still</button>
-	<button onclick='switchHeadValue(this.innerText);'>no</button>
 	<button onclick='switchHeadValue(this.innerText);'>yes</button>
+	<button onclick='switchHeadValue(this.innerText);'>no</button>
 </div>
 <script>
 	var renderer	= new THREE.WebGLRenderer();
@@ -70,8 +30,8 @@ tQuery.inherit	= function(childClass, parentClass){
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
-	camera.position.y = 0.5;
-	camera.position.z = 3;
+	camera.position.y = 0.3;
+	camera.position.z = 2;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		load Character							//
@@ -92,7 +52,7 @@ tQuery.inherit	= function(childClass, parentClass){
 
 
 	// init bodyAnims
-	var bodyAnims	= new THREEx.MinecraftCharAnimations(character);
+	var bodyAnims	= new THREEx.MinecraftCharBodyAnimations(character);
 	updateFcts.push(function(delta, now){
 		bodyAnims.update(delta, now)	
 	})

@@ -1,12 +1,11 @@
-THREEx.createMinecraftCharAnimations	= function(character){
-	return new THREEx.MinecraftCharAnimations(character);
+THREEx.createMinecraftCharBodyAnimations	= function(character){
+	return new THREEx.MinecraftCharBodyAnimations(character);
 }
 
-THREEx.MinecraftCharAnimations	= function(character){
+THREEx.MinecraftCharBodyAnimations	= function(character){
 	var animations	= this;
 	// call parent ctor
 	THREEx.Animations.call(this)
-console.log('***********', character)
 	var tweenAngle	= function(baseValue, nextValue, timePercent){
 		// compute the nextValue to get the shortest path - assume it is an angle
 		if( nextValue - baseValue > +Math.PI )	nextValue -= Math.PI*2;
@@ -142,5 +141,4 @@ console.log('***********', character)
 	}).propertyTweens(propTweens).onCapture(onCapture).onUpdate(onUpdate));
 }
 
-
-tQuery.inherit(THREEx.MinecraftCharAnimations, THREEx.Animations);
+THREEx.MinecraftCharBodyAnimations.prototype	= Object.create(THREEx.Animations.prototype);

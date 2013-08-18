@@ -53,5 +53,4 @@ THREEx.MinecraftCharHeadAnimations	= function(character){
 	}).propertyTweens(propTweens).onCapture(onCapture).onUpdate(onUpdate));
 }
 
-
-tQuery.inherit(THREEx.MinecraftCharHeadAnimations, THREEx.Animations);
+THREEx.MinecraftCharHeadAnimations.prototype	= Object.create(THREEx.Animations.prototype);

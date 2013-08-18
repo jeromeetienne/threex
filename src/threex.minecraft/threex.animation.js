@@ -177,7 +177,7 @@ THREEx.Animation.prototype.start	= function(){
 	// - the initial position is the position when the animation started.
 	// - it will be used as basePosition during the first keyframe of the animation
 	// - it is optional. the user may not define it
-	this._initialPos= tQuery.extend({}, this._keyframes[0].position)
+	this._initialPos= Object.create(this._keyframes[0].position)
 	this._onCapture(this._initialPos);
 
 	// init the loop callback
