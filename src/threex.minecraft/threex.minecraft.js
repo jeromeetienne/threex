@@ -23,6 +23,7 @@ THREEx.MinecraftChar	= function(skinUrl){
 	var materialTran= new THREE.MeshBasicMaterial({
 		map		: texture,
 		transparent	: true,
+		depthWrite	: false,
 		side		: THREE.DoubleSide
 	})
 
@@ -95,7 +96,7 @@ THREEx.MinecraftChar	= function(skinUrl){
 	
 	// build model.body
 	var geometry	= new THREE.CubeGeometry(sizes.bodyW, sizes.bodyH, sizes.bodyD)
-	model.body	= new THREE.Mesh(geometry, materialTran)
+	model.body	= new THREE.Mesh(geometry, material)
 	model.root.add(model.body)
 	model.body.position.y	= sizes.legH + sizes.bodyH/2
 	mapUv(geometry, 0, 28, 12, 32,  0)	// left

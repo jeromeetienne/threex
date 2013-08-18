@@ -1,6 +1,79 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<!-- include character -->
+<script src='../threex.minecraft.js'></script>
+<!-- include controls -->
+<script src='../threex.minecraftcontrols.js'></script>
+<!-- include animation -->
+<script src='../threex.animation.js'></script>
+<script src='../threex.animations.js'></script>
+<script src='../threex.minecraftcharheadanim.js'></script>
+<script src='../threex.minecraftcharbodyanim.js'></script>
+<!-- include player -->
+<script src='../threex.minecraftplayer.js'></script>
+<!-- include animation -->
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
 
-TODO from controls+animations
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	camera.position.y = 0.3;
+	camera.position.z = 2;
 
-TODO from controls+animations
-TODO from controls+animations
-TODO from controls+animations
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var player	= new THREEx.MinecraftPlayer()
+	updateFcts.push(function(delta, now){
+		player.update(delta, now)
+	})
+	
+
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		controls.input based on keyboard				//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	document.body.addEventListener('keydown', function(event){
+		var input	= player.controls.input
+		if( event.keyCode === 'W'.charCodeAt(0) )	input.up	= true
+		if( event.keyCode === 'S'.charCodeAt(0) )	input.down	= true
+		if( event.keyCode === 'A'.charCodeAt(0) )	input.left	= true
+		if( event.keyCode === 'D'.charCodeAt(0) )	input.right	= true
+	})
+	document.body.addEventListener('keyup', function(event){
+		var input	= player.controls.input
+		if( event.keyCode === 'W'.charCodeAt(0) )	input.up	= false
+		if( event.keyCode === 'S'.charCodeAt(0) )	input.down	= false
+		if( event.keyCode === 'A'.charCodeAt(0) )	input.left	= false
+		if( event.keyCode === 'D'.charCodeAt(0) )	input.right	= false
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
