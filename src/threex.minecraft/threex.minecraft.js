@@ -149,11 +149,11 @@ THREEx.MinecraftChar	= function(skinUrl){
 
 	// build model.legL
 	var geometry	= new THREE.CubeGeometry(sizes.legW, sizes.legH, sizes.legD)
-	model.legR	= new THREE.Mesh(geometry, material)
-	model.root.add(model.legR)
+	model.legL	= new THREE.Mesh(geometry, material)
+	model.root.add(model.legL)
 	geometry.applyMatrix( new THREE.Matrix4().makeTranslation(0, -sizes.legH/2, 0) );
-	model.legR.position.x	= sizes.legW/2
-	model.legR.position.y	= sizes.legH
+	model.legL.position.x	= sizes.legW/2
+	model.legL.position.y	= sizes.legH
 	mapUv(geometry, 0,  4, 12,  0,  0)	// left
 	mapUv(geometry, 1, 12, 12,  8,  0)	// right
 	mapUv(geometry, 2,  8, 16,  4, 12)	// top
