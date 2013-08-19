@@ -19,7 +19,7 @@ Note on animation based on morphtarget
   * it is in the influence computation
 
 POST about building minecraft character
-=======================================
+======================================= 
 
 you played minecraft, you loved it, you see webgl demos, you love them.
 Want about doing your own minecraft character in webgl ? would that be cool ?
