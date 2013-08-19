@@ -10,11 +10,10 @@ var BotBall2	= function(opts){
 		var texture	= THREE.ImageUtils.loadTexture('images/planets/mars_1k_color.jpg');
 		var material	= new THREE.MeshPhongMaterial({
 			map	: texture,
-			// bumpMap	: texture,
-			// bumpScale: 0.05,
 		})
 		return material
 	})
+	var respawnedEnabled	= opts.respawnedEnabled !== undefined ? opts.respawnedEnabled : false
 	
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -56,8 +55,7 @@ var BotBall2	= function(opts){
 
 	// setup origin	
 	if( opts.position ){
-		var position	= opts.position.clone()
-		//console.log('position', position)
+		var origin	= opts.position.clone()
 	}else{
 		// count the number of body of this type - used to fix startPosition
 		var bodyCounter	= 0
@@ -66,15 +64,16 @@ var BotBall2	= function(opts){
 			if( !isBall )	return
 			bodyCounter++
 		})
-		var position	= new THREE.Vector3()
-		position.set(-6*GAME.tileW, 6*GAME.tileW, -10*GAME.tileW)
-		position.z	*= Math.floor(bodyCounter % 2) === 1 ? 1 : -1
-		position.x	+= (Math.random()-0.5)*GAME.tileW*10;
-		position.y	+= bodyCounter * radius*2 * 1.5
-		position.z	+= (Math.random()-0.5)*GAME.tileW*5;
+		// setup origin	
+		var origin	= new CANNON.Vec3()
+		origin.set(-6*GAME.tileW, 6*GAME.tileW, -10*GAME.tileW)
+		origin.z	*= Math.floor(bodyCounter % 2) === 1 ? 1 : -1
+		origin.x	+= (Math.random()-0.5)*GAME.tileW*10;
+		origin.y	+= bodyCounter * radius*2 * 1.5
+		origin.z	+= (Math.random()-0.5)*GAME.tileW*5;
 	}
-
-	body.position.set(position.x, position.y, position.z)		
+	// init body.position to its origin
+	body.position.set(origin.x, origin.y, origin.z)
 	
 	// always be attracked by player
 	updateFcts.push(function(delta, now){
@@ -108,13 +107,21 @@ var BotBall2	= function(opts){
 		// emit a score
 		GAME.emitterScore.emit(object3d.position, scorePoints)
 
-		this.destroy()
-		
-		var nInstances	= 0
-		scene.traverse(function(object3d){
-			nInstances	+= / ball /.test(object3d.name) ? +1 : 0
-		})
-		if( nInstances === 0 )	yeller.dispatchEvent('gameWon')
+		if( respawnedEnabled ){
+console.log('ddddkkljklkj')
+			// reset all velocity
+			body.velocity.set(0,0,0)
+			body.angularVelocity.set(0,0,0)
+			// set player position
+			body.position.set(origin.x, origin.y, origin.z)		
+		}else{
+			this.destroy()
+			var nInstances	= 0
+			scene.traverse(function(object3d){
+				nInstances	+= / ball /.test(object3d.name) ? +1 : 0
+			})
+			if( nInstances === 0 )	yeller.dispatchEvent('gameWon')			
+		}
 	}.bind(this))
 
 	this.destroy	= function(){

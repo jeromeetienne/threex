@@ -117,6 +117,7 @@ console.warn = console.error
 </style>
 <div id='osdLeftColumn'>
 	<div id="score" class='osdFont'></div>
+	<div id="timer" class='osdFont'></div>
 	<div id="muteOsd" class='osdFont'></div>
 </div>
 <!-- include live html -->	
@@ -153,7 +154,7 @@ console.warn = console.error
 	<div id="killPlayerOsd" class='osdFont' style='display:none'>You die!</div>
 </div>
 <script>
-require([ '../../threex.skymap/package.require.js'
+require([ 'bower_components/threex.skymap/package.require.js'
 	, 'bower_components/threex.keyboardstate/package.require.js'
 ], function(){
 	window.cache	= new Microcache()
@@ -381,12 +382,6 @@ require([ '../../threex.skymap/package.require.js'
 		TWEEN.update()	
 	})	
 
-	// // add gameTimer
-	// var gameTimer	= new GameTimer()
-	// updateFcts.push(function(delta, now){
-	// 	gameTimer.update(delta, now)
-	// })
-	
 	updateFcts.push(function(delta, now){
 		/**
 		 * issue with the pivot point
@@ -425,7 +420,30 @@ require([ '../../threex.skymap/package.require.js'
 		sessionStorage.setItem("currentScore", gameScore.score());
 	});
 
-
+	//////////////////////////////////////////////////////////////////////////////////
+	//		timer								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// add gameTimer
+	var gameTimer	= new GameTimer()
+	updateFcts.push(function(delta, now){
+		// disable gameTimer
+		gameTimer.disable	= playerControls.disable;
+		// update the gameTimer
+		gameTimer.update(delta, now)
+	})
+	updateFcts.push(function(delta, now){
+		if( gameTimer.disable === true )	return;
+		var timeToLive	= 90.0
+		if( gameTimer.delay >= timeToLive ){
+			// fix excess in delay
+			gameTimer.delay	= timeToLive
+			gameTimer.display()
+			// dispatch killPlayer
+			yeller.dispatchEvent('killPlayer')	
+		}
+	})
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		init Map							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -437,22 +455,6 @@ require([ '../../threex.skymap/package.require.js'
 	updateFcts.push(function(delta, now){
 		map.update(delta, now);		
 	})
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		ball								//
-	//////////////////////////////////////////////////////////////////////////////////
-;(function(){
-return;
-	var player	= new Player({
-		liveMirror	: GAME.profile.playerLiveMirror
-	})
-	GAME.ball	= player.mesh
-	updateFcts.push(function(delta, now){
-		player.update(delta, now)
-	})
-	var body	= GAME.ball.userData.cannonBody.body
-	body.position.set(-15*GAME.tileW, 20*GAME.tileW, 0*GAME.tileW)	
-})()
 
 	//////////////////////////////////////////////////////////////////////////
 	//		User Controls						//
@@ -471,6 +473,8 @@ return;
 	})
 
 	yeller.addEventListener('gameStart', function(){
+		playerControls.disable	= true
+
 		Flow().seq(function(next){
 			renderer.domElement.style.webkitFilter	= 'blur(5px)';
 
@@ -479,7 +483,6 @@ return;
 			document.querySelector('#gameStartOsd').style.display	= 'block'
 			
 
-			playerControls.disable	= true
 			physicsWorld.stop()
 
 			setTimeout(function(){
@@ -496,6 +499,8 @@ return;
 	yeller.addEventListener('spawnPlayer', function(){
 
 		playerControls.disable	= false
+		gameTimer.delay		= 0
+		
 		if( physicsWorld.isRunning() === false )	physicsWorld.start()
 
 		sounds.playSpawn()
@@ -510,8 +515,8 @@ return;
 	yeller.addEventListener('killPlayer', function(){
 		console.log('killPlayer')
 
+		playerControls.disable	= true
 		Flow().seq(function(next){
-			playerControls.disable	= true
 
 			sounds.playDie()
 			
