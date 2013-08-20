@@ -81,7 +81,6 @@ THREEx.Glow.prototype.copyScene = function(srcScene, materialCb){
 		}else	console.assert(false)
 		// clone position/rotation/scale
 		dstObject.position	= srcObject.position
-		dstObject.rotation	= srcObject.rotation
 		dstObject.quaternion	= srcObject.quaternion
 		dstObject.scale		= srcObject.scale
 		// clone children

@@ -186,7 +186,7 @@ THREEx.VolumetricSpotLightMaterial	= function(opts){
 				'edgeIntensity = ( deltaDepth > 0.5) ? 1.0-edgeIntensity : edgeIntensity;',
 			'#endif',
 
-			'intensity		= intensity * edgeIntensity;',
+			// 'intensity		= intensity * edgeIntensity;',
 
 
 			//////////////////////////////////////////////////////////

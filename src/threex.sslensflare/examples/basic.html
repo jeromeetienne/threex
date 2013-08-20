@@ -12,8 +12,8 @@
 <script src="../../../vendor/three.js/examples/js/shaders/HorizontalBlurShader.js"></script>
 <script src="../../../vendor/three.js/examples/js/shaders/VerticalBlurShader.js"></script>
 
-<script src='../../threex.skymap/threex.texturecube.js'></script>
-<script src='../../threex.skymap/threex.skymap.js'></script>
+<script src='bower_components/threex.skymap/threex.texturecube.js'></script>
+<script src='bower_components/threex.skymap/threex.skymap.js'></script>
 
 <script src='../threex.sslensflare.js'></script>
 
@@ -37,7 +37,7 @@
 	//		add skymap							//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	THREEx.TextureCube.initWellKnownUrls('../../threex.skymap/')
+	THREEx.TextureCube.initWellKnownUrls('bower_components/threex.skymap/')
 	var mesh	= THREEx.createSkymap('swedishroyalcastle')
 	scene.add( mesh );
 
@@ -102,6 +102,7 @@
 	effect.uniforms['tLensColor'].value	= ssLensFlare.lensRenderTarget
 	composer.addPass(effect)
 
+	// add a dat.gui
 	new THREEx.addSsLensFlare2DatGui(ssLensFlare, effect)
 
 

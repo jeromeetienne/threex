@@ -33,7 +33,7 @@
 	var mesh	= new THREE.Mesh( geometry, material )
 	mesh.scale.set(1,1,1).multiplyScalar(2)
 	scene.add( mesh )
-	mesh.userData.domClasses	+= ' glowing'
+	mesh.userData.domClasses	+= ' glowing '
 
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
 	var material	= new THREE.MeshNormalMaterial()
@@ -93,7 +93,7 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	updateFcts.push(function(delta, now){
 		glow.update(delta)
-		composer.render(delta);
+		composer.render(delta)
 	})
 	
 	//////////////////////////////////////////////////////////////////////////////////

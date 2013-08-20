@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <script src="../../../../vendor/three.js/build/three.min.js"></script>
 <script src="../../../../vendor/require.js/require.js"></script>
+<!-- include for threex.glowdatgui -->
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
+<script src="../../threex.glowscene/threex.glowdatgui.js"></script>
 <script src="../threex.scenemirror.js"></script>
 <body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
-require([ '../../threex.glow/package.require.js'
+require([ '../../threex.glowscene/package.require.js'
 ], function(){
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer();
@@ -26,6 +29,8 @@ require([ '../../threex.glow/package.require.js'
 	materialOff.color.set('black')
 
 	var glow	= new THREEx.Glow(renderer, camera);
+	// add a DAT.gui for find tuning
+	new THREEx.addGlow2DatGui(glow)
 
 	var glowSceneMirror	= new THREEx.SceneMirror(scene, {
 		dstScene: glow.scene,

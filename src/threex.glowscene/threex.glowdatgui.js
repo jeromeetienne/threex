@@ -31,9 +31,9 @@ THREEx.addGlow2DatGui	= function(glow, datGui){
 	onChange()
 	
 	// config datGui
-	datGui.add( options, 'blurHLevel'	, 0.0 , 0.01)
+	datGui.add( options, 'blurHLevel'	, 0.0 , 0.1)
 		.listen().onChange( onChange )
-	datGui.add( options, 'blurVLevel'	, 0.0 , 0.01)
+	datGui.add( options, 'blurVLevel'	, 0.0 , 0.1)
 		.listen().onChange( onChange )
 	datGui.add( options, 'presetLow' )
 	datGui.add( options, 'presetHigh' )

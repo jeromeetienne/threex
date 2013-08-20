@@ -17,7 +17,7 @@
 	var scene	= new THREE.Scene();
 	scene.fog	= new THREE.FogExp2( 0x000000, 0.1 );
 
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 10);
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.3, 10);
 	camera.position.set(0,2,5)
 	camera.lookAt(scene.position)
 
@@ -118,14 +118,15 @@ THREE.ShaderLib['depthRGBA2']	= {
 		].join("\n")
 	}
 
-	// add a ambient light
+	// // add a ambient light
 	// var light	= new THREE.AmbientLight( 0x020202 )
+	// var light	= new THREE.AmbientLight( 0x888888 )
 	// scene.add( light )
-	// add a light in front
+	// // add a light in front
 	// var light	= new THREE.DirectionalLight('white', 1)
 	// light.position.set(0.5, 0.5, 2)
 	// scene.add( light )
-	// add a light behind
+	// // add a light behind
 	// var light	= new THREE.DirectionalLight('white', 0.75)
 	// light.position.set(-0.5, -0.5, -2)
 	// scene.add( light )
@@ -301,9 +302,9 @@ THREE.ShaderLib['depthRGBA2']	= {
 	spotLight.color		= mesh.material.uniforms.lightColor.value
 	spotLight.exponent	= 30
 	spotLight.angle		= Math.PI/3;
-	spotLight.intensity	= 10
+	spotLight.intensity	= 5
 	scene.add( spotLight )
-	// renderer.shadowMapEnabled	= true
+	renderer.shadowMapEnabled	= true
 
 	// doesnt seems to work - not moving with the spotLight
 	// var helper	= new THREE.SpotLightHelper(spotLight)
@@ -324,9 +325,9 @@ THREE.ShaderLib['depthRGBA2']	= {
 	light.shadowCameraTop	=  8
 	light.shadowCameraBottom= -8
 
-	light.shadowCameraVisible = true
+	// light.shadowCameraVisible = true
 
-	light.shadowBias	= -0.00008
+	light.shadowBias	= 0.0
 	light.shadowDarkness	= 0.5
 
 	light.shadowMapWidth	= 1024
