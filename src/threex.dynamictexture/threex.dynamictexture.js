@@ -1,13 +1,18 @@
 var THREEx	= THREEx	|| {}
 
-
+/**
+ * create a dynamic texture with a underlying canvas
+ * 
+ * @param {Number} width  width of the canvas
+ * @param {Number} height height of the canvas
+ */
 THREEx.DynamicTexture	= function(width, height){
-	var canvas	= document.createElement( 'canvas' );
+	var canvas	= document.createElement( 'canvas' )
 	canvas.width	= width
 	canvas.height	= height
-	var context	= canvas.getContext( '2d' );
-	
 	this.canvas	= canvas
+
+	var context	= canvas.getContext( '2d' )	
 	this.context	= context
 	
 	var texture	= new THREE.Texture(canvas)
@@ -16,10 +21,12 @@ THREEx.DynamicTexture	= function(width, height){
 
 /**
  * clear the canvas
- * @param  {String*} fillStyle the fillStyle to clear with, if not provided, fallback on .clearRect
- * @return {THREEx.DynamicTexture}           the object itself, for chained texture
+ * 
+ * @param  {String*} fillStyle 		the fillStyle to clear with, if not provided, fallback on .clearRect
+ * @return {THREEx.DynamicTexture}      the object itself, for chained texture
  */
 THREEx.DynamicTexture.prototype.clear = function(fillStyle){
+	// depends on fillStyle
 	if( fillStyle !== undefined ){
 		this.context.fillStyle	= fillStyle
 		this.context.fillRect(0,0,this.canvas.width, this.canvas.height)		
