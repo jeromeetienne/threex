@@ -6,11 +6,12 @@ var THREEx	= THREEx	|| {}
  *
  * @param  {THREE.WebGLRender}		renderer          instance of webgl renderer
  * @param  {THREE.WebGLRenderTarget}	colorRenderTarget the render target containing color rendering
+ * @param  {THREE.WebGLRenderTarget*}	lensRenderTarget the render target destination, optional
  * @return {THREEx.SsLensFlare}		the instanced object
  */
-THREEx.SsLensFlare	= function(renderer, colorRenderTarget){
+THREEx.SsLensFlare	= function(renderer, colorRenderTarget, lensRenderTarget){
 
-	var lensRenderTarget	= new THREE.WebGLRenderTarget(colorRenderTarget.width/2, colorRenderTarget.height/2, {
+	lensRenderTarget	= lensRenderTarget	|| new THREE.WebGLRenderTarget(colorRenderTarget.width/2, colorRenderTarget.height/2, {
 		minFilter	: THREE.LinearFilter,
 		magFilter	: THREE.LinearFilter,
 		format		: THREE.RGBFormat,
@@ -113,7 +114,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 			type	: 'v2',
 			value	: new THREE.Vector2(window.innerWidth, window.innerHeight)
 		},
-		uGhosts		: { type : 'i'	, value	: 8	},
+		//uGhosts		: { type : 'i'	, value	: 8	},
 		uGhostDispersal	: { type : 'f'	, value	: 1/5	},
 		uHaloWidth	: { type : 'f'	, value	: 0.5	},
 		uDistortion	: { type : 'f'	, value	: 10	},
@@ -127,13 +128,14 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 		'}'
 	].join('\n'),
 	fragmentShader: [
+		'#define MAX_GHOSTS 8',
+		
 		'uniform sampler2D tDiffuse;',
 		'uniform sampler2D tLensColor;',
 		
 		'varying vec2	vUv;',
 
 		'uniform vec2	textureSize;',
-		'uniform int	uGhosts;',
 		'uniform float	uGhostDispersal;',
 
 		'uniform float	uHaloWidth;',
@@ -164,7 +166,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 			///////////////////////////////////////////////////
 			//	sample ghosts:
 			'vec4 result = vec4(0.0);',
-			'for(int i = 0; i < uGhosts; ++i){',
+			'for(int i = 0; i < MAX_GHOSTS; ++i){',
 				// offset of the ghosts
 			'	vec2 offset	= fract(texcoord + ghostVec * float(i));',
 

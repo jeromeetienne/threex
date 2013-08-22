@@ -22,7 +22,6 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 		threshold	: 0.9,
 		
 		// feature
-		uGhosts		: featureShaderUniforms['uGhosts'].value,
 		uGhostDispersal	: featureShaderUniforms['uGhostDispersal'].value,
 		uHaloWidth	: featureShaderUniforms['uHaloWidth'].value,
 		uDistortion	: featureShaderUniforms['uDistortion'].value,
@@ -66,7 +65,6 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 		thresholdShaderUniforms['uBias'].value.set(uBias, uBias, uBias, 0.0)
 
 		// feature
-		featureShaderUniforms['uGhosts'].value		= options.uGhosts
 		featureShaderUniforms['uGhostDispersal'].value	= options.uGhostDispersal
 		featureShaderUniforms['uHaloWidth'].value	= options.uHaloWidth
 		featureShaderUniforms['uDistortion'].value	= options.uDistortion
@@ -88,7 +86,6 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 	datGui.add( options, 'threshold', 0, 1)		.listen().onChange( onChange )
 
 	var folder	= datGui.addFolder('Features');
-	folder.add( options, 'uGhosts', 0, 12).step(1)	.listen().onChange( onChange )
 	folder.add( options, 'uGhostDispersal', 0, 1)	.listen().onChange( onChange )
 	folder.add( options, 'uHaloWidth', 0, 2)	.listen().onChange( onChange )
 	folder.add( options, 'uDistortion', 0, 200)	.listen().onChange( onChange )
