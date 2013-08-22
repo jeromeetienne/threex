@@ -209,7 +209,7 @@ THREEx.SsLensFlare.FeatureGenerationShader	= {
 
 THREEx.SsLensFlare.BlendShader = {
 	uniforms: {
-		scale		: { type : 'f'	, value	: 4 },
+		artefactScale	: { type : 'f'	, value	: 4 },
 		mixRatio	: { type : "f"  , value : 0.5 },
 		opacity		: { type : "f"  , value : 2.0 },
 		tDiffuse	: { type : 't'	, value	: null },
@@ -233,21 +233,20 @@ THREEx.SsLensFlare.BlendShader = {
 		'uniform sampler2D tLensStar;',
 		'uniform sampler2D tLensColor;',
 
-		'uniform float	scale;',
+		'uniform float	artefactScale;',
 		"uniform float	opacity;",
 		"uniform float	mixRatio;",
 
 		'varying vec2	vUv;',
 		
 		'void main() {',
-			'vec4 lensColor	= texture2D(tLensDirt, vUv);',
-			'lensColor	+= texture2D(tLensStar, vUv);',
-			'lensColor	*= vec4(vec3(scale), 1.0);',
+			'vec4 artefactColor	= texture2D(tLensDirt, vUv);',
+			'artefactColor	+= texture2D(tLensStar, vUv);',
+			'artefactColor	*= vec4(vec3(artefactScale), 1.0);',
 
-
-			'vec4 texelLens		= texture2D(tLensColor, vUv) * lensColor;',
+			'vec4 texelLensColor	= texture2D(tLensColor, vUv) * artefactColor;',
 			'vec4 texelDiffuse	= texture2D(tDiffuse, vUv);',
-			'gl_FragColor		= opacity * mix(texelDiffuse, texelLens, mixRatio );',
+			'gl_FragColor		= opacity * mix(texelDiffuse, texelLensColor, mixRatio );',
 
 		'}'
 	].join('\n')

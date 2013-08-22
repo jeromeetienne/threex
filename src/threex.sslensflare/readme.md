@@ -62,30 +62,3 @@ TODO
 ====
 * rotationZ for diffraction starburst
   * with a rotationZ based on camera position 
-* blending formula is too complex
-  * opacity for tDiffuse + lensScale ? 
-* in blendShader
-  * dirtScale
-  * stardustScale
-  * diffuseScale
-* DONE put blur params in dat.gui
-* DONE preset 'lens only'
-
-* DONE downsampling first pass
-  * how ?
-  * render color directly to renderTarget
-    * renderer.render( sceneTmp, cameraOrtho, target, true );
-  * open a effect composer
-    * THREE.TexturePass from renderTarget
-    * who decide the size of the output texture here
-    * THREE.EffectComposer = function ( renderer, renderTarget );
-    * ThresholdShader first
-    * then FeatureGenerationShader
-    * some blur
-  * how to blend to output a fullresolution output
-    * single pass effect composer with BlendShader (color + lensDirt)
-    * done at full resolution
-* DONE what about API ?
-  * a effect composer which receive the original renderTarget
-  * output post blur
-  * up to the user to blend it back

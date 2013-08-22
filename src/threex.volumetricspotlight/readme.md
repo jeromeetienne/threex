@@ -6,6 +6,13 @@ as in described in ["Good Enough" Volumetrics for Spotlights](http://john-chapma
 post from 
 [john chapman](http://john-chapman-graphics.blogspot.fr/).
 
+TODO
+====
+* remove any depth 
+* if so it become a simple geometry rendering, so pass
+* put the depth work in a backup direction
+  * experimentDepth
+
 
 TODO
 ====

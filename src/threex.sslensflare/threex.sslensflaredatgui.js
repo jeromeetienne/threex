@@ -27,7 +27,7 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 		uDistortion	: featureShaderUniforms['uDistortion'].value,
 
 		// blend
-		blendScale	: 10,
+		artefactScale	: 10,
 		blendRatio	: 0.5,
 		blendLensOnly	: function(){
 			options.blendRatio	= 1.0;
@@ -76,7 +76,7 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 		vBlurShaderUniforms2['v'].value	= options.verticalBlur
 
 		// blend
-		blendShaderUniforms['scale'].value	= options.blendScale
+		blendShaderUniforms['artefactScale'].value	= options.artefactScale
 		blendShaderUniforms['mixRatio'].value	= options.blendRatio
 		// blendShaderUniforms['opacity'].value	= 1.0 - options.blendRatio
 	}
@@ -93,7 +93,7 @@ THREEx.addSsLensFlare2DatGui	= function(ssLensFlare, blendPass, datGui){
 
 	var folder	= datGui.addFolder('Blend');
 	folder.add( options, 'blendRatio', 0, 1)	.listen().onChange( onChange )
-	folder.add( options, 'blendScale', 0, 30)	.listen().onChange( onChange )
+	folder.add( options, 'artefactScale', 0, 30)	.listen().onChange( onChange )
 	folder.add( options, 'blendLensOnly' )
 	folder.add( options, 'blendDefault' )
 	// folder.open()
