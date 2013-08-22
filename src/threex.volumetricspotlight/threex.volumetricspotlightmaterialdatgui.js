@@ -51,14 +51,10 @@ THREEx.addVolumetricSpotlightMaterial2DatGui	= function(material, datGui){
 		datGui.add( options, 'edgeConstractPower'	, 0.0 , 3)
 			.listen().onChange( onChange )
 	}
-	datGui.add( options, 'anglePower', 0, 10)
-		.listen().onChange( onChange )
-	datGui.add( options, 'attenuation', 0, 10)
-		.listen().onChange( onChange )
-	datGui.add( options, 'edgeScale', 0, 30)
-		.listen().onChange( onChange )
-	datGui.addColor( options, 'lightColor' )
-		.listen().onChange( onChange )
+	datGui.add( options, 'anglePower', 0, 10)	.listen().onChange( onChange )
+	datGui.add( options, 'attenuation', 0, 10)	.listen().onChange( onChange )
+	datGui.add( options, 'edgeScale', 0, 30)	.listen().onChange( onChange )
+	datGui.addColor( options, 'lightColor' )	.listen().onChange( onChange )
 	datGui.add( options, 'presetR8' )
 	datGui.add( options, 'presetR8G8B8A8' )
 }

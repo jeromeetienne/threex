@@ -145,7 +145,8 @@ console.warn = console.error
 </style>
 <div id='osdCenterColumn'>
 	<div id="gameStartOsd" class='osdFont' style='display:none'>
-		<span class='mapName'>Unknown</span> Level<br/>
+		<span class='mapName'>Unknown</span>
+		<br/>
 		Ready ?
 	</div>
 	<div id="gameLostOsd" class='osdFont' style='display:none'>Game Over</div>
@@ -168,36 +169,146 @@ require([ 'bower_components/threex.skymap/package.require.js'
 	var onMobile	= 'ontouchstart' in window ? true : false
 	GAME.profile	= new RenderingProfile(onMobile ? 'mobile' : 'normal')
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		map config							//
+	//////////////////////////////////////////////////////////////////////////////////
+
 	var mapConfigs	= {
-		'pool-1'	: {
-			humanName	: 'Pool 1',
-			constructor	: MapPool1,
-		}, 
-		'planets-1'	: {
-			humanName	: 'Planets 1',
-			constructor	: MapPlanets1,
-		}, 
-		'sport-1'	: {
-			humanName	: 'Sport 1',
-			constructor	: MapSport1,
-		}, 
-		'01'	: {
-			humanName	: 'Dev',
-			constructor	: Map01,
-		}, 
-		'02'	: {
-			humanName	: 'Planets',
-			constructor	: Map02,
-		}, 
-		'03'	: {
-			humanName	: 'Pool',
-			constructor	: Map03,
-		}, 
-		'04'	: {
-			humanName	: 'Sport',
-			constructor	: Map04,
-		},
+		// 'pool-1'	: {
+		// 	humanName	: 'Pool 1',
+		// 	create		: function(){ return new MapPool1() },
+		// }, 
+		// 'planets-1'	: {
+		// 	humanName	: 'Planets 1',
+		// 	create		: function(){ return new MapPlanets1() },
+		// }, 
+		// '01'	: {
+		// 	humanName	: 'Dev',
+		// 	create		: function(){ return new Map01() },
+		// }, 
+		// '02'	: {
+		// 	humanName	: 'Planets',
+		// 	create		: function(){ return new Map02() },
+		// }, 
+		// '03'	: {
+		// 	humanName	: 'Pool',
+		// 	create		: function(){ return new Map03() },
+		// }, 
+		// '04'	: {
+		// 	humanName	: 'Sport',
+		// 	create		: function(){ return new Map04() },
+		// },
 	};
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	mapConfigs.sport_1_1	= {
+		humanName	: 'Sport: level-1 round-1',
+		create		: function(){
+			return new MapSport1({
+				nBalls	: 2
+			})
+		},
+	}
+	mapConfigs.sport_1_2	= {
+		humanName	: 'Sport: level-1 round-1',
+		create		: mapConfigs.sport_1_1.create
+	}
+	mapConfigs.sport_2_1	= {
+		humanName	: 'Sport: level-2 round-1',
+		create		: function(){
+			return new MapSport1({
+				nBalls	: 4
+			})
+		},
+	}
+	mapConfigs.sport_2_2	= {
+		humanName	: 'Sport: level-2 round-2',
+		create		: mapConfigs.sport_2_1.create
+	}
+	mapConfigs.sport_3_1	= {
+		humanName	: 'Sport: level-3 round-1',
+		create		: function(){
+			return new MapSport1({
+				nBalls	: 6
+			})
+		},
+	}
+	mapConfigs.sport_3_2	= {
+		humanName	: 'Sport: level-3 round-2',
+		create		: mapConfigs.sport_3_1.create
+	}
+	mapConfigs.sport_bonus	= {
+		humanName	: 'Sport: Bonus Round',
+		create		: function(){
+			return new MapSport1({
+				nBalls		: 6,
+				respawnedEnabled: true
+			})
+		},
+	}
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
+	mapConfigs.pool_1_1	= {
+		humanName	: 'Pool: level-1 round-1',
+		create		: function(){
+			return new MapPool1({
+				nBotBalls	: 4
+			})
+		},
+	}
+	mapConfigs.pool_1_2	= {
+		humanName	: 'Pool: level-1 round-2',
+		create		: mapConfigs.pool_1_1.create
+	}
+	////////
+	mapConfigs.pool_2_1	= {
+		humanName	: 'Pool: level-2 round-1',
+		create		: function(){
+			return new MapPool1({
+				nBotBalls	: 6,
+				nBotEnemies	: 1,
+			})
+		},
+	}
+	mapConfigs.pool_2_2	= {
+		humanName	: 'Pool: level-2 round-2',
+		create		: mapConfigs.pool_2_1.create
+	}
+	////////
+	mapConfigs.pool_3_1	= {
+		humanName	: 'Pool: level-3 round-1',
+		create		: function(){
+			return new MapPool1({
+				nBotBalls	: 6,
+				nBotBouncer	: 1
+			})
+		},
+	}
+	mapConfigs.pool_3_2	= {
+		humanName	: 'Pool: level-3 round-2',
+		create		: mapConfigs.pool_2_1.create
+	}
+	mapConfigs.pool_bonus	= {
+		humanName	: 'Pool: Bonus Round',
+		create		: function(){
+			return new MapPool1({
+				nBotBalls	: 6,
+				respawnedEnabled: true,
+				nBotEnemies	: 1,
+			})
+		},
+	}
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
 
 	var mapIds	= Object.keys(mapConfigs)
 	var firstMapId	= Object.keys(mapConfigs)[0]
@@ -449,8 +560,8 @@ require([ 'bower_components/threex.skymap/package.require.js'
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	
-	console.assert(mapConfigs[GAME.mapId].constructor)
-	var map	= new mapConfigs[GAME.mapId].constructor()
+	console.assert(mapConfigs[GAME.mapId].create)
+	var map	= mapConfigs[GAME.mapId].create()
 	scene.add(map.object3d)
 	updateFcts.push(function(delta, now){
 		map.update(delta, now);		

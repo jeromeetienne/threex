@@ -1,5 +1,14 @@
-var MapSport1	= function(){
-	// handle updateFcts for sounds
+var MapSport1	= function(opts){
+	// parse argument
+	opts			= opts	|| {}
+	opts.respawnedEnabled	= opts.respawnedEnabled !== undefined ? opts.respawnedEnabled : false
+	opts.ballAttraction	= opts.ballAttraction !== undefined ? opts.ballAttraction : 0.1
+	opts.nBalls		= opts.nBalls !== undefined ? opts.nBalls : 2
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		update loop								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	var updateFcts	= [];
 	this.update	= function(delta, now){
 		updateFcts.forEach(function(updateFct){
@@ -70,15 +79,21 @@ var MapSport1	= function(){
 	
 	;(function(){
 		var texture	= THREE.ImageUtils.loadTexture('images/ballTextures/BasketballColor.jpg')
-		var botBall	= new BotBall2({
-			ballAttraction	: 0.0,
-			material	: new THREE.MeshPhongMaterial({
-				map	: texture,
-			}),
-		})
-		updateFcts.push(function(delta, now){
-			botBall.update(delta, now)
-		})
+		var nBallsType	= Math.round(opts.nBalls/3)
+		for(var i = 0; i < nBallsType; i++){
+			;(function(){
+				var botBall	= new BotBall2({
+					ballAttraction	: opts.ballAttraction,
+					respawnedEnabled: opts.respawnedEnabled,
+					material	: new THREE.MeshPhongMaterial({
+						map	: texture,
+					}),
+				})
+				updateFcts.push(function(delta, now){
+					botBall.update(delta, now)
+				})
+			})()			
+		}
 	})()
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -88,17 +103,23 @@ var MapSport1	= function(){
 	;(function(){
 		var textureColor= THREE.ImageUtils.loadTexture('images/ballTextures/SoftBallColor.jpg')
 		var textureBump	= THREE.ImageUtils.loadTexture('images/ballTextures/SoftBallBump.jpg')
-		var botBall	= new BotBall2({
-			ballAttraction	: 0.0,
-			material	: new THREE.MeshPhongMaterial({
-				map	: textureColor,
-				bumpMap	: textureBump,
-				bumpScale: 0.02,
-			}),
-		})
-		updateFcts.push(function(delta, now){
-			botBall.update(delta, now)
-		})
+		var nBallsType	= Math.round(opts.nBalls/3)
+		for(var i = 0; i < nBallsType; i++){
+			;(function(){
+				var botBall	= new BotBall2({
+					ballAttraction	: opts.ballAttraction,
+					respawnedEnabled: opts.respawnedEnabled,
+					material	: new THREE.MeshPhongMaterial({
+						map	: textureColor,
+						bumpMap	: textureBump,
+						bumpScale: 0.02,
+					}),
+				})
+				updateFcts.push(function(delta, now){
+					botBall.update(delta, now)
+				})			
+			})()			
+		}
 	})()
 
 
@@ -109,16 +130,22 @@ var MapSport1	= function(){
 	;(function(){
 		var textureColor= THREE.ImageUtils.loadTexture('images/ballTextures/NewTennisBallColor.jpg')
 		var textureBump	= THREE.ImageUtils.loadTexture('images/ballTextures/TennisBallBump.jpg')
-		var botBall	= new BotBall2({
-			ballAttraction	: 0.0,
-			material	: new THREE.MeshPhongMaterial({
-				map	: textureColor,
-				bumpMap	: textureBump,
-				bumpScale: 0.02,
-			}),
-		})
-		updateFcts.push(function(delta, now){
-			botBall.update(delta, now)
-		})
+		var nBallsType	= Math.round(opts.nBalls/3)
+		for(var i = 0; i < nBallsType; i++){
+			;(function(){
+				var botBall	= new BotBall2({
+					ballAttraction	: opts.ballAttraction,
+					respawnedEnabled: opts.respawnedEnabled,
+					material	: new THREE.MeshPhongMaterial({
+						map	: textureColor,
+						bumpMap	: textureBump,
+						bumpScale: 0.02,
+					}),
+				})
+				updateFcts.push(function(delta, now){
+					botBall.update(delta, now)
+				})
+			})()			
+		}
 	})()
 }

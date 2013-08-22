@@ -1,5 +1,16 @@
-var MapPool1	= function(){
-	// handle updateFcts for sounds
+var MapPool1	= function(opts){
+	// parse argument
+	opts			= opts	|| {}
+	opts.respawnedEnabled	= opts.respawnedEnabled !== undefined ? opts.respawnedEnabled : false
+	opts.ballAttraction	= opts.ballAttraction !== undefined ? opts.ballAttraction : 0.1
+	opts.nBotBalls		= opts.nBotBalls !== undefined ? opts.nBotBalls : 2
+	opts.nBotEnemies	= opts.nBotEnemies !== undefined ? opts.nBotEnemies : 0
+	opts.nBotBouncers	= opts.nBotBouncers !== undefined ? opts.nBotBouncers : 0
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		update loop								//
+	//////////////////////////////////////////////////////////////////////////////////
+
 	var updateFcts	= [];
 	this.update	= function(delta, now){
 		updateFcts.forEach(function(updateFct){
@@ -77,21 +88,37 @@ var MapPool1	= function(){
 	})()
 
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		nBotEnemies							//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	for(var i = 0; i < opts.nBotEnemies; i++){
+		;(function(){
+			var botEnemy	= new BotEnemy()
+			updateFcts.push(function(delta, now){
+				botEnemy.update(delta, now)
+			})
+		})()
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		BasketBall							//
+	//		nBotBalls							//
 	//////////////////////////////////////////////////////////////////////////////////
 		
-	;(function(){
-		var texture	= THREEx.createPoolBall.ballTexture('8', true, "#000000", 512)
-		var botBall	= new BotBall2({
-			ballAttraction	: 0.0,
-			material	: new THREE.MeshPhongMaterial({
-				map	: texture,
-			}),
-		})
-		updateFcts.push(function(delta, now){
-			botBall.update(delta, now)
-		})
-	})()
+	for(var i = 0; i < opts.nBotBalls; i++){
+		;(function(){
+			var texture	= THREEx.createPoolBall.ballTexture('8', true, "#000000", 512)
+			var botBall	= new BotBall2({
+				ballAttraction	: opts.ballAttraction,
+				respawnedEnabled: opts.respawnedEnabled,
+				material	: new THREE.MeshPhongMaterial({
+					map	: texture,
+				}),
+			})
+			updateFcts.push(function(delta, now){
+				botBall.update(delta, now)
+			})
+		})()		
+	}
 }
