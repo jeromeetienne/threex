@@ -2,8 +2,10 @@ threex.dynamictexture
 =====================
 this is a three.js extension to handle dynamically generated texture.
 Good if you want to write text in a texture for example.
-
-It is similar to babylon.js which got [BABYLON.DynamicTexture](https://github.com/BabylonJS/Babylon.js/blob/master/Babylon/Materials/textures/babylon.dynamicTexture.js).
+It is similar to
+[babylon.js](http://www.babylonjs.com)
+which got 
+[BABYLON.DynamicTexture](https://github.com/BabylonJS/Babylon.js/blob/master/Babylon/Materials/textures/babylon.dynamicTexture.js).
 
 
 How To Use It ? 

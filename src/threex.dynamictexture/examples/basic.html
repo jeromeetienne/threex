@@ -15,14 +15,14 @@
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 	
-	var dynamicTexture	= new THREEx.DynamicdynamicTexture(512,512)
+	var dynamicTexture	= new THREEx.DynamicTexture(512,512)
 	dynamicTexture.context.font	= "bolder 150px Verdana";
 	
 	var counter	= 0;
 	updateFcts.push(function(delta, now){
 		counter++;
 		dynamicTexture.clear('cyan')
-			.drawText(counter.toString(), undefined, 128, 'red')
+			.drawText(counter.toString(), undefined, 256, 'red')
 	})
 	
 	
