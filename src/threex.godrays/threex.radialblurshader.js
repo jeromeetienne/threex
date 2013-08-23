@@ -13,7 +13,7 @@ THREEx.RadialBlurShader	= {
 		tDiffuse	: {type: 't', value: null	},
 
 		fSunScreenX	: {type: 'f', value: 0.5	},
-		 fSunScreenY	: {type: 'f', value: 0.5	},
+		fSunScreenY	: {type: 'f', value: 0.5	},
 
 		fExposure	: {type: 'f', value: 0.6	},
 		fDecay		: {type: 'f', value: 0.93	},
