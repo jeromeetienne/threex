@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-<script src='../threex.audiovideotexture.js'></script>
+<script src='../threex.videotexture.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -18,17 +18,23 @@
 	window.AudioContext	= window.AudioContext || window.webkitAudioContext;
 	var context	= new AudioContext()
 	// create the videoTexture
-	var avTexture	= new THREEx.AudioVideoTexture(context, 'videos/sintel.ogv', function(nodeSource){
-		nodeSource.connect(context.destination)
-	})
+	var videoTexture= new THREEx.VideoTexture('videos/sintel.ogv')
 	updateFcts.push(function(delta, now){
-		avTexture.update(delta, now)
+		videoTexture.update(delta, now)
 	})
+	// wait until the vid is loaded
+	videoTexture.video.addEventListener('canplaythrough', function(event){
+		// create a source node from the mediaElement
+		var sourceNode	= context.createMediaElementSource(videoTexture.video)
+		// connect it to WebAudio API
+		sourceNode.connect(destination)
+	})
+
 	
 	// use the texture in a THREE.Mesh
 	var geometry	= new THREE.CubeGeometry(1,1,1);
 	var material	= new THREE.MeshBasicMaterial({
-		map	: avTexture	.texture
+		map	: videoTexture.texture
 	});
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
