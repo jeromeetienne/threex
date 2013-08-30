@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../vendor/webrtc.io-client/lib/webrtc.io.js'></script>
+<script src='bower_components/threex.videotexture/threex.videotexture.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -7,24 +9,33 @@
 
 	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 100 );
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
 	camera.position.z = 3;
-	
-	
-	;(function(){
-		// add a ambient light
-		var light	= new THREE.AmbientLight( 0x020202 )
-		scene.add( light )
-		// add a light in front
-		var light	= new THREE.DirectionalLight('white', 1)
-		light.position.set(0.5, 0.5, 2)
-		scene.add( light )
-		// add a light behind
-		var light	= new THREE.DirectionalLight('white', 0.75)
-		light.position.set(-0.5, -0.5, -2)
-		scene.add( light )		
-	})()
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	rtc.createStream({'video': true, 'audio': false}, function(mediaStream){
+		var url		= URL.createObjectURL(mediaStream);
+		var videoTexture= new THREEx.VideoTexture(url)
+		onRenderFcts.push(function(delta, now){
+			videoTexture.update(delta, now)
+		})
+		var geometry	= new THREE.PlaneGeometry(1,1)
+		var material	= new THREE.MeshBasicMaterial({
+			map	: videoTexture.texture
+		})
+		var mesh	= new THREE.Mesh(geometry, material)
+		scene.add(mesh)
+	}, function(){
+		console.log('createStream failed', arguments)
+	});
+
+	var room	= 'public';
+	var serverUrl	= "ws://localhost:8080/";
+	rtc.connect(serverUrl, room);
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
@@ -32,29 +43,13 @@
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
 	var material	= new THREE.MeshNormalMaterial();
 	var mesh	= new THREE.Mesh( geometry, material );
-	mesh.position.y	= 1;
-	mesh.position.z	= -1;
-	scene.add( mesh );
+	// scene.add( mesh );
 	
 	onRenderFcts.push(function(delta, now){
-		var angle	= now * Math.PI * 2
-		mesh.position.y	= Math.cos(angle)*0.5 + 1
-		mesh.rotation.y	+= 0.2 * delta * Math.PI * 2
+		// mesh.rotation.x += 1 * delta;
+		// mesh.rotation.y += 2 * delta;		
 	})
-
-;(function(){
-	var geometry	= new THREE.PlaneGeometry( 10, 10);
-	var material	= new THREE.MeshPhongMaterial({
-		color		: 'cyan',
-		transparent	: true,
-		opacity		: 0.4
-	});
-	var mesh	= new THREE.Mesh( geometry, material );
-	mesh.lookAt(new THREE.Vector3(0, 1, 0))
-window.planeMesh	= mesh;
-	scene.add( mesh );
-})()
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -65,8 +60,7 @@ window.planeMesh	= mesh;
 	}, false)
 	onRenderFcts.push(function(delta, now){
 		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		// camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
-		camera.position.y	= 1
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
 		camera.lookAt( scene.position )
 	})
 
@@ -74,21 +68,8 @@ window.planeMesh	= mesh;
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////
-
-	renderer.autoClear = false;
 	onRenderFcts.push(function(){
-
-		scene.scale.y	*= -1
-		camera.scale.y	*= -1
-		mesh.material.side	= THREE.BackSide
-
-		renderer.render( scene, camera );
-
-		scene.scale.y	*= -1
-		camera.scale.y	*= -1
-		mesh.material.side	= THREE.FrontSide
-
-		renderer.render( scene, camera );
+		renderer.render( scene, camera );		
 	})
 	
 	//////////////////////////////////////////////////////////////////////////////////
@@ -103,8 +84,8 @@ window.planeMesh	= mesh;
 		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
 		lastTimeMsec	= nowMsec
 		// call each update function
-		onRenderFcts.forEach(function(onRender){
-			onRender(deltaMsec/1000, nowMsec/1000)
+		onRenderFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
 		})
 	})
 </script></body>

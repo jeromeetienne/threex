@@ -1,0 +1,11 @@
+{
+  "name": "threex.videotexture",
+  "_release": "a1dcf8cf6f",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "a1dcf8cf6f481af6fe575d5a4973da9e1c17619a"
+  },
+  "_source": "/Users/jeromeetienne/webwork/threex.videotexture",
+  "_target": "*"
+}
