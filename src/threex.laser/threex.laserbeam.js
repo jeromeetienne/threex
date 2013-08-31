@@ -1,7 +1,7 @@
 var THREEx = THREEx || {}
 
 THREEx.LaserBeam	= function(){
-	var container	= new THREE.Object3D()
+	var object3d	= new THREE.Object3D()
 	// generate the texture
 	var canvas	= generateLaserBodyCanvas()
 	var texture	= new THREE.Texture( canvas )
@@ -21,9 +21,9 @@ THREEx.LaserBeam	= function(){
 		var mesh	= new THREE.Mesh(geometry, material)
 		mesh.position.x	= 1/2
 		mesh.rotation.x	= i/nPlanes * Math.PI
-		container.add(mesh)
+		object3d.add(mesh)
 	}
-	return container
+	return object3d
 	
 	function generateLaserBodyCanvas(){
 		// init canvas

@@ -41,11 +41,11 @@
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var laserBeam	= new THREEx.LaserBeam()
-	scene.add(laserBeam)
+	scene.add(laserBeam)§
 	laserBeam.position.x	= 2
-	var collision	= new THREEx.LaserCooked(laserBeam)
+	var laserCooked	= new THREEx.LaserCooked(laserBeam)
 	onRenderFcts.push(function(delta, now){
-		collision.update(delta, now)
+		laserCooked.update(delta, now)
 	})
 
 
