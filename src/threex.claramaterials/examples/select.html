@@ -6,6 +6,9 @@
 	<button onclick='setMaterial(this.innerText);updateMesh();'>Leather</button>
 	<button onclick='setMaterial(this.innerText);updateMesh();'>Lava</button>
 	<button onclick='setMaterial(this.innerText);updateMesh();'>BrushedMetal</button>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Stone</button>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Cobblestone</button>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Grass</button>
 	<br/>
 	<button onclick='setGeometry(this.innerText);updateMesh();'>Sphere</button>
 	<button onclick='setGeometry(this.innerText);updateMesh();'>Cube</button>
@@ -45,33 +48,29 @@
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 
+	var mesh	= null
+	var material	= null
+	var geometry	= null
+	
+	setMaterial('Lava')
+	setGeometry('Sphere')
+	updateMesh()
+
 	updateFcts.push(function(delta, now){
-		var mesh	= currentMesh
 		mesh.rotation.x += 0.2 * delta;
 		mesh.rotation.y += 0.3 * delta;		
 	})
 
-	var currentMesh		= null
-	var currentMaterial	= null
-	var currentGeometry	= null
-	
-	window.currentMesh	= currentMesh
-	window.currentMaterial	= currentMaterial
-	window.currentGeometry	= currentGeometry
-
-	setMaterial('Lava')
-	setGeometry('Sphere')
-	updateMesh()
 	
 	function setMaterial(type){
 		if( type === 'WhiteSand' ){
-			var material	= THREEx.ClaraioMaterials.createWhiteSand()
+			material	= THREEx.ClaraioMaterials.createWhiteSand()
 		}else if( type === 'Leather' ){
-			var material	= THREEx.ClaraioMaterials.createLeather()
+			material	= THREEx.ClaraioMaterials.createLeather()
 		}else if( type === 'Lava' ){
-			var material	= THREEx.ClaraioMaterials.createLava()
+			material	= THREEx.ClaraioMaterials.createLava()
 		}else if( type === 'BrushedMetal' ){
-			var material	= THREEx.ClaraioMaterials.createBrushedMetal()
+			material	= THREEx.ClaraioMaterials.createBrushedMetal()
 			var texture	= THREE.ImageUtils.loadTextureCube([
 				'../images/cubes/swisscastleblur/posx.png',
 				'../images/cubes/swisscastleblur/negx.png',
@@ -83,28 +82,27 @@
 			material.envMap		= texture
 			material.reflectivity	= 0.93
 			material.refractionRatio= 0.98
+		}else if( type === 'Stone' ){
+			material	= THREEx.ClaraioMaterials.createStone()
+		}else if( type === 'Cobblestone' ){
+			material	= THREEx.ClaraioMaterials.createCobblestone()
+		}else if( type === 'Grass' ){
+			material	= THREEx.ClaraioMaterials.createGrass()
 		}else	console.assert(false)
-		currentMaterial	= material
 	}
 	function setGeometry(type){
 		if( type === 'Sphere' ){
-			var geometry	= new THREE.SphereGeometry( 1, 32, 16);
+			geometry	= new THREE.SphereGeometry( 1, 32, 16);
 		}else if( type === 'Cube' ){
-			var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+			geometry	= new THREE.CubeGeometry( 1, 1, 1);
 		}else if( type === 'TorusKnot' ){
-			var geometry	= new THREE.TorusKnotGeometry( 1-0.15, 0.15, 128, 16);
+			geometry	= new THREE.TorusKnotGeometry( 1-0.15, 0.15, 128, 16);
 		}else	console.assert(false)
-		currentGeometry	= geometry
 	}
 	function updateMesh(){
-		currentMesh && scene.remove(currentMesh)
-		console.log('currentGeometry', currentGeometry)
-		console.log('currentMaterial', currentMaterial)
-
-		var mesh	= new THREE.Mesh(currentGeometry, currentMaterial);
+		if( mesh )	scene.remove(mesh)
+		mesh	= new THREE.Mesh(geometry, material);
 		scene.add(mesh)
-		currentMesh	= mesh
-		window.currentMesh	= currentMesh
 	}
 
 	

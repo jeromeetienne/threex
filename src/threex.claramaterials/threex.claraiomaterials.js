@@ -53,18 +53,57 @@ THREEx.ClaraioMaterials.createLava	= function(){
 	return material	
 }
 
-THREEx.ClaraioMaterials.createBrushedMetal	= function(){
+THREEx.ClaraioMaterials.createStone	= function(){
 	var baseURL	= THREEx.ClaraioMaterials.baseURL;
 	var material	= new THREE.MeshPhongMaterial({
 		color		: '#ffffff',
-		ambient		: '#666666',
-		shininess	: 33,
-		emissive	: '#000000',
-		bumpMap		: THREE.ImageUtils.loadTexture(baseURL+'images/BrushedMetal.png'),
-		bumpScale	: 0.001,
-		specular	: '#ffffff',
+		map		: THREE.ImageUtils.loadTexture(baseURL+'images/BrickColor.png'),
+
+		shininess	: 14,
+		ambient		: '#1e1e1e',
+
+		normalMap	: THREE.ImageUtils.loadTexture(baseURL+'images/BrickNormal.png'),
+
+		specularMap	: THREE.ImageUtils.loadTexture(baseURL+'images/BrickSpec.png'),
+		specular	: '#4c4a4a',
+
 	});
 	return material	
 }
 
+THREEx.ClaraioMaterials.createCobblestone	= function(){
+	var baseURL	= THREEx.ClaraioMaterials.baseURL;
+	var material	= new THREE.MeshPhongMaterial({
+		color		: '#ffffff',
+		map		: THREE.ImageUtils.loadTexture(baseURL+'images/CobbleStoneColor.png'),
+
+		shininess	: 14,
+		ambient		: '#1e1e1e',
+
+		normalMap	: THREE.ImageUtils.loadTexture(baseURL+'images/CobbleStoneNormal.png'),
+
+		specularMap	: THREE.ImageUtils.loadTexture(baseURL+'images/CobbleStoneSpec.png'),
+		specular	: '#4c4a4a',
+
+	});
+	return material	
+}
+
+THREEx.ClaraioMaterials.createGrass	= function(){
+	var baseURL	= THREEx.ClaraioMaterials.baseURL;
+	var material	= new THREE.MeshPhongMaterial({
+		color		: '#ffffff',
+		map		: THREE.ImageUtils.loadTexture(baseURL+'images/Grass_Color.png'),
+
+		shininess	: 14,
+		ambient		: '#1e1e1e',
+
+		normalMap	: THREE.ImageUtils.loadTexture(baseURL+'images/Grass_NRM.png'),
+
+		specularMap	: THREE.ImageUtils.loadTexture(baseURL+'images/Grass_Spec.png'),
+		specular	: '#4c4a4a',
+
+	});
+	return material	
+}
 

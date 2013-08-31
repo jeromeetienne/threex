@@ -1,6 +1,6 @@
 var THREEx = THREEx || {}
 
-THREEx.LaserMeshCollision	= function(container){
+THREEx.LaserCooked	= function(container){
 	// for update loop
 	var updateFcts	= []
 	this.update	= function(delta, now){
@@ -10,8 +10,8 @@ THREEx.LaserMeshCollision	= function(container){
 	}
 
 	// build THREE.Sprite for impact
-	// TODO pass it as THREE.LensFlare to remove 'part in object' impact
-	var texture	= THREE.ImageUtils.loadTexture('../../threex.particles/examples/images/blue_particle.jpg')	
+	var textureUrl	= THREEx.LaserCooked.baseURL+'images/blue_particle.jpg';
+	var texture	= THREE.ImageUtils.loadTexture(textureUrl)	
 	var material	= new THREE.SpriteMaterial({
 		map			: texture,
 		blending		: THREE.AdditiveBlending,
@@ -56,5 +56,6 @@ THREEx.LaserMeshCollision	= function(container){
 			container.scale.x	= 10			
 		}
 	});
-
 }
+
+THREEx.LaserCooked.baseURL	= '../'
