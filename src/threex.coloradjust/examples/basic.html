@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/BloomPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/DotScreenPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/FilmPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/MaskPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/RenderPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/SavePass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="../../../vendor/three.js/examples/js/postprocessing/TexturePass.js"></script>
+<script src="../../../vendor/three.js/examples/js/shaders/CopyShader.js"></script>
+<script src="../../../vendor/three.js/examples/js/shaders/SepiaShader.js"></script>
+
+<script src="../threex.coloradjust.js"></script>
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer({
+		//antialias	: true
+	});
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 3;
+	
+
+	var images = {
+		'default'		: "../images/default.png",
+		'monochrome'		: "../images/monochrome.png",
+		'sepia'			: "../images/sepia.png",
+		'saturated'		: "../images/saturated.png",
+		'posterize'		: "../images/posterize.png",
+		'inverse'		: "../images/inverse.png",
+		'color-negative'	: "../images/color-negative.png",
+		'high-contrast-bw'	: "../images/high-contrast-bw.png",
+		'funky-contrast'	: "../images/funky-contrast.png",
+		'nightvision'		: "../images/nightvision.png",
+		'thermal'		: "../images/thermal.png",
+		'black-white'		: "../images/black-white.png",
+		'hue-plus-60'		: "../images/hue-plus-60.png",
+		'hue-plus-180'		: "../images/hue-plus-180.png",
+		'hue-minus-60'		: "../images/hue-minus-60.png",
+		'red-to-cyan'		: "../images/red-to-cyan.png",
+		'blues'			: "../images/blues.png",
+		'infrared'		: "../images/infrared.png",
+		'radioactive'		: "../images/radioactive.png",
+		'goolgey'		: "../images/googley.png",
+		'bgy'			: "../images/bgy.png"
+	};
+
+
+	function buildTexture(url, width, callback) {
+		// create the canvas
+		var canvas	= document.createElement("canvas");
+		canvas.width	= width * width;
+		canvas.height	= width;
+		// load the image
+		var image	= document.createElement('img');
+		image.addEventListener('load', function (event){
+			var ctx		= canvas.getContext("2d");
+			ctx.drawImage(image, 0, 0);
+			texture.needsUpdate	= true
+			callback	&& callback(texture)
+		})
+		image.src	= url
+		// create the texture
+		var texture	= new THREE.Texture(canvas);
+		// return the just built texture
+		return texture;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	onRenderFcts.push(function(delta, now){
+		// mesh.rotation.x += 1 * delta;
+		// mesh.rotation.y += 2 * delta;		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * start with mixAmount === 0 with default in tColorCube0
+ * colorRenderer.delay	= 2
+ * colorRenderer.setTexture('posterize')
+ * * copy tColorCube0 in tColorCube1
+ * * set .mixAmount to 1
+ * * decrease mixAmount in .update until mixAmount === 0
+ */
+
+	var colorRenderer= new THREEx.ColorAdjustRenderer(renderer, scene, camera);
+	colorRenderer.colorAdjustPass.uniforms.mixAmount.value	= 0
+	colorRenderer.colorAdjustPass.uniforms.tColorCube0.value= buildTexture(images.bgy, 8)
+	colorRenderer.colorAdjustPass.uniforms.tColorCube1.value= buildTexture(images.default, 8)
+	onRenderFcts.push(function(delta, now){
+		colorRenderer.update(delta, now)
+	});
+
+	// onRenderFcts.push(function(delta, now){
+	// 	renderer.render(scene, camera)
+	// })
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
