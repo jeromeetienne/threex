@@ -1,7 +1,35 @@
 var THREEx	= THREEx	|| {};
 
+THREEx.ColorAdjust	= {}
 
-THREEx.ColorAdjustRenderer	= function(renderer, scene, camera){
+THREEx.ColorAdjust.baseURL	= '../'
+
+THREEx.ColorAdjust.colorCubes	= {
+	'default'		: 'images/default.png',
+	'monochrome'		: 'images/monochrome.png',
+	'sepia'			: 'images/sepia.png',
+	'saturated'		: 'images/saturated.png',
+	'posterize'		: 'images/posterize.png',
+	'inverse'		: 'images/inverse.png',
+	'color-negative'	: 'images/color-negative.png',
+	'high-contrast-bw'	: 'images/high-contrast-bw.png',
+	'funky-contrast'	: 'images/funky-contrast.png',
+	'nightvision'		: 'images/nightvision.png',
+	'thermal'		: 'images/thermal.png',
+	'black-white'		: 'images/black-white.png',
+	'hue-plus-60'		: 'images/hue-plus-60.png',
+	'hue-plus-180'		: 'images/hue-plus-180.png',
+	'hue-minus-60'		: 'images/hue-minus-60.png',
+	'red-to-cyan'		: 'images/red-to-cyan.png',
+	'blues'			: 'images/blues.png',
+	'infrared'		: 'images/infrared.png',
+	'radioactive'		: 'images/radioactive.png',
+	'goolgey'		: 'images/googley.png',
+	'bgy'			: 'images/bgy.png',
+}
+
+
+THREEx.ColorAdjust.Renderer	= function(renderer, scene, camera){
 	// create the composer
 	var composer	= new THREE.EffectComposer( renderer )
 	this.composer	= composer
@@ -9,23 +37,62 @@ THREEx.ColorAdjustRenderer	= function(renderer, scene, camera){
 	var effect	= new THREE.RenderPass( scene, camera )
 	composer.addPass( effect )
 
-	var effect	= new THREE.ShaderPass( THREEx.ColorAdjustShader )
+	var effect	= new THREE.ShaderPass( THREEx.ColorAdjust.Shader )
 	this.colorAdjustPass	= effect;
 	composer.addPass( effect )
+
+	effect.uniforms['mixAmount'].value	= 0
+	effect.uniforms['tColorCube0'].value	= buildTexture(THREEx.ColorAdjust.baseURL + THREEx.ColorAdjust.colorCubes['default'], 8)
+	effect.uniforms['tColorCube1'].value	= effect.uniforms['tColorCube0'].value
 
 	// mark the last pass as ```renderToScreen```
 	composer.passes[composer.passes.length-1].renderToScreen	= true;
 
+	this.delay	= 0.5
+	
 	this.update	= function(delta, now){
+		if( effect.uniforms['mixAmount'].value > 0 ){
+			effect.uniforms['mixAmount'].value	-= delta/this.delay;
+			effect.uniforms['mixAmount'].value	= Math.max(effect.uniforms['mixAmount'].value, 0) 
+		}
+		
 		composer.render(delta);		
+	}.bind(this)
+
+	this.setColorCube	= function(value){
+		effect.uniforms['tColorCube1'].value	= effect.uniforms['tColorCube0'].value
+		var url		= THREEx.ColorAdjust.baseURL + THREEx.ColorAdjust.colorCubes[value]
+		effect.uniforms['tColorCube0'].value	= buildTexture(url, 8)
+		effect.uniforms['mixAmount'].value	= 1
+	}
+	
+	function buildTexture(url, width, callback) {
+		// create the canvas
+		var canvas	= document.createElement("canvas");
+		canvas.width	= width * width;
+		canvas.height	= width;
+		// load the image
+		var image	= document.createElement('img');
+		image.addEventListener('load', function (event){
+			var ctx		= canvas.getContext("2d");
+			ctx.drawImage(image, 0, 0);
+			texture.needsUpdate	= true
+			callback	&& callback(texture)
+		})
+		image.src	= url
+		// create the texture
+		var texture	= new THREE.Texture(canvas);
+		// return the just built texture
+		return texture;
 	}
 }
+
 
 /**
  * ColorAdjustShader - from http://webglsamples.googlecode.com/hg/color-adjust/color-adjust.html 
  * by Greggman
  */
-THREEx.ColorAdjustShader	= {
+THREEx.ColorAdjust.Shader	= {
 	uniforms	: {
 		'mixAmount'	: { type: 'f', value: 0.5 },
 		'tDiffuse'	: { type: 't', value: null },

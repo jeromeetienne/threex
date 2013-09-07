@@ -17,7 +17,8 @@ Show Don't Tell
 ===============
 * [examples/basic.html](http://jeromeetienne.github.io/threex.coloradjust/examples/basic.html)
 \[[view source](https://github.com/jeromeetienne/threex.coloradjust/blob/master/examples/basic.html)\] :
-It shows this feature, and that one which is coded like that.
+It shows how to use the ```THREEx.ColorAdjust.Renderer```.
+It changes the color cube randomly every 3-seconds just to put some animations
 * [examples/requirejs.html](http://jeromeetienne.github.io/threex.coloradjust/examples/requirejs.html)
 \[[view source](https://github.com/jeromeetienne/threex.coloradjust/blob/master/examples/requirejs.html)\] :
 It does that this way, and it is cool in that case.
