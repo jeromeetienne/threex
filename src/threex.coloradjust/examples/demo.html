@@ -7,51 +7,52 @@
 <script src="../../../vendor/three.js/examples/js/shaders/CopyShader.js"></script>
 <script src="../threex.coloradjust.js"></script>
 <script src="../threex.coloradjust.js"></script>
+<div style='position:absolute; right: 0px; ; opacity: 0.5; color: white'>
+	Transition Delay<br/>
+	<input type="range" min="0" max="3" style='background: grey;' step='any' onchange='colorRenderer.delay=this.value;'>
+</div>
 <div style='position:absolute'>
-	<button onclick='switchValue(this.innerText);'>default</button>
-	<button onclick='switchValue(this.innerText);'>monochrome</button>
-	<button onclick='switchValue(this.innerText);'>sepia</button>
-	<button onclick='switchValue(this.innerText);'>saturated</button>
-	<button onclick='switchValue(this.innerText);'>posterize</button>
-	<button onclick='switchValue(this.innerText);'>inverse</button>
-	<button onclick='switchValue(this.innerText);'>color-negative</button>
-	<button onclick='switchValue(this.innerText);'>high-contrast-bw</button>
-	<button onclick='switchValue(this.innerText);'>funky-contrast</button>
-	<button onclick='switchValue(this.innerText);'>nightvision</button>
-	<button onclick='switchValue(this.innerText);'>thermal</button>
-	<button onclick='switchValue(this.innerText);'>black-white</button>
-	<button onclick='switchValue(this.innerText);'>hue-plus-60</button>
-	<button onclick='switchValue(this.innerText);'>hue-plus-180</button>
-	<button onclick='switchValue(this.innerText);'>hue-minus-60</button>
-	<button onclick='switchValue(this.innerText);'>red-to-cyan</button>
-	<button onclick='switchValue(this.innerText);'>blues</button>
-	<button onclick='switchValue(this.innerText);'>infrared</button>
-	<button onclick='switchValue(this.innerText);'>radioactive</button>
-	<button onclick='switchValue(this.innerText);'>goolgey</button>
-	<button onclick='switchValue(this.innerText);'>bgy</button>
+	<button onclick='switchValue(this.innerText);'>default</button><br/>
+	<button onclick='switchValue(this.innerText);'>monochrome</button><br/>
+	<button onclick='switchValue(this.innerText);'>sepia</button><br/>
+	<button onclick='switchValue(this.innerText);'>saturated</button><br/>
+	<button onclick='switchValue(this.innerText);'>posterize</button><br/>
+	<button onclick='switchValue(this.innerText);'>inverse</button><br/>
+	<button onclick='switchValue(this.innerText);'>color-negative</button><br/>
+	<button onclick='switchValue(this.innerText);'>high-contrast-bw</button><br/>
+	<button onclick='switchValue(this.innerText);'>funky-contrast</button><br/>
+	<button onclick='switchValue(this.innerText);'>nightvision</button><br/>
+	<button onclick='switchValue(this.innerText);'>thermal</button><br/>
+	<button onclick='switchValue(this.innerText);'>black-white</button><br/>
+	<button onclick='switchValue(this.innerText);'>hue-plus-60</button><br/>
+	<button onclick='switchValue(this.innerText);'>hue-plus-180</button><br/>
+	<button onclick='switchValue(this.innerText);'>hue-minus-60</button><br/>
+	<button onclick='switchValue(this.innerText);'>red-to-cyan</button><br/>
+	<button onclick='switchValue(this.innerText);'>blues</button><br/>
+	<button onclick='switchValue(this.innerText);'>infrared</button><br/>
+	<button onclick='switchValue(this.innerText);'>radioactive</button><br/>
+	<button onclick='switchValue(this.innerText);'>goolgey</button><br/>
+	<button onclick='switchValue(this.innerText);'>bgy</button><br/>
 </div>
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
-	var renderer	= new THREE.WebGLRenderer({
-		//antialias	: true
-	});
+	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
 	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
-	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 2;
-
+	var camera	= new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2,  window.innerHeight / 2, window.innerHeight / -2, -100, 100);
+				
 	//////////////////////////////////////////////////////////////////////////////////
-	//		add an object and make it move					//
-	//////////////////////////////////////////////////////////////////////////////////	
+	//		create the video texture					//
+	//////////////////////////////////////////////////////////////////////////////////
 
-	// create the video element
 	var video	= document.createElement('video');
-	video.width	= 320;
-	video.height	= 240;
-	video.autoplay	= true;
-	video.loop	= true;
+	video.width	= 320
+	video.height	= 240
+	video.autoplay	= true
+	video.loop	= true
+	video.volume	= 0
 	video.src	= 'videos/sintel.ogv';
 	var texture	= new THREE.Texture( video );
 	onRenderFcts.push(function(){
@@ -59,42 +60,45 @@
 		texture.needsUpdate	= true;		
 	})
 
+	// trick to work around bugs in the video loop
+	onRenderFcts.push(function(delta, now){
+		if( video.currentTime === video.duration ){
+			video.src = video.src	
+		}
+	})
+	
+	document.querySelector('canvas').addEventListener('click', function(event){
+		console.log('clicked', video.paused)
+		if( video.paused ){
+			video.play()	
+		}else{
+			video.pause()
+		}
+	}, false)
 
-	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+
+
+	var geometry	= new THREE.PlaneGeometry( window.innerWidth, window.innerHeight )
 	var material	= new THREE.MeshBasicMaterial();
 	material.map	= texture
-	var mesh	= new THREE.Mesh( geometry, material );
-	scene.add( mesh );
-	onRenderFcts.push(function(delta, now){
-		// mesh.rotation.x += 1 * delta;
-		// mesh.rotation.y += 2 * delta;		
-	})
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		Camera Controls							//
-	//////////////////////////////////////////////////////////////////////////////////
-	var mouse	= {x : 0, y : 0}
-	document.addEventListener('mousemove', function(event){
-		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
-		mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	}, false)
-	onRenderFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
-		camera.lookAt( scene.position )
-	})
+	// material.color.set('white')
+	var mesh	= new THREE.Mesh(geometry, material)
+	scene.add(mesh)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var colorRenderer= new THREEx.ColorAdjust.Renderer(renderer, scene, camera);
-	colorRenderer.setColorCube('default')
-	
+	colorRenderer.setColorCube('default')	
 	onRenderFcts.push(function(delta, now){
 		colorRenderer.update(delta, now)
 	});
 
+	// for UI
 	function switchValue (value){
 		colorRenderer.setColorCube(value)
 	}
