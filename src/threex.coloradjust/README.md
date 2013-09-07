@@ -7,9 +7,6 @@ for
 [three.js](http://threejs.org)
 which provide an color adjustement based on a 3d texture.
 It is very flexible, you can build those textures with any image editing software.
-
-
-
 It is from
 [color-adjust demo](http://webglsamples.googlecode.com/hg/color-adjust/color-adjust.html)
 by
@@ -59,27 +56,27 @@ colorRenderer.update(delta, now)
 ```
 
 You can set the color cube you want amoung the 22 available. It default to ```default```.
-Here is the full list of available colors adjustement : ```default```,
-```monochrome```,
-```sepia```,
-```saturated```,
-```posterize```,
-```inverse```,
-```color-negative```,
-```high-contrast-bw```,
-```funky-contrast```,
-```nightvision```,
-```thermal```,
-```black-white```,
-```hue-plus-60```,
-```hue-plus-180```,
-```hue-minus-60```,
-```red-to-cyan```,
-```blues```,
-```infrared```,
-```radioactive```,
-```goolgey```,
-```bgy```.
+Here is the full list of available colors adjustement : default,
+monochrome,
+sepia,
+saturated,
+posterize,
+inverse,
+color-negative,
+high-contrast-bw,
+funky-contrast,
+nightvision,
+thermal,
+black-white,
+hue-plus-60,
+hue-plus-180,
+hue-minus-60,
+red-to-cyan,
+blues,
+infrared,
+radioactive,
+goolgey,
+bgy.
 
 ```javascript
 colorRenderer.setColorCube('default')	
