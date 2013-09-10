@@ -43,16 +43,24 @@
 
 
 
-	
-	var composer	= new THREE.EffectComposer( renderer );
+	var renderTarget= new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
+		minFilter	: THREE.LinearFilter,
+		magFilter	: THREE.LinearFilter,
+		format		: THREE.RGBAFormat,
+		stencilBuffer	: false
+	});
+	var composer	= new THREE.EffectComposer(renderer, renderTarget );
 
 	var effect	= new THREE.RenderPass( scene, camera )
 	composer.addPass( effect );
 
-	// create the effect
-	var effect	= new THREE.ShaderPass( THREE.SepiaShader );
-	effect.uniforms[ "amount" ].value = 0.9;
+	var effect	= new THREE.ShaderPass( THREE.CopyShader );
 	composer.addPass( effect );
+
+	// // create the effect
+	// var effect	= new THREE.ShaderPass( THREE.SepiaShader );
+	// effect.uniforms[ "amount" ].value = 0.9;
+	// composer.addPass( effect );
 	
 	effect.renderToScreen = true;
 

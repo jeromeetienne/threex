@@ -1,21 +1,38 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.js'></script>
 <script src='../threex.claraiomaterials.js'></script>
-<div style='position:absolute; top: 0px;'>
-	<button onclick='setMaterial(this.innerText);updateMesh();'>WhiteSand</button>
+<div style='position:absolute; top: 10px; left: 10px'>
+	<label>Fabric:</label>
 	<button onclick='setMaterial(this.innerText);updateMesh();'>Leather</button>
-	<button onclick='setMaterial(this.innerText);updateMesh();'>Lava</button>
-	<button onclick='setMaterial(this.innerText);updateMesh();'>BrushedMetal</button>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Jean</button>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>BlackLeather</button>
+	<hr>
+	<label>Architectural :</label>
 	<button onclick='setMaterial(this.innerText);updateMesh();'>Stone</button>
 	<button onclick='setMaterial(this.innerText);updateMesh();'>Cobblestone</button>
+	<hr>
+	<label>Environmental :</label>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Lava</button>
 	<button onclick='setMaterial(this.innerText);updateMesh();'>Grass</button>
-	<br/>
-	<button onclick='setGeometry(this.innerText);updateMesh();'>Sphere</button>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Sand</button>
+	<hr>
+	<label>Metals :</label>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Metal</button>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>BrushedMetal</button>
+	<hr>
+	<label>Woods :</label>
+	<button onclick='setMaterial(this.innerText);updateMesh();'>Wood</button>
+	<hr>
+	<label>Shape:</label>
 	<button onclick='setGeometry(this.innerText);updateMesh();'>Cube</button>
+	<button onclick='setGeometry(this.innerText);updateMesh();'>Sphere</button>
+	<button onclick='setGeometry(this.innerText);updateMesh();'>Torus</button>
 	<button onclick='setGeometry(this.innerText);updateMesh();'>TorusKnot</button>
 </div>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
-	var renderer	= new THREE.WebGLRenderer();
+	var renderer	= new THREE.WebGLRenderer({
+		antialias	: true
+	});
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
@@ -30,7 +47,7 @@
 
 	;(function(){
 		// add a ambient light
-		var light	= new THREE.AmbientLight( 0x020202 )
+		var light	= new THREE.AmbientLight( 0x202020 )
 		scene.add( light )
 		// add a light in front
 		var light	= new THREE.DirectionalLight('white', 1)
@@ -53,7 +70,7 @@
 	var geometry	= null
 	
 	setMaterial('Lava')
-	setGeometry('Sphere')
+	setGeometry('Cube')
 	updateMesh()
 
 	updateFcts.push(function(delta, now){
@@ -63,31 +80,28 @@
 
 	
 	function setMaterial(type){
-		if( type === 'WhiteSand' ){
-			material	= THREEx.ClaraioMaterials.createWhiteSand()
+		if( type === 'Sand' ){
+			material	= THREEx.ClaraioMaterials.createSand()
 		}else if( type === 'Leather' ){
 			material	= THREEx.ClaraioMaterials.createLeather()
+		}else if( type === 'Jean' ){
+			material	= THREEx.ClaraioMaterials.createJean()
+		}else if( type === 'BlackLeather' ){
+			material	= THREEx.ClaraioMaterials.createBlackLeather()
 		}else if( type === 'Lava' ){
 			material	= THREEx.ClaraioMaterials.createLava()
+		}else if( type === 'Metal' ){
+			material	= THREEx.ClaraioMaterials.createMetal()
 		}else if( type === 'BrushedMetal' ){
 			material	= THREEx.ClaraioMaterials.createBrushedMetal()
-			var texture	= THREE.ImageUtils.loadTextureCube([
-				'../images/cubes/swisscastleblur/posx.png',
-				'../images/cubes/swisscastleblur/negx.png',
-				'../images/cubes/swisscastleblur/posy.png',
-				'../images/cubes/swisscastleblur/negy.png',
-				'../images/cubes/swisscastleblur/posz.png',
-				'../images/cubes/swisscastleblur/negz.png',
-			])
-			material.envMap		= texture
-			material.reflectivity	= 0.93
-			material.refractionRatio= 0.98
 		}else if( type === 'Stone' ){
 			material	= THREEx.ClaraioMaterials.createStone()
 		}else if( type === 'Cobblestone' ){
 			material	= THREEx.ClaraioMaterials.createCobblestone()
 		}else if( type === 'Grass' ){
 			material	= THREEx.ClaraioMaterials.createGrass()
+		}else if( type === 'Wood' ){
+			material	= THREEx.ClaraioMaterials.createWood()
 		}else	console.assert(false)
 	}
 	function setGeometry(type){
@@ -95,8 +109,10 @@
 			geometry	= new THREE.SphereGeometry( 1, 32, 16);
 		}else if( type === 'Cube' ){
 			geometry	= new THREE.CubeGeometry( 1, 1, 1);
+		}else if( type === 'Torus' ){
+			geometry	= new THREE.TorusGeometry( 1-0.25, 0.25, 32, 32);
 		}else if( type === 'TorusKnot' ){
-			geometry	= new THREE.TorusKnotGeometry( 1-0.15, 0.15, 128, 16);
+			geometry	= new THREE.TorusKnotGeometry( 1-0.25, 0.25, 128, 16);
 		}else	console.assert(false)
 	}
 	function updateMesh(){
