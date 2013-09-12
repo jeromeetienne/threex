@@ -52,7 +52,7 @@ THREEx.SpaceShips.loadSpaceFighter02(function(object3d){
 ```
 
 You get the idea. here is how to add ```SpaceFighter03```,
-```Shuttle01```,
+```Shuttle01``` and
 ```Shuttle02```.
 
 ```javascript
