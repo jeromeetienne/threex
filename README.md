@@ -41,7 +41,8 @@ var THREEx	= THREEx	|| {};
 ```
 
 Then you declare your module, up to you to know what it is supposed to do. But if you 
-could document it in [jsdoc](http://usejsdoc.org/), i would be grateful :)
+could document it, i would be grateful :)
+If you look for a format, see [jsdoc](http://usejsdoc.org/).
 
 ```
 /**
@@ -50,6 +51,14 @@ could document it in [jsdoc](http://usejsdoc.org/), i would be grateful :)
 THREEx.SuperModule	= function( /* arguments... */ ){
 	// here you put your own thing
 };
+```
+
+If needed, you can have a ```.destroy()``` function to act as explicit destructor
+
+```
+this.destroy	= function(){
+	// here, clean things up
+}
 ```
 
 ## To Update Rendering of Your Module
@@ -100,19 +109,80 @@ updateFcts.push(function callback(delta, now){
 })
 ```
 
-to remove a functoin in this update loop, you can do
+to remove a function in this update loop, you can do
 
 ```
 updateFcts.splice(updateFcts.indexOf(callback),1)
 ```
 
+## Folders
 
+* ```/examples``` contains the examples for your module
+* ```/readme.md``` contains a readme about your module. 
+For more on readme, see [Readme Driven Development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html)
+* maybe a ```/threex.supermodule.js``` file which contains the js code of your module
+  * If your module is too complex for a single file, for example you could do
+    * ```/threex.supermodule.js``` the main file for your module
+    * ```/threex.supermodulecontrols.js``` for the controls of your module
+    * ```/threex.supermodulesounds.js``` for the sounds of your module
+    * and so on
+    
+## How to handle depandency
 
-If needed, you can have a ```.destroy()``` function to act as explicit destructor
+With several files, it may become interesting to handle dependancy, for that, 
+[require.js](http://requirejs.org/) is recommended.
+
+You can provide a ```/package.require.js``` file.
+This file will require all the files of your modules.
+Thus the developper using your module just have to require this file to get
+the dependancies of your modules.
+for examples
+  
+```
+define( [ './threex.supermodule',
+	, './threex.supermodulecontrols',
+	, './threex.supermodulesounds',
+	], function(){
+	// ... this is called when dependancies are loaded
+});
+```
+
+## How to localize your assets
+
+Sometime a modules need assets, e.g. you got a module for a spaceship in a game, it will
+need a model for the ship itself, some sounds for the reactors, and some images for the 
+explosions when the ship fire. 
+When you load the assets, you need to localise them. How to do that ?
+
+A simple way is to define a baseUrl which depends on the module location, for example.
 
 ```
-this.destroy	= function(){
-	// here, clean things up
-}
+THREEx.SuperModule.baseUrl	= "../";
+```
+
+And now every time you needs to load one of your assets you build the url like that.
+
+here require.js may 
+helps. In your ```package.require.js```, you can include the following
+
+```
+THREEx.SuperModule.baseUrl	= "../";
+```
+
+Then you build all your url like that to get the url of your assets
+
+```
+var imageUrl	= THREEx.SuperModule.baseUrl+'/images/explosion.jpg';
+```
+
+Up to you to set the ```.baseUrl```. You may set manually or automatically
+with require.js with the following code in your ```package.require.js``` file.
+
+```
+define( [ 'module'
+	], function(module){
+	// set baseUrl for this module
+	THREEx.SuperModule.baseUrl	= module.uri+'/../';
+});
 ```
 
