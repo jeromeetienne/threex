@@ -14,9 +14,9 @@ THREEx.addGodRays2DatGui	= function(godRays, datGui){
 	datGui.add(hBlurPass.uniforms['h'], 'value').min(0.0).max(0.01).name('hBlurPass')
 	datGui.add(vBlurPass.uniforms['v'], 'value').min(0.0).max(0.01).name('vBlurPass')
 
-	datGui.add(rBlurPass.uniforms['fExposure'], 'value')	.min(0.0).max(1.0).step(0.01).name("Exposure");
-	datGui.add(rBlurPass.uniforms['fDecay'], 'value')	.min(0.6).max(1.0).step(0.01).name("Decay");
-	datGui.add(rBlurPass.uniforms['fDensity'], 'value')	.min(0.0).max(1.0).step(0.01).name("Density");
-	datGui.add(rBlurPass.uniforms['fWeight'], 'value')	.min(0.0).max(1.0).step(0.01).name("Weight");
-	datGui.add(rBlurPass.uniforms['fClamp'], 'value')	.min(0.0).max(1.0).step(0.01).name("Clamp");
+	datGui.add(rBlurPass.uniforms['fExposure'], 'value')	.min(0.0).max(2.0).name("Exposure");
+	datGui.add(rBlurPass.uniforms['fDecay'], 'value')	.min(0.6).max(2.0).name("Decay");
+	datGui.add(rBlurPass.uniforms['fDensity'], 'value')	.min(0.0).max(2.0).name("Density");
+	datGui.add(rBlurPass.uniforms['fWeight'], 'value')	.min(0.0).max(2.0).name("Weight");
+	datGui.add(rBlurPass.uniforms['fClamp'], 'value')	.min(0.0).max(2.0).name("Clamp");
 }

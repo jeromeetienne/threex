@@ -9,7 +9,7 @@ THREEx.GodRays	= function(renderer, camera, renderTarget){
 			minFilter	: THREE.LinearFilter,
 			magFilter	: THREE.LinearFilter,
 			format		: THREE.RGBFormat
-		})		
+		})
 	}
 	this.renderTarget = renderTarget
 	
@@ -41,7 +41,7 @@ THREEx.GodRays	= function(renderer, camera, renderTarget){
 	effect.uniforms[ 'v' ].value	= blurVLevel
 	composer.addPass( effect )
 
-	// add HorizontalBlur Pass
+	// add RadialBlurShader Pass
 	var effect	= new THREE.ShaderPass( THREEx.RadialBlurShader )
 	composer.addPass( effect )
 };

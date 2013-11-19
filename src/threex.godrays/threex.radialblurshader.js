@@ -46,21 +46,21 @@ THREEx.RadialBlurShader	= {
 		'uniform float fWeight;',
 		'uniform float fClamp;',
 
-		'const int iSamples = 30;',
+		'const int iSamples	= 30;',
 
 		'void main()',
 		'{',
-			'vec2 coord	= vec2(vUv.x, 1.0-vUv.y);',
+			'vec2 coord	 = vec2(vUv.x, 1.0-vUv.y);',
 			'vec2 deltaCoord = vec2(coord - vec2(fSunScreenX, fSunScreenY));',
-			'deltaCoord *= 1.0 /  float(iSamples) * fDensity;',
+			'deltaCoord	*= 1.0 /  float(iSamples) * fDensity;',
 			'float illuminationDecay = 1.0;',
-			'vec4 FragColor	= vec4(0.0);',
+			'vec4 FragColor	 = vec4(0.0);',
 
-			'for(int i=0; i < iSamples ; i++){',
+			'for(int i=0; i < iSamples; i++){',
 				'coord		-= deltaCoord;',
-				'vec4 texel	= texture2D(tDiffuse, coord);',
+				'vec4 texel	 = texture2D(tDiffuse, coord);',
 				'texel		*= illuminationDecay * fWeight;',
-				
+
 				'FragColor	+= texel;',
 
 				'illuminationDecay	*= fDecay;',
