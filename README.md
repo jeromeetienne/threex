@@ -135,7 +135,9 @@ For more on readme, see [Readme Driven Development](http://tom.preston-werner.co
     * ```/threex.supermodulecontrols.js``` for the controls of your module
     * ```/threex.supermodulesounds.js``` for the sounds of your module
     * and so on
-    
+* put your images assets in ```/images```, your sounds assets in ```/sounds```
+, your models in ```/models```, you get the idea.
+
 ## How to handle depandencies
 
 With several files, it may become interesting to handle dependancy, for that, 
