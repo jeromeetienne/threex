@@ -82,7 +82,7 @@ this.update	= function(delta, now){
 }
 ```
 
-### More cooked version
+### More Cooked Version
 
 If you got many stuff to update, it may be nice to have an actual rendering
 loop, like this one.
@@ -120,11 +120,11 @@ to remove a function in this update loop, you can do
 updateFcts.splice(updateFcts.indexOf(callback),1)
 ```
 
-## To Update the physics of Your Module
+## To Update The Physics Of Your Module
 
 Same as for updating rendering, but replace ```update``` by ```tick``` everywhere :)
 
-## Folders
+## Folders Hierarchie
 
 * ```/examples``` contains the examples for your module
 * ```/readme.md``` contains a readme about your module. 
@@ -138,7 +138,7 @@ For more on readme, see [Readme Driven Development](http://tom.preston-werner.co
 * put your images assets in ```/images```, your sounds assets in ```/sounds```
 , your models in ```/models```, you get the idea.
 
-## How to handle depandencies
+## How To Handle Dependencies
 
 With several files, it may become interesting to handle dependancy, for that, 
 [require.js](http://requirejs.org/) is recommended.
@@ -158,7 +158,7 @@ define( [ './threex.supermodule',
 });
 ```
 
-## How to localize your assets
+## How To Localize Your Assets
 
 Sometime a modules need assets, e.g. you got a module for a spaceship in a game, it will
 need a model for the ship itself, some sounds for the reactors, and some images for the 
