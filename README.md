@@ -29,6 +29,11 @@ the old threex is in [jeromeetienne/threex](https://github.com/jeromeetienne/thr
 How To Write a THREEx Module
 ============================
 
+You can find a sample threex module in 
+[threex.sample repo](https://github.com/jeromeetienne/threex.sample), 
+You could just grab it and modify it if you see fit.
+Let's come back on writing your own from scratch.
+
 First you declare ```THREEx``` namespace. This will works whenever ```THREEx``` 
 is already defined or not. Thus you dont have any dependancy. This is a [vendor.js]()
 namespace, so to say.
@@ -115,6 +120,10 @@ to remove a function in this update loop, you can do
 updateFcts.splice(updateFcts.indexOf(callback),1)
 ```
 
+## To Update the physics of Your Module
+
+Same as for updating rendering, but replace ```update``` by ```tick``` everywhere :)
+
 ## Folders
 
 * ```/examples``` contains the examples for your module
@@ -127,7 +136,7 @@ For more on readme, see [Readme Driven Development](http://tom.preston-werner.co
     * ```/threex.supermodulesounds.js``` for the sounds of your module
     * and so on
     
-## How to handle depandency
+## How to handle depandencies
 
 With several files, it may become interesting to handle dependancy, for that, 
 [require.js](http://requirejs.org/) is recommended.
@@ -161,15 +170,6 @@ THREEx.SuperModule.baseUrl	= "../";
 ```
 
 And now every time you needs to load one of your assets you build the url like that.
-
-here require.js may 
-helps. In your ```package.require.js```, you can include the following
-
-```
-THREEx.SuperModule.baseUrl	= "../";
-```
-
-Then you build all your url like that to get the url of your assets
 
 ```
 var imageUrl	= THREEx.SuperModule.baseUrl+'/images/explosion.jpg';
