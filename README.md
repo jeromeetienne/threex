@@ -126,6 +126,8 @@ Same as for updating rendering, but replace ```update``` by ```tick``` everywher
 
 ## Folders Hierarchie
 
+Some guidelines on how to organize your files
+
 * ```/examples``` contains the examples for your module
 * ```/readme.md``` contains a readme about your module. 
 For more on readme, see [Readme Driven Development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html)
@@ -186,5 +188,25 @@ define( [ 'module'
 	// set baseUrl for this module
 	THREEx.SuperModule.baseUrl	= module.uri+'/../';
 });
+```
+
+## Bower To Handle Publishing/retrieval Of Threex Modules
+
+Here is how to publish your module.
+
+```
+bower register threex.supermodule git@github.com:jeromeetienne/threex.supermodule.git
+```
+
+Here is how to install a module.
+
+```
+bower install threex.supermodule
+```
+
+Here is how to get the list of all threex modules.
+
+```
+bower search threex.
 ```
 
