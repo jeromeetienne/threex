@@ -126,7 +126,7 @@ Same as for updating rendering, but replace ```update``` by ```tick``` everywher
 
 ## Folders Hierarchie
 
-Some guidelines on how to organize your files
+Some guidelines on how to organize your files:
 
 * ```/examples``` contains the examples for your module
 * ```/readme.md``` contains a readme about your module. 
@@ -190,7 +190,7 @@ define( [ 'module'
 });
 ```
 
-## Bower To Handle Publishing/retrieval Of Threex Modules
+## Bower To Publish Threex Modules
 
 Here is how to publish your module.
 
