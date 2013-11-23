@@ -1,3 +1,6 @@
+var THREEx	= THREEx || {};
+
+
 /**
  * create a THREEx.Animations
  *

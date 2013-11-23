@@ -19,7 +19,6 @@ THREEx.MinecraftPlayer	= function(){
 	
 	var character	= new THREEx.MinecraftChar()
 	this.character	= character
-	scene.add(character.root)
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		animation							//

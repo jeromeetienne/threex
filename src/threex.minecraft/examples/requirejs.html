@@ -1,18 +1,9 @@
 <!DOCTYPE html>
-<script src='../../../vendor/three.js/build/three.min.js'></script>
-<!-- include character -->
-<script src='../threex.minecraft.js'></script>
-<!-- include controls -->
-<script src='../threex.minecraftcontrols.js'></script>
-<!-- include animation -->
-<script src='../threex.animation.js'></script>
-<script src='../threex.animations.js'></script>
-<script src='../threex.minecraftcharheadanim.js'></script>
-<script src='../threex.minecraftcharbodyanim.js'></script>
-<!-- include player -->
-<script src='../threex.minecraftplayer.js'></script>
-<!-- include animation -->
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src="../../../vendor/require.js/require.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb;overflow: hidden;'><script>
+require([ '../package.require.js'
+], function(){
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -77,4 +68,5 @@
 			updateFn(deltaMsec/1000, nowMsec/1000)
 		})
 	})
+})
 </script></body>

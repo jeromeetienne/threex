@@ -1,8 +1,9 @@
+var THREEx	= THREEx || {};
+
+
 THREEx.createAnimation	= function(opts){
 	return new THREEx.Animation(opts);
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////
 //		Constructor							//
