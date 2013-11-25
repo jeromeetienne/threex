@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>WebRTC codelab: step 2</title>
+
+<style>
+</style>
+
+</head>
+
+<body>
+
+<video />
+
+<script>
+navigator.getUserMedia = 
+	navigator.getUserMedia || 
+	navigator.webkitGetUserMedia || 
+	navigator.mozGetUserMedia;
+
+navigator.getUserMedia({video: true}, function successCallback(stream) {
+	window.stream = stream; // stream available to console
+	var video = document.querySelector("video");
+	video.src = window.URL.createObjectURL(stream);
+	video.play();
+}, function errorCallback(error){
+	console.log("navigator.getUserMedia error: ", error);
+});
+</script>
+
+</body></html>

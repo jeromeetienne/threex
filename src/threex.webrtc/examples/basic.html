@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+// shim for getUserMedia
+navigator.getUserMedia =
+  	navigator.getUserMedia		||
+	navigator.webkitGetUserMedia	||
+	navigator.mozGetUserMedia;
+
+var servers		= null;
+var localPeerConnection	= new webkitRTCPeerConnection(servers);
+
+	navigator.getUserMedia({
+		audio	: true,
+		video	: true
+	}, function(stream){
+		console.log("Received local stream", stream);
+		localVideo.src	= URL.createObjectURL(stream);
+		localStream	= stream;
+		callButton.disabled = false;
+	}, function(error) {
+		console.log("navigator.getUserMedia error: ", error);
+	});
+
+</script></body>

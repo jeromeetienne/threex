@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="keywords" content="JavaScript, WebRTC" />
+	<meta name="description" content="WebRTC codelab" />
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1">
+	<title>WebRTC codelab: step 3</title>
+	<style>
+	video {
+		-webkit-filter: blur(3px) contrast(1.7) hue-rotate(120deg) sepia(0.4);
+	}
+	</style>
+</head>
+<body>
+
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay muted></video>
+
+  <div>
+	<button id="startButton">Start</button>
+	<button id="callButton">Call</button>
+	<button id="hangupButton">Hang Up</button>
+  </div>
+<script>
+var localStream, localPeerConnection, remotePeerConnection;
+
+var localVideo	= document.getElementById("localVideo");
+var remoteVideo = document.getElementById("remoteVideo");
+
+var startButton	= document.getElementById("startButton");
+var callButton	= document.getElementById("callButton");
+var hangupButton= document.getElementById("hangupButton");
+startButton.disabled	= false;
+callButton.disabled	= true;
+hangupButton.disabled	= true;
+startButton.onclick	= start;
+callButton.onclick	= call;
+hangupButton.onclick	= hangup;
+
+function start() {
+	console.log("Requesting local stream");
+	startButton.disabled = true;
+	
+	navigator.getUserMedia =
+	  	navigator.getUserMedia ||
+		navigator.webkitGetUserMedia ||
+		navigator.mozGetUserMedia;
+		
+	navigator.getUserMedia({
+		audio	: true,
+		video	: true
+	}, function(stream){
+		console.log("Received local stream", stream);
+		localVideo.src	= URL.createObjectURL(stream);
+		localStream	= stream;
+		callButton.disabled = false;
+	}, function(error) {
+		console.log("navigator.getUserMedia error: ", error);
+	});
+}
+
+function call() {
+	callButton.disabled	= true;
+	hangupButton.disabled	= false;
+	console.log("Starting call. localStream");
+	console.dir(localStream)
+
+	if (localStream.getVideoTracks().length > 0) {
+		console.log('Using video device: ' + localStream.getVideoTracks()[0].label);
+	}
+	if (localStream.getAudioTracks().length > 0) {
+		console.log('Using audio device: ' + localStream.getAudioTracks()[0].label);
+	}
+
+	var servers		= null;
+	localPeerConnection	= new webkitRTCPeerConnection(servers);
+	console.log("Created local peer connection object localPeerConnection");
+	localPeerConnection.addEventListener('icecandidate', function(event){
+		if( event.candidate ){
+			remotePeerConnection.addIceCandidate(new RTCIceCandidate(event.candidate));
+			console.log("Local ICE candidate: \n" + event.candidate.candidate);
+		}
+	})
+
+	remotePeerConnection	= new webkitRTCPeerConnection(servers);
+	console.log("Created remote peer connection object remotePeerConnection");
+	console.dir(remotePeerConnection)
+
+	remotePeerConnection.addEventListener('addstream', function(event){
+		  remoteVideo.src = URL.createObjectURL(event.stream);
+		  console.log("Received remote stream");
+	})
+
+	remotePeerConnection.addEventListener('icecandidate', function(event){
+		if( event.candidate ){
+			localPeerConnection.addIceCandidate(new RTCIceCandidate(event.candidate));
+			console.log("Remote ICE candidate: \n " + event.candidate.candidate);
+		}
+	})
+
+
+	localPeerConnection.addStream(localStream);
+	console.log("Added localStream to localPeerConnection");
+	localPeerConnection.createOffer(function(description){
+
+		localPeerConnection.setLocalDescription(description);
+		console.log("Offer from localPeerConnection: \n" + description.sdp);
+
+		remotePeerConnection.setRemoteDescription(description);
+
+		remotePeerConnection.createAnswer(function(description){
+			remotePeerConnection.setLocalDescription(description);
+			console.log("Answer from remotePeerConnection: \n" + description.sdp);
+			localPeerConnection.setRemoteDescription(description);
+		});
+	});
+}
+
+function hangup() {
+	console.log("Ending call");
+	localPeerConnection.close();
+	remotePeerConnection.close();
+	localPeerConnection	= null;
+	remotePeerConnection	= null;
+	hangupButton.disabled	= true;
+	callButton.disabled	= false;
+}
+
+</script>
+</body></html>

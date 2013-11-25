@@ -96,14 +96,14 @@ THREEx.MinecraftPlayer	= function(){
 	//		Say								//
 	//////////////////////////////////////////////////////////////////////////////////
 	this._sayObject3D	= null
-	this.sayTimeout		= 10.0;
-	this._sayBirthDate	= null;
+	this._sayBirthDate	= null
+	this.sayTimeout		= 10.0
 	updateFcts.push(function(delta, now){
 		// if there is no say at the moment, do nothing
-		if( this._sayBirthDate === null )	return;
+		if( this._sayBirthDate === null )	return
 		// if the say sprite isnt old enougth to timeout, do nothing
 		var sayAge	= (Date.now() - this._sayBirthDate)/1000.0
-		if( sayAge < this.sayTimeout )		return;
+		if( sayAge < this.sayTimeout )		return
 		// remove the say sprite
 		this.clearSay()
 	}.bind(this))
@@ -113,7 +113,7 @@ THREEx.MinecraftPlayer	= function(){
 		this._sayObject3D	= null
 		this._sayBirthDate	= null
 	}
-	this.setSay= function(nickName){
+	this.setSay	= function(nickName){
 		if( this._sayObject3D )	this.clearSay()
 		// update for timer
 		this._sayBirthDate	= Date.now()
