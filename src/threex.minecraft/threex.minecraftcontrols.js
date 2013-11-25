@@ -1,3 +1,5 @@
+var THREEx	= THREEx || {};
+
 THREEx.MinecraftControls	= function(object3d, input){
 	// arguments default values
 	input		= input	|| {}

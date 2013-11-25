@@ -1,3 +1,5 @@
+var THREEx	= THREEx || {};
+
 THREEx.createMinecraftCharBodyAnimations	= function(character){
 	return new THREEx.MinecraftCharBodyAnimations(character);
 }
