@@ -52,8 +52,7 @@ THREEx.MinecraftPlayer	= function(){
 	 	}
 		// update player.previousPos/player.prevRotation
 		previousPos.copy( object3d.position )
-	});
-
+	})
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		controls							//
@@ -79,7 +78,6 @@ THREEx.MinecraftPlayer	= function(){
 		var canvas	= THREEx.MinecraftPlayer._buildNickCartouche(nickName);
 		var texture	= new THREE.Texture(canvas)
 		texture.needsUpdate	= true
-		console.log('texture', texture)
 		// build the sprite itself
 		var material	= new THREE.SpriteMaterial({
 			map			: texture,
@@ -90,8 +88,8 @@ THREEx.MinecraftPlayer	= function(){
 		sprite.position.y	= 1.15
 		// add sprite to the character
 		character.root.add(this._nicknameObject3D)
-	}	
-	
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Say								//
 	//////////////////////////////////////////////////////////////////////////////////

@@ -193,3 +193,33 @@ THREEx.MinecraftChar.prototype.loadSkin	= function(url, onLoad){
 	image.src = url;
 	return this;	// for chained API
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//		support for skin Well Known Url					//
+//////////////////////////////////////////////////////////////////////////////////
+
+THREEx.MinecraftChar.prototype.loadWellKnownSkin	= function(name, onLoad){
+	console.assert(THREEx.MinecraftChar.skinWellKnownUrls[name])
+	var url	= THREEx.MinecraftChar.baseUrl + THREEx.MinecraftChar.skinWellKnownUrls[name];
+	return this.loadSkin(url, onLoad)
+}
+
+THREEx.MinecraftChar.skinWellKnownUrls	= {
+	'3djesus'		: 'images/3djesus.png',
+	'iron-man'		: 'images/Iron-Man-Minecraft-Skin.png',
+	'joker'			: 'images/Joker.png',
+	'mario'			: 'images/Mario.png',
+	'sonicthehedgehog'	: 'images/Sonicthehedgehog.png',
+	'spiderman'		: 'images/Spiderman.png',
+	'superman'		: 'images/Superman.png',
+	'agentsmith'		: 'images/agentsmith.png',
+	'batman'		: 'images/batman.png',
+	'char'			: 'images/char.png',
+	'god'			: 'images/god.png',
+	'jetienne'		: 'images/jetienne.png',
+	'martialartist'		: 'images/martialartist.png',
+	'robocop'		: 'images/robocop.png',
+	'theflash'		: 'images/theflash.png',
+	'woody'			: 'images/woody.png',
+}
