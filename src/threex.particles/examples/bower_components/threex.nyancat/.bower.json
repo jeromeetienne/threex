@@ -1,0 +1,14 @@
+{
+  "name": "threex.nyancat",
+  "homepage": "https://github.com/jeromeetienne/threex.nyancat",
+  "_release": "master",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "d118bfa30e2d1108614149e32414abb48bd005b2"
+  },
+  "_source": "git://github.com/jeromeetienne/threex.nyancat.git",
+  "_target": "*",
+  "_originalSource": "threex.nyancat",
+  "_direct": true
+}

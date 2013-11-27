@@ -42,6 +42,7 @@ scene.add(mesh)
 
 Possible Improvements
 =====================
+* merge the geometry to make it faster to run
 * expose the internal options to the user
 
 
