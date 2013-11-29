@@ -18,6 +18,9 @@
   <body>
 
     <div class="container">
+      
+
+    <div class="container">
       <div class="jumbotron">
         <h1>THREEx <small>three.js extensions vendor.js style</small>
         </h1>
@@ -38,10 +41,39 @@
           to start with.
         </div>
       <br/>
-      
-      <div class="row">  
+
+      <div class="row">
+      	<div class="col-offset-5">
+		<div class="btn-group" id='tagbuttons' data-toggle="buttons">
+		  <label class="btn btn-primary">
+		    <input type="checkbox" data-tag='model'>Model
+		  </label>
+		  <label class="btn btn-primary">
+		    <input type="checkbox" data-tag='effect'>Effect
+		  </label>
+		</div>
+	</div>
+      </div>
+      <br/>
+
+	<style>
+		#items .item {
+			display	: none;
+		}
+		#items[data-tag=''] .item {
+			display	: block;
+		}
+		#items[data-tag~=model] .item[data-tag~=model] {
+			display	: block;
+		}
+		#items[data-tag~=effect] .item[data-tag~=effect] {
+			display	: block;
+		}
+	</style>
+
+      <div class="row" id='items' data-tag=''>  
         <!-- threex.montainsarena -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item" data-tag='model'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.montainsarena/examples/basic.html'>
               <img src="www/screenshots/threex.montainsarena.png" class="img-rounded thumbnail">
@@ -56,7 +88,7 @@
          </div>
         </div>
         <!-- threex.grassground -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item" data-tag='model'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.grassground/examples/basic.html'>
               <img src="www/screenshots/threex.grassground.png" class="img-rounded thumbnail">
@@ -71,7 +103,7 @@
          </div>
         </div>
         <!-- threex.spaceships -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item" data-tag='model'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.spaceships/examples/basic.html'>
               <img src="www/screenshots/threex.spaceships.png" class="img-rounded thumbnail">
@@ -87,7 +119,7 @@
          </div>
         </div>
         <!-- threex.coloradjust -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item" data-tag='effect'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.coloradjust/examples/demo.html'>
               <img src="www/screenshots/threex.coloradjust.png" class="img-rounded thumbnail">
@@ -105,7 +137,7 @@
          </div>
         </div>
         <!-- threex.bubble -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item" data-tag='model effect'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.bubble/examples/basic.html'>
               <img src="www/screenshots/threex.bubble.png" class="img-rounded thumbnail">
@@ -121,7 +153,7 @@
          </div>
         </div>
         <!-- threex.laser -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.laser/examples/demo.html'>
               <img src="www/screenshots/threex.laser.png" class="img-rounded thumbnail">
@@ -138,7 +170,7 @@
          </div>
         </div>
         <!-- threex.suzanne -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.suzanne/examples/basic.html'>
               <img src="www/screenshots/threex.suzanne.png" class="img-rounded thumbnail">
@@ -153,7 +185,7 @@
          </div>
         </div>
         <!-- threex.volumetricspotlight -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.volumetricspotlight/examples/basic.html'>
               <img src="www/screenshots/threex.volumetricspotlight.png" class="img-rounded thumbnail">
@@ -171,7 +203,7 @@
          </div>
         </div>
         <!-- threex.sslensflare -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.sslensflare/examples/basic.html'>
               <img src="www/screenshots/threex.sslensflare.png" class="img-rounded thumbnail">
@@ -190,7 +222,7 @@
          </div>
         </div>
         <!-- threex.vertexanimation -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.vertexanimation/examples/demo.html'>
               <img src="www/screenshots/threex.vertexanimation.png" class="img-rounded thumbnail">
@@ -205,7 +237,7 @@
          </div>
         </div>
         <!-- threex.videotexture -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.videotexture/examples/videotexture.html'>
               <img src="www/screenshots/threex.videotexture.png" class="img-rounded thumbnail">
@@ -222,7 +254,7 @@
           </div>
         </div>
         <!-- threex.dynamictexture -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.dynamictexture/examples/basic.html'>
               <img src="www/screenshots/threex.dynamictexture.png" class="img-rounded thumbnail">
@@ -240,7 +272,7 @@
           </div>
         </div>
         <!-- threex.glowkeycolor -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.glowkeycolor/examples/minecraft_tron.html'>
               <img src="www/screenshots/threex.glowkeycolor.png" class="img-rounded thumbnail">
@@ -256,7 +288,7 @@
           </div>
         </div>
         <!-- threex.skymap -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.skymap/examples/basic.html'>
               <img src="www/screenshots/threex.skymap.png" class="img-rounded thumbnail">
@@ -271,7 +303,7 @@
           </div>
         </div>
         <!-- threex.keyboardstate -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.keyboardstate/examples/basic.html'>
               <img src="www/screenshots/threex.keyboardstate.png" class="img-rounded thumbnail">
@@ -287,7 +319,7 @@
           </div>
         </div>
         <!-- threex.depthoffield -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.depthoffield/examples/basic.html'>
               <img src="www/screenshots/threex.depthoffield.png" class="img-rounded thumbnail">
@@ -304,7 +336,7 @@
           </div>
         </div>
         <!-- threex.cannonjs -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.cannonjs/examples/domino.html'>
               <img src="www/screenshots/threex.cannonjs.png" class="img-rounded thumbnail">
@@ -322,7 +354,7 @@
           </div>
         </div>
         <!-- threex.basiclighting -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.basiclighting/examples/demo.html'>
               <img src="www/screenshots/threex.basiclighting.png" class="img-rounded thumbnail">
@@ -338,7 +370,7 @@
           </div>
         </div>
         <!-- threex.windowresize -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.windowresize/examples/basic.html'>
               <img src="www/screenshots/threex.windowresize.png" class="img-rounded thumbnail">
@@ -352,7 +384,7 @@
           </div>
         </div>
         <!-- threex.htmlmixer -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.htmlmixer/examples/demo.html'>
               <img src="www/screenshots/threex.htmlmixer.png" class="img-rounded thumbnail">
@@ -370,7 +402,7 @@
           </div>
         </div>
         <!-- threex.noiseshadermaterial -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.noiseshadermaterial/examples/volumetric-cloud-procedural.html'>
               <img src="www/screenshots/threex.noiseshadermaterial.png" class="img-rounded thumbnail">
@@ -389,7 +421,7 @@
           </div>
         </div>
         <!-- threex.nyancat -->
-        <div class="col-lg-6">
+        <div class="col-lg-6 item">
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.nyancat/examples/basic.html'> 
               <img src="www/screenshots/threex.nyancat.png" class="img-rounded thumbnail">
@@ -406,7 +438,7 @@
           </div>
         </div>
         <!-- threex.geometricglow -->
-        <div class="col-lg-6"> 
+        <div class="col-lg-6 item"> 
           <div class="col-lg-4"> 
             <a href='http://jeromeetienne.github.io/threex.geometricglow/examples/geometricglowmesh.html'>
               <img src="www/screenshots/threex.geometricglow.png" class="img-rounded thumbnail">
@@ -420,7 +452,7 @@
           </div>
         </div>
         <!-- threex.planets -->
-        <div class="col-lg-6"> 
+        <div class="col-lg-6 item"> 
           <div class="col-lg-4"> 
             <a href='http://jeromeetienne.github.io/threex.planets/examples/earth.html'>
               <img src="www/screenshots/threex.planets.png" class="img-rounded thumbnail">
@@ -436,7 +468,7 @@
           </div>
         </div>  
         <!-- threex.proceduralcity -->
-        <div class="col-lg-6"> 
+        <div class="col-lg-6 item"> 
           <div class="col-lg-4"> 
             <a href='http://jeromeetienne.github.io/threex.proceduralcity/examples/demo.html'>
               <img src="www/screenshots/threex.proceduralcity.png" class="img-rounded thumbnail">
@@ -455,7 +487,7 @@
           </div>
         </div>  
         <!-- threex.rendererstats -->
-        <div class="col-lg-6"> 
+        <div class="col-lg-6 item"> 
           <div class="col-lg-4"> 
             <a href='http://jeromeetienne.github.io/threex.rendererstats/examples/basic.html'>
               <img src="www/screenshots/threex.rendererstats.png" class="img-rounded thumbnail">
@@ -470,7 +502,7 @@
           </div>
         </div>
         <!-- threex.transparency -->
-        <div class="col-lg-6"> 
+        <div class="col-lg-6 item"> 
           <div class="col-lg-4"> 
             <a href='http://jeromeetienne.github.io/threex.transparency/examples/basic.html'>
               <img src="www/screenshots/threex.transparency.png" class="img-rounded thumbnail">
@@ -489,5 +521,41 @@
 
     <!-- github ribbon -->
     <a href="https://github.com/jeromeetienne/threex"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
+	<!-- Bootstrap core JavaScript
+	================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="www/jquery/jquery-1.10.2.min.js"></script>
+	<script src="www/bootstrap/js/bootstrap.min.js"></script>
+
+	<script>
+		jQuery(function(){
+			$('.btn-group').button()
+			jQuery('#tagbuttons label').on('click', function(){
+				setTimeout(function(){
+					var selectedTags	= ''
+					jQuery('#tagbuttons input:checked').each(function(){
+						var tag	= jQuery(this).attr('data-tag')
+						console.log('selected', tag)
+						selectedTags	+= ' '+ jQuery(this).attr('data-tag')
+					})
+					jQuery('#items').attr('data-tag', selectedTags)
+				}, 0)
+			});
+		})
+	</script>
   </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
