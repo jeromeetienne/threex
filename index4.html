@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <base target='_blank'>
+
+    <title>THREEx - extensions for three.js</title>
+
+    <!-- Bootstrap core CSS --> 
+    <link href="www/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <!-- <link href="www/bootstrap/css/jumbotron-narrow.css" rel="stylesheet"> -->
+  </head>
+  <body>      
+
+    <div class="container">
+      <div class="jumbotron">
+        <h1>THREEx <small>three.js extensions vendor.js style</small>
+        </h1>
+        <p class="lead">THREEx is a way to write three.js extension ala vendor.js.
+          So as little dependancy as possible.
+          It is modules to help you write three.js stuff, not a framework.</p>
+      </div>
+      
+      <div class="row">
+        <h2>Existing Extensions
+    <div class="btn-group" id='tagbuttons'>
+      <button type="button" class="btn btn-default" data-tag=''>All
+        <span class="badge">?</span>
+      </button>
+      <button type="button" class="btn btn-default" data-tag='model'>Model
+        <span class="badge">?</span>
+      </button>
+      <button type="button" class="btn btn-default" data-tag='effect'>Effect
+        <span class="badge">?</span>
+      </button>
+      <button type="button" class="btn btn-default" data-tag='shader'>Shader
+        <span class="badge">?</span>
+      </button>
+      <button type="button" class="btn btn-default" data-tag='tool'>
+        Tool
+        <span class="badge">?</span>
+      </button>
+      <button type="button" class="btn btn-default" data-tag='posteffect'>
+        PostEffect
+        <span class="badge">?</span>
+      </button>
+    </div>
+  </h2>
+        <div>
+          Here is a list of the existing extensions. Feel free to contribute your own. Just do a
+          <a href='https://help.github.com/articles/using-pull-requests'>pull request</a>
+          , edit this file, copy an existing line and fit it to your own needs. 
+          Wanna try live in the browser ? There is a <a href='http://jeromeetienne.github.io/threex-playground/'>threex playground</a> waiting for you!
+          If you want to create your own, here is
+          <a href='https://github.com/jeromeetienne/threex.sample'>three.sample</a>
+          to start with.
+        </div>
+      <br/>
+  <style>
+    #items .item {
+      display : none;
+    }
+    #items[data-tag=''] .item {
+      display : block;
+    }
+    #items[data-tag~=model] .item[data-tag~=model] {
+      display : block;
+    }
+    #items[data-tag~=effect] .item[data-tag~=effect] {
+      display : block;
+    }
+    #items[data-tag~=shader] .item[data-tag~=shader] {
+      display : block;
+    }
+    #items[data-tag~=tool] .item[data-tag~=tool] {
+      display : block;
+    }
+    #items[data-tag~=posteffect] .item[data-tag~=posteffect] {
+      display : block;
+    }
+  </style>
+
+    <div class="row" id='items' data-tag=''>  
+
+    </div> <!-- /row -->
+
+    <!-- github ribbon -->
+    <a href="https://github.com/jeromeetienne/threex"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
+      <template id='itemTemplate'>
+        <div class="col-lg-6 item">
+          <div class="col-lg-4 _thumbnail">
+          </div>
+          <div class="col-lg-8 _description">
+          </div>
+        </div>
+      </template>
+      <items hidden>
+        <!-- threex.planets -->
+        <item>
+          <thumbnail>
+            <a href='http://jeromeetienne.github.io/threex.planets/examples/earth.html'>
+              <img src="www/screenshots/threex.planets.png" class="img-rounded thumbnail">
+            </a>
+          </thumbnail>
+          <description>
+            <a href='https://github.com/jeromeetienne/threex.planets'>
+              <h2>threex.planets</h2>
+            </a>
+            It helps you to display all the planets from the solar system.
+            It is on <a href='http://planetpixelemporium.com/'>planetpixelemporium</a>.
+            As a cherry on the cake, it has a 'atmosphere material'.
+          </description>
+        </item>
+        <!-- threex.proceduralcity -->
+        <item>
+          <thumbnail>
+            <a href='http://jeromeetienne.github.io/threex.proceduralcity/examples/demo.html'>
+              <img src="www/screenshots/threex.proceduralcity.png" class="img-rounded thumbnail">
+            </a>
+          </thumbnail>
+          <description>
+            <a href='https://github.com/jeromeetienne/threex.proceduralcity'>
+              <h2>threex.proceduralcity</h2>
+            </a>
+            It is a three.js extension to display a fully procedural city based on 
+            <a href='http://www.mrdoob.com/lab/javascript/webgl/city/01/'>"city"</a>
+            , a  demo 
+            <a href='https://twitter.com/mrdoob/status/350730133319073792'>recently released</a>
+            by 
+            <a href='http://mrdoob.com'>@mrdoob</a>.
+          </description>
+        </item>
+        <!-- threex.rendererstats -->
+        <item>
+          <thumbnail>
+            <a href='http://jeromeetienne.github.io/threex.rendererstats/examples/basic.html'>
+              <img src="www/screenshots/threex.rendererstats.png" class="img-rounded thumbnail">
+            </a>
+          </thumbnail>
+          <description>
+            <a href='https://github.com/jeromeetienne/threex.rendererstats'>
+              <h2>threex.rendererstats</h2>
+            </a>
+            It is a three.js extension to display realtime informations about THREE.WebGLRenderer.
+            It is widely inpired from @mrdoob <a href='https://github.com/mrdoob/stats.js/'>stats.js</a>.
+          </description>
+        </item>
+        <!-- threex.transparency -->
+        <item>
+          <thumbnail>
+              <a href='http://jeromeetienne.github.io/threex.transparency/examples/basic.html'>
+                <img src="www/screenshots/threex.transparency.png" class="img-rounded thumbnail">
+              </a>
+          </thumbnail>
+          <description>
+              <a href='https://github.com/jeromeetienne/threex.transparency'>
+                <h2>threex.transparency</h2>
+              </a>
+              It is a three.js extension to easily handle transparency.
+              It is released under MIT license.            
+          </description>
+        </item>
+      </items>
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="www/jquery/jquery-1.10.2.min.js"></script>
+  <script src="www/bootstrap/js/bootstrap.min.js"></script>
+
+  <script>
+    jQuery(function(){
+      $('.btn-group').button()
+      jQuery('#tagbuttons .btn').on('click', function(){
+        var tag = jQuery(this).attr('data-tag')
+        jQuery('#items').attr('data-tag', tag)
+      })
+      jQuery('#tagbuttons .btn').each(function(){
+        var tag   = jQuery(this).attr('data-tag')
+        if( tag !== '' ){
+          var count = jQuery('#items .item[data-tag~='+tag+']').length
+        }else{
+          var count = jQuery('#items .item').length
+        }
+        jQuery('#tagbuttons .btn[data-tag~='+tag+'] .badge').text(count)
+      });
+          })
+    
+    var templateElement = document.querySelector('#itemTemplate')
+    var itemElements  = document.querySelectorAll('items item')
+    for(var i = 0; i < itemElements.length; i++){
+      var renderedElement = templateElement.content.cloneNode(true)
+      var itemElement   = itemElements[i]
+      var thumbnailElement  = itemElement.querySelector('thumbnail')    
+      var descriptionElement  = itemElement.querySelector('description')    
+      // console.log('itemElement', itemElement)  
+      // console.log('thumbnailElement', thumbnailElement, thumbnailElement.innerHTML)
+      // console.log('description', descriptionElement.innerHTML)
+      renderedElement.querySelector('._thumbnail')
+              .appendChild(thumbnailElement.cloneNode(true))
+      renderedElement.querySelector('._description')
+              .appendChild(descriptionElement.cloneNode(true))
+
+      // console.log('renderedElement', renderedElement)
+
+      document.querySelector('#items')
+        .appendChild(renderedElement.cloneNode(true))
+    }
+  </script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

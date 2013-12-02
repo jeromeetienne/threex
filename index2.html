@@ -536,7 +536,30 @@
     <!-- github ribbon -->
     <a href="https://github.com/jeromeetienne/threex"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 
-
+      <template id='itemTemplate'>
+        <div class="col-lg-6 item">
+          <div class="col-lg-4 _thumbnail">
+          </div>
+          <div class="col-lg-8 _description">
+          </div>
+        </div>
+      </template>
+      <items hidden>
+        <item>
+          <thumbnail>
+              <a href='http://jeromeetienne.github.io/threex.transparency/examples/basic.html'>
+                <img src="www/screenshots/threex.transparency.png" class="img-rounded thumbnail">
+              </a>
+          </thumbnail>
+          <description>
+              <a href='https://github.com/jeromeetienne/threex.transparency'>
+                <h2>threex.transparency</h2>
+              </a>
+              It is a three.js extension to easily handle transparency.
+              It is released under MIT license.            
+          </description>
+        </item>
+      </items>
 	<!-- Bootstrap core JavaScript
 	================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
@@ -559,7 +582,30 @@
 				}
 				jQuery('#tagbuttons .btn[data-tag~='+tag+'] .badge').text(count)
 			});
+      
+      
 		})
+    
+		var templateElement	= document.querySelector('#itemTemplate')
+
+		var itemElements	= document.querySelectorAll('items item')
+		for(var i = 0; i < itemElements.length; i++){
+			var renderedElement	= templateElement.content//.cloneNode(true)
+			var itemElement		= itemElements[i]
+			var thumbnailElement	= itemElement.querySelector('thumbnail')		
+			var descriptionElement	= itemElement.querySelector('description')		
+			console.log('itemElement', itemElement)	
+			console.log('thumbnailElement', thumbnailElement, thumbnailElement.innerHTML)
+			console.log('description', descriptionElement.innerHTML)
+			// renderedElement.querySelector('.thumbnail').innerHTML	= thumbnailElement.innerHTML
+			// renderedElement.querySelector('.thumbnail').innerHTML	= thumbnailElement.innerHTML
+			renderedElement.querySelector('._thumbnail')
+			        .appendChild(thumbnailElement.cloneNode(true))
+			renderedElement.querySelector('._description')
+			        .appendChild(descriptionElement.cloneNode(true))
+			console.log('renderedElement', renderedElement)
+			document.querySelector('#items').appendChild(renderedElement.cloneNode(true))
+		}
 	</script>
   </body>
 </html>

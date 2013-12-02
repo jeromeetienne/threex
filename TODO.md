@@ -1,5 +1,20 @@
-* how to use a threex package.require.js modules in tQuery
-  * it is only a package loadable thru require.js. So it should be ok
-  * to get compatibility with world/ctx with convertion function()
-* do a THREEx.MeshBuilder same for material and geometry
-  * it receive a THREE.Mesh, add a bundle of builder function to it
+# about home page refatoring
+* maybe items loaded by link import
+  * http://www.html5rocks.com/en/tutorials/webcomponents/imports/
+* put data separatly from the template
+  * template as http://www.html5rocks.com/en/tutorials/webcomponents/template/
+* fancy animation
+  * http://desandro.github.io/3dtransforms/docs/card-flip.html
+  * http://demo.marcofolio.net/profile_cards/
+* card design with bootstrap
+  * http://aozora.github.io/bootplus/plus.html#cards-news
+* just the carrousel
+  * large screenshot needed
+  
+# What would be an item
+* thumbnail
+* screenshot
+* title
+* demoLink
+* infoLink
+* markdown/html description
