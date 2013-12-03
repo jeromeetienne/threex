@@ -30,7 +30,7 @@ bower install threex.objcoord
 How To Use It
 =============
 
-## THREEx.ObjCoord.worldPosition(object3d)
+#### THREEx.ObjCoord.worldPosition(object3d)
 
 This function gives you the world position of a given ```THREE.Object3D```.
 So it is a ```THREE.Vector3``` using your scene position as origin.
@@ -41,7 +41,7 @@ console.log(position)
 // ... display the world position x,y,z of the object3d
 ```
 
-## THREEx.ObjCoord.screenPosition(object3d, camera)
+#### THREEx.ObjCoord.screenPosition(object3d, camera)
 
 this function gives your the screen coordinates of a given object3d.
 Screen coordinates is -1,-1 on top-left, and +1,+1 in bottom right of the screen.
@@ -53,11 +53,11 @@ console.log(position)
 // ... display the position in screen coordinates of the object3d
 ```
 
-## THREEx.ObjCoord.cssPosition(object3d, camera, renderer)
+#### THREEx.ObjCoord.cssPosition(object3d, camera, renderer)
 
 Suppose you got a 3d object on your scene. 
 And you want the css position matching the position of this object. 
-This function does exclatly this for you :)
+This function does excatly this for you :)
 
 Let's see how to use it. First let's create the dom element.
 Note the 'position: absolute;'
