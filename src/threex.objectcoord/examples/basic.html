@@ -16,18 +16,24 @@
 	//////////////////////////////////////////////////////////////////////////////////	
 	var geometry	= new THREE.SphereGeometry(0.1);
 	var material	= new THREE.MeshNormalMaterial();
+	var mesh0	= new THREE.Mesh( geometry, material );
+	mesh0.position.x	= 1;
+	scene.add( mesh0 );
+
+	var geometry	= new THREE.SphereGeometry(0.1);
+	var material	= new THREE.MeshNormalMaterial();
 	var mesh	= new THREE.Mesh( geometry, material );
-	mesh.position.x	= 1;
-	scene.add( mesh );
+	mesh.position.x	= -5;
+	mesh0.add( mesh );
 	
 	// Create dom element
 	var element	= document.createElement('div')
 	document.body.appendChild(element)
-	element.innerHTML	= 'John';	
+	element.innerHTML	= 'threex';	
 	element.style.position	= 'absolute'
 	// move it at the object position
 	onRenderFcts.push(function(delta, now){
-		var position	= THREEx.ObjCoord.cssPosition(mesh, camera,renderer)
+		var position		= THREEx.ObjCoord.cssPosition(mesh, camera,renderer)
 		element.style.left	= (position.x-element.offsetWidth /2)+'px';
 		element.style.top	= (position.y-element.offsetHeight/2)+'px';
 	})

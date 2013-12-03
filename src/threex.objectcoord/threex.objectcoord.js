@@ -33,8 +33,8 @@ THREEx.ObjCoord.worldPosition	= function(object3d){
  * @return {THREE.Vector3}			the screen position
  */
 THREEx.ObjCoord.screenPosition	= function(object3d, camera){
-	var position	= THREEx.ObjCoord.worldPosition(object3d)
-	return THREEx.ObjCoord.convertWorldToScreenSpace(position, camera)
+	var position	= this.worldPosition(object3d)
+	return this.convertWorldToScreenSpace(position, camera)
 }
 
 
