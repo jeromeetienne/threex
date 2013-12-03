@@ -16,26 +16,62 @@
 	//////////////////////////////////////////////////////////////////////////////////	
 	var geometry	= new THREE.SphereGeometry(0.1);
 	var material	= new THREE.MeshNormalMaterial();
-	var mesh0	= new THREE.Mesh( geometry, material );
-	mesh0.position.x	= 1;
-	scene.add( mesh0 );
+	var meshParent	= new THREE.Mesh( geometry, material );
+	meshParent.position.x= 0.5;
+	scene.add( meshParent );
 
 	var geometry	= new THREE.SphereGeometry(0.1);
 	var material	= new THREE.MeshNormalMaterial();
 	var mesh	= new THREE.Mesh( geometry, material );
-	mesh.position.x	= -5;
-	mesh0.add( mesh );
+	mesh.position.x	= 1;
+	meshParent.add( mesh );
+	
+	onRenderFcts.push(function(delta, now){
+		var angle	= now * Math.PI * 2 * 0.4
+		mesh.position.x	= Math.cos(angle)*0.6
+		mesh.position.y	= Math.sin(angle)*0.3
+		mesh.position.z	= Math.sin(angle*2)*0.3
+	})
+	
 	
 	// Create dom element
 	var element	= document.createElement('div')
 	document.body.appendChild(element)
-	element.innerHTML	= 'threex';	
+	element.innerHTML	= 'threex'
 	element.style.position	= 'absolute'
+
+
+	var element	= document.createElement('iframe')
+	document.body.appendChild(element)
+	element.src	= 'http://githubbadge.appspot.com/jeromeetienne'
+	element.style.border	= '0'
+	element.style.height	= '142px';
+	element.style.width	= '200px';
+	element.style.overflow	= 'hidden'
+	element.style.position	= 'absolute'
+	element.frameBorder	= '0'
+	
+	
 	// move it at the object position
 	onRenderFcts.push(function(delta, now){
 		var position		= THREEx.ObjCoord.cssPosition(mesh, camera,renderer)
 		element.style.left	= (position.x-element.offsetWidth /2)+'px';
-		element.style.top	= (position.y-element.offsetHeight/2)+'px';
+		element.style.top	= (position.y-70-element.offsetHeight/2)+'px';
+		
+		// element.innerHTML= ' '
+		// var position	 = THREEx.ObjCoord.screenPosition(mesh, camera)
+		// element.innerHTML+= 'screen coordinates: '
+		// 	+ position.x.toFixed(4)
+		// 	+ ', '
+		// 	+ position.y.toFixed(4)
+		// element.innerHTML+= '<br/>'
+		// var position	= THREEx.ObjCoord.screenPosition(mesh, camera)
+		// element.innerHTML+= 'world coordinates: '
+		// 	+ position.x.toFixed(4)
+		// 	+ ', '
+		// 	+ position.y.toFixed(4)
+		// 	+ ', '
+		// 	+ position.z.toFixed(4)
 	})
 
 	

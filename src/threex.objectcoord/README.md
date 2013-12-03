@@ -30,10 +30,14 @@ bower install threex.objcoord
 How To Use It
 =============
 
+The whole module is only 3 simple functions. But they are the kind
+you don't want to re-write over and over :)
+
 #### THREEx.ObjCoord.worldPosition(object3d)
 
 This function gives you the world position of a given ```THREE.Object3D```.
-So it is a ```THREE.Vector3``` using your scene position as origin.
+So it returns a ```THREE.Vector3``` using your scene position as origin.
+This may be usefull to detect collision with the border of your game map for example.
 
 ```
 var position	= THREEx.ObjCoord.worldPosition(object3d)
@@ -45,7 +49,7 @@ console.log(position)
 
 this function gives your the screen coordinates of a given object3d.
 Screen coordinates is -1,-1 on top-left, and +1,+1 in bottom right of the screen.
-(TODO find a reference)
+This may be usefull to know when a given position is no more on screen.
 
 ```
 var position	= THREEx.ObjCoord.screenPosition	= function(object3d, camera){
@@ -57,6 +61,7 @@ console.log(position)
 
 Suppose you got a 3d object on your scene. 
 And you want the css position matching the position of this object. 
+Thus you can have any dom element following your 3d object in the webgl.
 This function does excatly this for you :)
 
 Let's see how to use it. First let's create the dom element.
@@ -77,7 +82,7 @@ element.style.left	= (position.x-element.offsetWidth /2)+'px';
 element.style.top	= (position.y-element.offsetHeight/2)+'px';
 ```
 
-<iframe src='http://jeromeetienne.github.io/threex/src/threex.objectcoord/examples/basic.html' style='width:100%; height: 480px'></iframe>
+
 
 
 
