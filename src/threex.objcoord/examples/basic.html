@@ -28,9 +28,9 @@
 	
 	onRenderFcts.push(function(delta, now){
 		var angle	= now * Math.PI * 2 * 0.4
-		mesh.position.x	= Math.cos(angle)*0.6
-		mesh.position.y	= Math.sin(angle)*0.3
-		mesh.position.z	= Math.sin(angle*2)*0.3
+		// mesh.position.x	= Math.cos(angle)*0.6
+		// mesh.position.y	= Math.sin(angle)*0.3
+		// mesh.position.z	= Math.sin(angle*2)*0.3
 	})
 	
 	
@@ -84,16 +84,16 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
-	var mouse	= {x : 0, y : 0}
-	document.addEventListener('mousemove', function(event){
-		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
-		mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	}, false)
-	onRenderFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
-		camera.lookAt( scene.position )
-	})
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// onRenderFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
 
 
 	//////////////////////////////////////////////////////////////////////////////////
