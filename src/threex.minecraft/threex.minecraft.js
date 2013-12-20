@@ -167,15 +167,23 @@ THREEx.MinecraftChar	= function(skinUrl){
 	function mapUv(geometry, faceIdx, x1, y1, x2, y2){
 		var tileUvW	= 1/64;
 		var tileUvH	= 1/32;
-		var UVs		= geometry.faceVertexUvs[0][faceIdx * 2];
-		UVs[0].x = x1 * tileUvW;	UVs[0].y = y1 * tileUvH;
-		UVs[1].x = x1 * tileUvW;	UVs[1].y = y2 * tileUvH;
-		UVs[2].x = x2 * tileUvW;	UVs[2].y = y1 * tileUvH;
-		 
-		var UVs		= geometry.faceVertexUvs[0][faceIdx * 2 + 1];
-		UVs[0].x = x1 * tileUvW;	UVs[0].y = y2 * tileUvH;
-		UVs[1].x = x2 * tileUvW;	UVs[1].y = y2 * tileUvH;
-		UVs[2].x = x2 * tileUvW;	UVs[2].y = y1 * tileUvH;
+		if( geometry.faces[faceIdx] instanceof THREE.Face3 ){
+			var UVs		= geometry.faceVertexUvs[0][faceIdx * 2];
+			UVs[0].x = x1 * tileUvW;	UVs[0].y = y1 * tileUvH;
+			UVs[1].x = x1 * tileUvW;	UVs[1].y = y2 * tileUvH;
+			UVs[2].x = x2 * tileUvW;	UVs[2].y = y1 * tileUvH;
+			 
+			var UVs		= geometry.faceVertexUvs[0][faceIdx * 2 + 1];
+			UVs[0].x = x1 * tileUvW;	UVs[0].y = y2 * tileUvH;
+			UVs[1].x = x2 * tileUvW;	UVs[1].y = y2 * tileUvH;
+			UVs[2].x = x2 * tileUvW;	UVs[2].y = y1 * tileUvH;			
+		}else if( geometry.faces[faceIdx] instanceof THREE.Face4 ){
+			var UVs                = geometry.faceVertexUvs[0][faceIdx];
+			UVs[0].x = x1 * tileUvW;        UVs[0].y = y1 * tileUvH;
+			UVs[1].x = x1 * tileUvW;        UVs[1].y = y2 * tileUvH;
+			UVs[2].x = x2 * tileUvW;        UVs[2].y = y2 * tileUvH;
+			UVs[3].x = x2 * tileUvW;        UVs[3].y = y1 * tileUvH;   			
+		}else	console.assert(false)
 	}
 }
 
