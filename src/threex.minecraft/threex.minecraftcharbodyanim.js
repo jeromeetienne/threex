@@ -17,25 +17,32 @@ THREEx.MinecraftCharBodyAnimations	= function(character){
 
 	
 	var onUpdate	= function(position){
-		character.armR.rotation.z	= position.armRRotationZ;
-		character.armL.rotation.z	= position.armLRotationZ;
+		character.armR.rotation.z	= position.armRRotationZ ? position.armRRotationZ : 0;
+		character.armL.rotation.z	= position.armLRotationZ ? position.armLRotationZ : 0;
 
-		character.armR.rotation.x	=  position.armRotationX;
-		character.armL.rotation.x	= -position.armRotationX;
+		character.armR.rotation.x	= position.armRotationX ?  position.armRotationX : 0;
+		character.armL.rotation.x	= position.armRotationX ? -position.armRotationX : 0;
 
-		character.legR.rotation.x	=  position.legRotationX;
-		character.legL.rotation.x 	= -position.legRotationX;
+		character.legR.rotation.z	= position.legRRotationZ ? position.legRRotationZ : 0;
+		character.legL.rotation.z	= position.legLRotationZ ? position.legLRotationZ : 0;
+
+		character.legR.rotation.x	= position.legRotationX ?  position.legRotationX : 0;
+		character.legL.rotation.x 	= position.legRotationX ? -position.legRotationX : 0;
 	};
 	var onCapture	= function(position){
 		position.armLRotationZ	= character.armL.rotation.z;
 		position.armRRotationZ	= character.armR.rotation.z;
 		position.armRotationX	= character.armR.rotation.x;
+		position.legLRotationZ	= character.legL.rotation.z;
+		position.legRRotationZ	= character.legR.rotation.z;
 		position.legRotationX	= character.legR.rotation.x;
 	};
 	var propTweens	= {
 		armLRotationZ	: tweenAngle,
 		armRRotationZ	: tweenAngle,
 		armRotationX	: tweenAngle,
+		legLRotationZ	: tweenAngle,
+		legRRotationZ	: tweenAngle,
 		legRotationX	: tweenAngle		
 	}
 	
@@ -52,6 +59,22 @@ THREEx.MinecraftCharBodyAnimations	= function(character){
 		armRRotationZ	: -Math.PI/10,
 		armRotationX	: -angleRange,
 		legRotationX	: +angleRange
+	}).propertyTweens(propTweens).onCapture(onCapture).onUpdate(onUpdate));
+
+	animations.add('strafe'	, THREEx.createAnimation().pushKeyframe(0.5, {
+		armLRotationZ	: +angleRange/2,
+		armRRotationZ	: -angleRange/2,
+		armRotationX	: +Math.PI/10,
+		legLRotationZ	: -angleRange,
+		legRRotationZ	: +angleRange,
+		legRotationX	: -Math.PI/5		
+	}).pushKeyframe(0.5, {
+		armLRotationZ	: -angleRange/2,
+		armRRotationZ	: +angleRange/2,
+		armRotationX	: +Math.PI/10,
+		legLRotationZ	: +angleRange,
+		legRRotationZ	: -angleRange,
+		legRotationX	: -Math.PI/5
 	}).propertyTweens(propTweens).onCapture(onCapture).onUpdate(onUpdate));
 
 	// Setup 'walk' animation
@@ -73,7 +96,34 @@ THREEx.MinecraftCharBodyAnimations	= function(character){
 		armLRotationZ	: 0,
 		armRRotationZ	: 0,
 		armRotationX	: 0,
+		legLRotationZ	: 0,
+		legRRotationZ	: 0,
 		legRotationX	: 0
+	}).propertyTweens(propTweens).onCapture(onCapture).onUpdate(onUpdate));
+
+	// Setup 'jump' animation
+	animations.add('jump', THREEx.createAnimation().pushKeyframe(0.15, {
+		armLRotationZ	: +3*Math.PI/4,
+		armRRotationZ	: -3*Math.PI/4,
+		armRotationX	: +angleRange,
+		legRotationX	: +angleRange
+	}).propertyTweens(propTweens).onCapture(onCapture).onUpdate(onUpdate));
+
+	// Setup 'fall' animation
+	animations.add('fall', THREEx.createAnimation().pushKeyframe(0.5, {
+		armLRotationZ	: Math.PI-3*Math.PI/5,
+		armRRotationZ	: Math.PI+3*Math.PI/5,
+		armRotationX	: +angleRange,
+		legLRotationZ	: +Math.PI/5,
+		legRRotationZ	: -Math.PI/5,
+		legRotationX	: +angleRange
+	}).pushKeyframe(0.5, {
+		armLRotationZ	: Math.PI-Math.PI/10,
+		armRRotationZ	: Math.PI+Math.PI/10,
+		armRotationX	: -angleRange,
+		legLRotationZ	: 0,
+		legRRotationZ	: 0,
+		legRotationX	: -angleRange
 	}).propertyTweens(propTweens).onCapture(onCapture).onUpdate(onUpdate));
 
 	// Setup 'wave' animation
