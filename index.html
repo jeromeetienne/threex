@@ -32,21 +32,22 @@
 		  <button type="button" class="btn btn-default" data-tag=''>All
 		  	<span class="badge">?</span>
 		  </button>
-		  <button type="button" class="btn btn-default" data-tag='model'>Model
+		  <button type="button" class="btn btn-default" data-tag='content'>Content
 		  	<span class="badge">?</span>
 		  </button>
 		  <button type="button" class="btn btn-default" data-tag='effect'>Effect
 		  	<span class="badge">?</span>
 		  </button>
-		  <button type="button" class="btn btn-default" data-tag='shader'>Shader
+      <button type="button" class="btn btn-default" data-tag='shader'>Shader
+        <span class="badge">?</span>
+      </button>
+      <button type="button" class="btn btn-default" data-tag='input'>Input
+        <span class="badge">?</span>
+      </button>
+		  <button type="button" class="btn btn-default" data-tag='tool'>Tool
 		  	<span class="badge">?</span>
 		  </button>
-		  <button type="button" class="btn btn-default" data-tag='tool'>
-		  	Tool
-		  	<span class="badge">?</span>
-		  </button>
-		  <button type="button" class="btn btn-default" data-tag='posteffect'>
-		  	PostEffect
+		  <button type="button" class="btn btn-default" data-tag='postprocessing'>PostProcessing
 		  	<span class="badge">?</span>
 		  </button>
 		</div>
@@ -68,7 +69,7 @@
 		#items[data-tag=''] .item {
 			display	: block;
 		}
-		#items[data-tag~=model] .item[data-tag~=model] {
+		#items[data-tag~=content] .item[data-tag~=content] {
 			display	: block;
 		}
 		#items[data-tag~=effect] .item[data-tag~=effect] {
@@ -80,14 +81,17 @@
 		#items[data-tag~=tool] .item[data-tag~=tool] {
 			display	: block;
 		}
-		#items[data-tag~=posteffect] .item[data-tag~=posteffect] {
+		#items[data-tag~=postprocessing] .item[data-tag~=postprocessing] {
 			display	: block;
 		}
+    #items[data-tag~=inputg] .item[data-tag~=inputg] {
+      display : block;
+    }
 	</style>
 
       <div class="row" id='items' data-tag=''>  
         <!-- threex.objcoord -->
-        <div class="col-lg-6 item" data-tag='model'>
+        <div class="col-lg-6 item" data-tag='content'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.objcoord/examples/demo.html'>
               <img src="www/screenshots/threex.objcoord.png" class="img-rounded thumbnail">
@@ -103,7 +107,7 @@
          </div>
         </div>
         <!-- threex.montainsarena -->
-        <div class="col-lg-6 item" data-tag='model'>
+        <div class="col-lg-6 item" data-tag='content'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.montainsarena/examples/basic.html'>
               <img src="www/screenshots/threex.montainsarena.png" class="img-rounded thumbnail">
@@ -118,7 +122,7 @@
          </div>
         </div>
         <!-- threex.poolball -->
-        <div class="col-lg-6 item" data-tag='model'>
+        <div class="col-lg-6 item" data-tag='content'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.poolball/examples/basic.html'>
               <img src="www/screenshots/threex.poolball.png" class="img-rounded thumbnail">
@@ -133,7 +137,7 @@
          </div>
         </div>
         <!-- threex.grassground -->
-        <div class="col-lg-6 item" data-tag='model'>
+        <div class="col-lg-6 item" data-tag='content'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.grassground/examples/basic.html'>
               <img src="www/screenshots/threex.grassground.png" class="img-rounded thumbnail">
@@ -148,7 +152,7 @@
          </div>
         </div>
         <!-- threex.spaceships -->
-        <div class="col-lg-6 item" data-tag='model'>
+        <div class="col-lg-6 item" data-tag='content'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.spaceships/examples/basic.html'>
               <img src="www/screenshots/threex.spaceships.png" class="img-rounded thumbnail">
@@ -215,7 +219,7 @@
          </div>
         </div>
         <!-- threex.suzanne -->
-        <div class="col-lg-6 item" data-tag='model'>
+        <div class="col-lg-6 item" data-tag='content'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.suzanne/examples/basic.html'>
               <img src="www/screenshots/threex.suzanne.png" class="img-rounded thumbnail">
@@ -248,7 +252,7 @@
          </div>
         </div>
         <!-- threex.sslensflare -->
-        <div class="col-lg-6 item" data-tag='effect shader posteffect'>
+        <div class="col-lg-6 item" data-tag='effect shader postprocessing'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.sslensflare/examples/basic.html'>
               <img src="www/screenshots/threex.sslensflare.png" class="img-rounded thumbnail">
@@ -348,7 +352,7 @@
           </div>
         </div>
         <!-- threex.keyboardstate -->
-        <div class="col-lg-6 item">
+        <div class="col-lg-6 item" data-tag='input'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.keyboardstate/examples/basic.html'>
               <img src="www/screenshots/threex.keyboardstate.png" class="img-rounded thumbnail">
@@ -364,7 +368,7 @@
           </div>
         </div>
         <!-- threex.depthoffield -->
-        <div class="col-lg-6 item">
+        <div class="col-lg-6 item" data-tag='postprocessing'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.depthoffield/examples/basic.html'>
               <img src="www/screenshots/threex.depthoffield.png" class="img-rounded thumbnail">
@@ -466,7 +470,7 @@
           </div>
         </div>
         <!-- threex.nyancat -->
-        <div class="col-lg-6 item" data-tag='model'>
+        <div class="col-lg-6 item" data-tag='content'>
           <div class="col-lg-4">
             <a href='http://jeromeetienne.github.io/threex.nyancat/examples/basic.html'> 
               <img src="www/screenshots/threex.nyancat.png" class="img-rounded thumbnail">
@@ -497,7 +501,7 @@
           </div>
         </div>
         <!-- threex.planets -->
-        <div class="col-lg-6 item" data-tag='model'> 
+        <div class="col-lg-6 item" data-tag='content'> 
           <div class="col-lg-4"> 
             <a href='http://jeromeetienne.github.io/threex.planets/examples/earth.html'>
               <img src="www/screenshots/threex.planets.png" class="img-rounded thumbnail">
