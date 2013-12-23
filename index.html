@@ -63,6 +63,13 @@
         </div>
       <br/>
 	<style>
+		/*handle selected item*/
+		#items .item.active {
+			background-color: lightgrey;
+			-webkit-border-radius: 1em;
+			-moz-border-radius: 1em;
+			border-radius: 1em;
+		}
 		/*handle hashLink*/
 		#items .item .hashLink {
 			visibility	: hidden;
@@ -632,7 +639,14 @@ jQuery(function(){
 	items.forEach(function(item){
 		output	+= Mustache.render(htmlTemplate, item);
 	})
-	jQuery(output).appendTo('#items')		
+	jQuery(output).appendTo('#items')
+
+	// honor location.hash as active	
+	if( window.location.hash.substr(1) ){
+		var selectedId	= window.location.hash.substr(1);
+		var element	= document.getElementById(selectedId)
+		element.classList.add('active')
+	}
 })
 </script>
 <script>
