@@ -63,12 +63,19 @@
         </div>
       <br/>
 	<style>
+		/*handle hashLink*/
+		#items .item .hashLink {
+			visibility	: hidden;
+		}
+		#items .item:hover .hashLink {
+			visibility	: visible;
+			text-decoration	: none;
+		}
+
+		/*handle tags filter*/
 		#items .item {
 			display	: none;
 		}
-		#items .item .title:after {
-			content: ' >';
-		} 
 		#items[data-tag=''] .item {
 			display	: block;
 		}
@@ -117,7 +124,11 @@
 			</div>
 			<div class="col-lg-8">
 				<a href='{{{repository}}}'>
-					<h2>{{name}}</h2>
+					<h2>{{name}}
+						<small>
+							<a  class='hashLink'href='#{{name}}'>&#x00B6</a>
+						</small>
+					</h2>
 				</a>
 				{{{description}}}
 				<br/>
