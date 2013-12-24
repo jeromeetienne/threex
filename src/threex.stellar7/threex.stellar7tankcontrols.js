@@ -32,6 +32,33 @@ THREEx.Stellar7TankControls	= function(tank){
 		velocity.applyMatrix4( matrix );
 		tank.baseMesh.position.add(velocity);
 	}.bind(this))
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		handle inputs							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var inputs	= {
+		turnRight	: false,
+		turnLeft	: false,
+		moveAhead	: false,
+		moveBack	: false,
+		gunRight	: false,
+		gunLeft		: false,
+	}
+	this.inputs	= inputs
+	onRenderFcts.push(function(delta, now){
+		if( inputs.turnRight )		turnSpeed	= -Math.PI/4
+		else if( inputs.turnLeft )	turnSpeed	= +Math.PI/4
+		else				turnSpeed	= 0
+
+		if( inputs.moveAhead )		moveSpeed	= +2
+		else if( inputs.moveBack )	moveSpeed	= -2
+		else				moveSpeed	= 0
+
+		if( inputs.gunRight )		gunSpeed	= -Math.PI/4
+		else if( inputs.gunLeft )	gunSpeed	= +Math.PI/4
+		else				gunSpeed	= 0
+	}.bind(this))
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -41,8 +68,8 @@ THREEx.Stellar7TankControls	= function(tank){
 		inputs.turnRight	= direction > 0 ? true : false
 		inputs.turnLeft		= direction < 0 ? true : false
 	}
-	this.turnRight	= function(){ this.turn(-1)	}.bind(this)
-	this.turnLeft	= function(){ this.turn(+1)	}.bind(this)
+	this.turnRight	= function(){ this.turn(+1)	}.bind(this)
+	this.turnLeft	= function(){ this.turn(-1)	}.bind(this)
 	this.turnStop	= function(){ this.turn( 0)	}.bind(this)
 	
 	this.move	= function(direction){
@@ -57,34 +84,7 @@ THREEx.Stellar7TankControls	= function(tank){
 		inputs.gunRight	= direction > 0 ? true : false
 		inputs.gunLeft	= direction < 0 ? true : false
 	}
-	this.gunRight	= function(){ this.gun(-1)	}.bind(this)
-	this.gunLeft	= function(){ this.gun(+1)	}.bind(this)
+	this.gunRight	= function(){ this.gun(+1)	}.bind(this)
+	this.gunLeft	= function(){ this.gun(-1)	}.bind(this)
 	this.gunStop	= function(){ this.gun( 0)	}.bind(this)
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	var inputs	= {
-		turnRight	: false,
-		turnLeft	: false,
-		moveAhead	: false,
-		moveBack	: false,
-		gunRight	: false,
-		gunLeft		: false,
-	}
-	this.inputs	= inputs
-	onRenderFcts.push(function(delta, now){
-		if( this.inputs.turnRight )	turnSpeed	= +Math.PI/4
-		else if( this.inputs.turnLeft )	turnSpeed	= -Math.PI/4
-		else				turnSpeed	= 0
-
-		if( this.inputs.moveAhead )	moveSpeed	= +2
-		else if( this.inputs.moveBack )	moveSpeed	= -2
-		else				moveSpeed	= 0
-
-		if( this.inputs.gunRight )	gunSpeed	= +Math.PI/4
-		else if( this.inputs.gunLeft )	gunSpeed	= -Math.PI/4
-		else				gunSpeed	= 0
-	}.bind(this))
 }

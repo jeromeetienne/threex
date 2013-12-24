@@ -11,7 +11,7 @@ What about code orga
 ====================
 * THREEx.Stellar7.TankModel
 * THREEx.Stellar7.TankControls
-  * may be human controlled
+  * may be human controlled - THREEx.Stellar7.KeyboardTankControls
   * may be bots controlled - fightcode like
 * THREEx.Stellar7.TankCameraControls
 * THREEx.Stellar7.TankVehicule
