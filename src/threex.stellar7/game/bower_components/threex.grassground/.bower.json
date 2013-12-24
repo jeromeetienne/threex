@@ -1,0 +1,14 @@
+{
+  "name": "threex.grassground",
+  "homepage": "https://github.com/jeromeetienne/threex.grassground",
+  "_release": "master",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "0ffcabff09ee719da60fadad8bbed7851d0fe05d"
+  },
+  "_source": "git://github.com/jeromeetienne/threex.grassground.git",
+  "_target": "*",
+  "_originalSource": "threex.grassground",
+  "_direct": true
+}

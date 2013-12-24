@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<script src='vendor/three.js/build/three.js'></script>
+<script src="../threex.keyboardstate.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	var keyboard	= new THREEx.KeyboardState(renderer.domElement);
+	renderer.domElement.setAttribute("tabIndex", "0");
+	renderer.domElement.focus();
+	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * ## how to get rid of keyboard auto repeat
+	 * * keydown is repeated automatically due to keyboard autorepeat
+	 * * this is an example of how to handle detect keydown without autorepat
+	 */
+
+	// only on keydown + no repeat
+	var wasPressed	= {};
+	keyboard.domElement.addEventListener('keydown', function(event){
+		if( keyboard.eventMatches(event, 'left') && !wasPressed['left'] ){
+			mesh.rotation.x	+= -Math.PI/6
+			wasPressed['left']	= true;
+		}
+		if( keyboard.eventMatches(event, 'right') && !wasPressed['right']){
+			mesh.rotation.x	+= +Math.PI/6
+			wasPressed['right']	= true;			
+		}
+	})	
+	// listen on keyup to maintain ```wasPressed``` array
+	keyboard.domElement.addEventListener('keyup', function(event){
+		if( keyboard.eventMatches(event, 'left') ){
+			wasPressed['left']	= false;
+		}
+		if( keyboard.eventMatches(event, 'right') ){
+			wasPressed['right']	= false;
+		}
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

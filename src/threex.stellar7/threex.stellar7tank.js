@@ -15,6 +15,9 @@ THREEx.Stellar7Tank	= function(){
 	
 	// get the base
 	var geometry	= new THREE.CubeGeometry( 0.5, 0.2, 1);
+	var matrix	= new THREE.Matrix4()
+	matrix.makeTranslation(0, 0.1, 0)
+	geometry.applyMatrix(matrix)
 	var material	= new THREE.MeshNormalMaterial();
 	var baseMesh	= new THREE.Mesh( geometry, material );
 	this.object3d	= baseMesh
@@ -24,7 +27,7 @@ THREEx.Stellar7Tank	= function(){
 	var material	= new THREE.MeshNormalMaterial();
 	var cannonMesh	= new THREE.Mesh( geometry, material );
 	baseMesh.add(cannonMesh)
-	cannonMesh.position.set(0,0.2, -0.2)
+	cannonMesh.position.set(0,0.3, -0.2)
 	this.cannonMesh	= cannonMesh
 
 	// get the cannon
@@ -39,23 +42,47 @@ THREEx.Stellar7Tank	= function(){
 	//		controls							//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	this.gunSpeed	= 0
+	var gunSpeed	= 0
 	onRenderFcts.push(function(delta, now){
-		var angle	= this.gunSpeed * delta
-		cannonMesh.rotateY(angle)
+		var angle	= gunSpeed * delta
+		cannonMesh.rotation.y	+= angle
 	}.bind(this))
 	
-	this.turnSpeed	= 0
+	var turnSpeed	= 0
 	onRenderFcts.push(function(delta, now){
-		var angle	= this.turnSpeed * delta
-		baseMesh.rotateY(angle)
+		var angle	= turnSpeed * delta
+		baseMesh.rotation.y	+= angle
 	}.bind(this))
 
-	this.moveSpeed	= 0
+	var moveSpeed	= 0
 	onRenderFcts.push(function(delta, now){
-		var velocity	= new THREE.Vector3(0, 0, this.moveSpeed);
+		var velocity	= new THREE.Vector3(0, 0, moveSpeed*delta);
 		var matrix	= new THREE.Matrix4().makeRotationY(baseMesh.rotation.y);
 		velocity.applyMatrix4( matrix );
 		baseMesh.position.add(velocity);
 	}.bind(this))
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	this.turnRight	= function(){
+		turnSpeed	= -Math.PI/4
+	}
+	this.turnLeft	= function(){
+		turnSpeed	= +Math.PI/4
+	}
+	this.turnStop	= function(){
+		turnSpeed	= 0
+	}
+
+	this.moveAhead	= function(){
+		moveSpeed	= +1
+	}
+	this.moveBack	= function(){
+		moveSpeed	= -1
+	}
+	this.moveStop	= function(){
+		moveSpeed	=  0
+	}
 }

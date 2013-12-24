@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<script src='vendor/three.js/build/three.js'></script>
+<script src='../threex.texturecube.js'></script>
+<script src='../threex.skymap.js'></script>
+<script src='vendor/three.js/examples/js/ImprovedNoise.js'></script>
+
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer({
+		antialias	: true
+	});
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 6;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		mars								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+		
+	var mesh	= THREEx.createSkymap('mars')
+	scene.add( mesh );
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// add a ambient light
+	var light	= new THREE.AmbientLight( 0x202020 )
+	scene.add( light )
+	// add a light in front
+	var light	= new THREE.DirectionalLight('firebrick', 1)
+	light.position.set(0.5, 3.5, -2)
+	scene.add( light )
+	// add a light behind
+	var light	= new THREE.DirectionalLight('white', 15)
+	light.position.set(0, 2, -20)
+	scene.add( light )
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// PILLARS
+	;(function(){
+		var geometry	= new THREE.CylinderGeometry(0.5, 0.5, 5, 30, 1, true)
+		var material	= new THREE.MeshPhongMaterial();
+		material.map	= THREE.ImageUtils.loadTexture('images/water.jpg')
+		material.color.set('hotpink')
+		var nPillars	= 30
+		for(var i = 0; i < nPillars; i++ ){
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.x	= (i - nPillars/2) + i * 1
+			mesh.position.z	= 0
+			scene.add( mesh );
+			var mesh	= new THREE.Mesh( geometry, material );
+			mesh.position.x	= (i - nPillars/2) + i * 1
+			mesh.position.z	= -3
+			scene.add( mesh );
+		}
+	})()
+
+	// GROUND	
+	;(function(){
+		var geometry	= new THREE.PlaneGeometry(40, 40)
+		var material	= new THREE.MeshNormalMaterial()
+		var mesh	= new THREE.Mesh( geometry, material );
+		mesh.position.y	= -2.5
+		mesh.lookAt(new THREE.Vector3(0,1,0))
+		scene.add( mesh );
+	})()
+	
+	// WATER FRONT
+	;(function(){
+		var material	= new THREE.SpriteMaterial({
+			color	: 'cyan',
+			opacity	: 0.5,
+			map	: THREE.ImageUtils.loadTexture('images/water.jpg'),	
+		})
+		window.material	= material
+		var mesh	= new THREE.Sprite(material)
+		mesh.position.set(window.innerWidth/2, window.innerHeight/2, 1)
+		mesh.scale.set(window.innerWidth, window.innerHeight, 1)
+		scene.add( mesh )
+		onRenderFcts.push(function(delta, now){
+			mesh.visible	= camera.position.y < -0.1/2 ? true : false
+		})
+	})()
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// add a reflexion
+	var geometry	= new THREE.PlaneGeometry(40, 40, 100, 100)
+	// var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshPhongMaterial()
+	material.color.set('steelblue')
+	material.shininess	= 60
+	material.specular.set('orangered')
+
+	material.envMap		= THREEx.createTextureCube('mars')
+	material.reflectivity	= 0.6
+	
+	material.transparent	= true
+	material.depthWrite	= false
+
+	material.opacity	= 0.9
+	material.side		= THREE.DoubleSide
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.lookAt(new THREE.Vector3(0,1,0))
+	scene.add( mesh );
+
+	onRenderFcts.push(function(delta, now){
+		material.side	= camera.position.y < -0.1/2 ? THREE.BackSide : THREE.FrontSide
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		scroll texture							//
+	//////////////////////////////////////////////////////////////////////////////////
+
+;(function(){
+	material.bumpMap= THREE.ImageUtils.loadTexture('images/water.jpg')
+	var texture	= material.bumpMap
+	var perlin 	= new ImprovedNoise();	
+	texture.wrapT	= THREE.RepeatWrapping;
+	texture.wrapS	= THREE.RepeatWrapping;
+	texture.repeat.multiplyScalar(10)
+	material.bumpScale	= 0.005
+
+	onRenderFcts.push(function(delta, now){
+		// normalize the offset
+		texture.offset.y	+= (perlin.noise(10*now, 0, 0)+0.5) * 200.0 * delta;
+		// texture.offset.x	+= perlin.noise(0.5*now, 0, 0) * 10.0 * delta;
+		// texture.offset.y	= (perlin.noise(0.1*now, 0, 0) + 0.5) * 1 * delta % 1;
+		// texture.offset.x= (texture.offset.x + 1 * delta)%1;
+		// update the texture
+		texture.needsUpdate	= true;
+	})
+})()
+	
+;(function(){
+// return
+	var perlin 	= new ImprovedNoise();	
+	material.map	= THREE.ImageUtils.loadTexture('images/water.jpg')
+	var texture	= material.map
+	texture.wrapT	= THREE.RepeatWrapping;
+	texture.wrapS	= THREE.RepeatWrapping;
+	texture.repeat.multiplyScalar(10)
+	onRenderFcts.push(function(delta, now){
+		var texture	= material.map
+		// normalize the offset
+		texture.offset.x	+= (perlin.noise(0.1*now, 0, 0) + 0.5) * 0.01 * delta;
+		texture.offset.y	= (texture.offset.y + 0.05 * delta)%1;
+		// update the texture
+		texture.needsUpdate	= true;
+	})
+})()
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		put waves 							//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// WAVES ANIMATIONS
+	var waveHeight	= 0.2
+	onRenderFcts.push(function(delta, now){
+// return
+		var verticesPerX	= geometry.widthSegments + 1
+		var angleOffset		= now * Math.PI * 2 * 0.5
+		geometry.vertices.forEach(function(vertex, vertexIdx){
+			var x	= vertexIdx % verticesPerX
+			var y	= Math.floor(vertexIdx / verticesPerX)
+			var angle	= angleOffset 
+			angle		+= 1.0 * y/geometry.heightSegments* Math.PI*2;
+			angle		+= 0.5 * x/geometry.widthSegments * Math.PI*2;
+			vertex.z	= Math.cos(angle) * waveHeight*2
+		})
+		geometry.computeFaceNormals()
+		geometry.computeVertexNormals()
+		geometry.normalsNeedUpdate = true
+		geometry.verticesNeedUpdate = true
+	})
+	
+	// SNAP CAMERA OUT OF WAVES 
+	onRenderFcts.push(function(delta, now){
+		if( camera.position.y > -waveHeight && camera.position.y <= 0 ){
+			camera.position.y	 = +waveHeight
+		}else if( camera.position.y < +waveHeight && camera.position.y >= 0 ){
+			camera.position.y	 = -waveHeight
+		}
+	});	
+		
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y + 2) * (delta*4)
+		camera.lookAt( scene.position )
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
