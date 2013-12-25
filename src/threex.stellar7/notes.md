@@ -11,10 +11,10 @@ What about code orga
 ====================
 * THREEx.Stellar7.TankModel
 * THREEx.Stellar7.TankControls
-  * may be human controlled - THREEx.Stellar7.KeyboardTankControls
   * may be bots controlled - fightcode like
+  * THREEx.Stellar7.TankKeyboardControls
 * THREEx.Stellar7.TankCameraControls
-* THREEx.Stellar7.TankVehicule
+* THREEx.Stellar7.TankPlayer
   * include Model, Controls, life
   * onTankCollision
   * onWallCollision

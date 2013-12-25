@@ -5,7 +5,9 @@ var THREEx	= THREEx	|| {}
  */
 THREEx.Stellar7TankKeyboardControls	= function(keyboard, tankControls){
 
+	// add EventDispatcher in this object
 	THREE.EventDispatcher.prototype.apply(this)
+
 	
 	this.update	= function(delta, now){
 		var inputs	= tankControls.inputs
@@ -23,9 +25,7 @@ THREEx.Stellar7TankKeyboardControls	= function(keyboard, tankControls){
 	keyboard.domElement.addEventListener('keydown', function(event){
 		if( keyboard.eventMatches(event, 'space') && !wasPressed['space'] ){
 			wasPressed['space']	= true;
-			// TODO how to link that to the fire model
-			console.log('FIRE')
-			this.dispatchEvent('fire')
+			this.dispatchEvent({ type: 'fire' })
 		}
 	}.bind(this))	
 	// listen on keyup to maintain ```wasPressed``` array
