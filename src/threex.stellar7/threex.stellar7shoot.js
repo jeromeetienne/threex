@@ -28,6 +28,9 @@ THREEx.Stellar7Shoot	= function(){
 	})
 }
 
+/**
+ * create a shoot as if it were originated by this tank
+ */
 THREEx.Stellar7Shoot.fromTank	= function(tankModel){
 	var shoot	= new THREEx.Stellar7Shoot()
 	shoot.object3d.position

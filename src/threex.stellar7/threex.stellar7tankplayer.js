@@ -49,6 +49,9 @@ THREEx.Stellar7TankPlayer	= function(){
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
+	this.onMapCollision	= function(){
+		console.log('mapCollision')
+	}
 	this.onTankCollision	= function(){}
 	this.onShootCollision	= function(){}
 	this.onHitByShoot	= function(){}

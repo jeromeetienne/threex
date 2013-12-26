@@ -23,8 +23,8 @@ What about code orga
 * THREEx.Stellar7.Shoot
   * contains the model and the controls
   * THREEx.Stellar7.Shoot.fromTank
-* THREEx.Stellar7.Game
+* THREEx.Stellar7.Map
+* THREEx.Stellar7.Game 
   * all the players
   * all the shoots
   * loop: update all players, all shoots, handle events
-* bots handled by fightcode 
