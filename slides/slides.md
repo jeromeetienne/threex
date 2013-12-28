@@ -23,6 +23,7 @@ output: index.html
 ### Means 
 
 * dev of game modules around html5 tech
+* minigame to show off what is possible
 * documentation and advocaty of the effort
 
 --
@@ -51,7 +52,8 @@ output: index.html
 ### in 3d
 
 * all three.js obviously
-* threex extensions, tquery plugins
+* threex extensions
+* some good idea in tquery plugins. to import
 * good stuff to import from babylon.js 
   * it has a game orientation
 
@@ -59,8 +61,8 @@ output: index.html
 
 ### in audio
 
-* webaudiox.js to ease access to webaudio api
 * sound localisation is a key feature
+* webaudiox.js to ease access to webaudio api
 * html5rocks tutorial
 
 --
@@ -68,8 +70,13 @@ output: index.html
 ### in physics
 
 * not much
+  * due to no clear winner for 'good 3d physics library in js'
   * mainly because there are no clear winner for 'good 3d physics library in js'
 * some work in threex.cannonjs
+* maybe something based on obb,aabb, sphere, raycasting
+  * good math in /src/math three.js
+  * it is included in Geometry
+* what babylon.js is doing ?
 
 --
 
@@ -82,9 +89,24 @@ output: index.html
 
 --
 
+### in user authentication
+
+* passport.js with all big social networks
+
+-- 
+
+### in IA
+
+* machine.js
+* pathfinding.js
+
+
+--
+
 ### about game itself
 
 * unclear how much we should do 
   * out of scope of the library ?
 * "maybe you can do that like that, or like this. it is up to you"
 * component/behavior ? or some other wellknow scheme ?
+* chat
