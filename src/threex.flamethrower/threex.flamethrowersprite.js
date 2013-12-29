@@ -1,6 +1,6 @@
 var THREEx	= THREEx	|| {}
 
-THREEx.FlameThrowerSprite	= function(onReady){
+THREEx.FlameThrowerSprite	= function(texture, nTiles, onReady){
 	onReady	= onReady	|| function(){}
 	// init texture
 	var texture	= new THREEx.FlameThrowerTexture(function(texture, nTiles){
@@ -22,6 +22,7 @@ THREEx.FlameThrowerSprite	= function(onReady){
 	var nTiles	= THREEx.FlameThrowerTexture.imageUrls.length
 	this.nTiles	= nTiles
 	material.uvScale.set(1, 1/nTiles)
+
 	this.setTile	= function(imageIdx){
 		var uvOffsetY	= 1 - imageIdx * 1/nTiles;
 		material.uvOffset.set(0, uvOffsetY)
