@@ -4,8 +4,9 @@ THREEx.FlameThrowerSprite	= function(onReady){
 	onReady	= onReady	|| function(){}
 	// init texture
 	var texture	= new THREEx.FlameThrowerTexture(function(texture, nTiles){
-		onReady()
-	})
+		onReady(this)
+	}.bind(this))
+	this.texture	= texture
 	// init sprite material
 	var material	= new THREE.SpriteMaterial({
 		map			: texture,
