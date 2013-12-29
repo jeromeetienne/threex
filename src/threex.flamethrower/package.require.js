@@ -1,9 +1,10 @@
-define( [ 'module'	// to set .baseURL
+define( [ 'module'			// to set .baseURL
 	, './threex.textureutils'
-	, './threex.flamethrower'
+	, './threex.flamethrowertexture'
+	, './threex.flamethrowersprite'
 	, './webaudiox.flamethrower'
 	], function(module){
 	// set baseUrl for this extension
-	THREEx.FlameThrower.baseUrl	= module.uri+'/../'
-	WebAudiox.FlameThrower.baseUrl	= module.uri+'/../'
+	THREEx.FlameThrowerTexture.baseUrl	= module.uri+'/../'
+	WebAudiox.FlameThrower.baseUrl		= module.uri+'/../'
 });

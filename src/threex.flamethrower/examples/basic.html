@@ -2,6 +2,7 @@
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../threex.textureutils.js'></script>
 <script src='../webaudiox.flamethrower.js'></script>
+<script src='../threex.flamethrowertexture.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -50,14 +51,13 @@
 	//////////////////////////////////////////////////////////////////////////////////
 // TODO put that in the particle itself ?
 
-	loadTremulousFlameParticules(urls, function(texture, urls){
+	new THREEx.FlameThrowerTexture(function(texture, nTiles){
 		// create sound
 		var sound	= new WebAudiox.FlameThrower()
 		// update sound
 		updateFcts.push(function(delta, now){ sound.update(delta, now)	}) 
 
 		// create emitter
-		var nTiles	= urls.length 
 		var emitter	= new FlameThrowerEmitter(texture, nTiles, scene)
 		// update emitter
 		updateFcts.push(function(delta, now){ emitter.update(delta, now)	}) 
@@ -80,26 +80,6 @@
 			sound.trigger.stop()	
 		})
 	})
-
-	function loadTremulousFlameParticules(urls, onReady){
-		// load all the images from urls
-		THREEx.TextureUtils.loadImages(urls, function(images, urls){
-			// build a tiled spreadsheet canvas with images
-			var canvas	= THREEx.TextureUtils.buildTiledSpriteSheet({
-				images	: images,
-				spriteW	: images[0].width,
-				spriteH	: images[0].height,
-				nSpriteX: 1
-			});
-			// create the texture
-			var texture	= new THREE.Texture( canvas );
-			texture.needsUpdate = true;
-			// generate Alpha as it got no alpha 
-			THREEx.TextureUtils.generateAlphaFromLuminance(texture, 16, 1);
-			// notify caller
-			onReady(texture, urls)
-		})
-	}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
