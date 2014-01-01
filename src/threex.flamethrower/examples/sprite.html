@@ -13,20 +13,21 @@
 	var updateFcts	= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
-	camera.position.z = 3;
+	camera.position.z = 1;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var sprite	= new THREEx.FlameThrowerSprite()
-	scene.add(sprite.object3d)
-	updateFcts.push(function(delta, now){
-		var age		= (now%0.6)/0.6
-		var imageIdx	= Math.floor(age * sprite.nTiles);
-		sprite.setTile(imageIdx)
+	new THREEx.FlameThrowerTexture(function(texture){
+		var sprite	= new THREEx.FlameThrowerSprite(texture)
+		scene.add(sprite.object3d)
+		updateFcts.push(function(delta, now){
+			var age		= (now%0.6)/0.6
+			var imageIdx	= Math.floor(age * sprite.nTiles);
+			sprite.setTile(imageIdx)
+		})
 	})
-	
 	
 
 	//////////////////////////////////////////////////////////////////////////////////

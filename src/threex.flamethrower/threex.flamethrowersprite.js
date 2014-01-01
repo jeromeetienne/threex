@@ -1,11 +1,7 @@
 var THREEx	= THREEx	|| {}
 
-THREEx.FlameThrowerSprite	= function(texture, nTiles, onReady){
-	onReady	= onReady	|| function(){}
+THREEx.FlameThrowerSprite	= function(texture){
 	// init texture
-	var texture	= new THREEx.FlameThrowerTexture(function(texture, nTiles){
-		onReady(this)
-	}.bind(this))
 	this.texture	= texture
 	// init sprite material
 	var material	= new THREE.SpriteMaterial({
@@ -26,5 +22,10 @@ THREEx.FlameThrowerSprite	= function(texture, nTiles, onReady){
 	this.setTile	= function(imageIdx){
 		var uvOffsetY	= 1 - imageIdx * 1/nTiles;
 		material.uvOffset.set(0, uvOffsetY)
+	}
+	
+	this.clone	= function(){
+		var flameSprite	= new THREEx.FlameThrowerSprite(this.texture)
+		return flameSprite
 	}
 }

@@ -20,14 +20,17 @@
 	//////////////////////////////////////////////////////////////////////////////////
 // TODO put that in the particle itself ?
 
-	var sprite	= new THREEx.FlameThrowerSprite(function(flameThrowerSprite){
+	new THREEx.FlameThrowerTexture(function(texture){
+		var flameSprite	= new THREEx.FlameThrowerSprite(texture)
+		scene.add(flameSprite.object3d)
+
 		// create sound
 		var sound	= new WebAudiox.FlameThrower()
 		// update sound
 		updateFcts.push(function(delta, now){ sound.update(delta, now)	}) 
 
 		// create emitter
-		var emitter	= new FlameThrowerEmitter(flameThrowerSprite.texture, flameThrowerSprite.nTiles, scene)
+		var emitter	= new FlameThrowerEmitter(flameSprite, scene)
 		// update emitter
 		updateFcts.push(function(delta, now){ emitter.update(delta, now)	}) 
 
@@ -78,7 +81,9 @@
 //		comment								//
 //////////////////////////////////////////////////////////////////////////////////
 	
-function FlameThrowerEmitter(texture, nTiles, container){
+function FlameThrowerEmitter(flameSprite, container){
+	var texture	= flameSprite.texture
+	var nTiles	= flameSprite.nTiles
 	// handle local loop
 	var updateFcts	= [];
 	// init trigger

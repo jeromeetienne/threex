@@ -24,8 +24,7 @@ THREEx.FlameThrowerTexture	= function(onReady){
 		// generate Alpha as it got no alpha
 		THREEx.TextureUtils.generateAlphaFromLuminance(texture, 16, 1)
 		// notify caller
-		var nTiles	= urls.length
-		onReady(texture, nTiles)
+		onReady(texture)
 	})
 	return texture
 }
@@ -34,18 +33,18 @@ THREEx.FlameThrowerTexture	= function(onReady){
 THREEx.FlameThrowerTexture.baseUrl	= '../'
 
 THREEx.FlameThrowerTexture.imageUrls	= [
-	// 'images/flame00.png',
-	// 'images/flame01.png',
-	// 'images/flame02.png',
-	// 'images/flame03.png',
-	// 'images/flame04.png',
-	// 'images/flame05.png',
-	// 'images/flame06.png',
-	// 'images/flame07.png',
-	// 'images/flame08.png',
-	// 'images/flame09.png',
-	// 'images/flame10.png',
-	// 'images/flame11.png',
+	'images/flame00.png',
+	'images/flame01.png',
+	'images/flame02.png',
+	'images/flame03.png',
+	'images/flame04.png',
+	'images/flame05.png',
+	'images/flame06.png',
+	'images/flame07.png',
+	'images/flame08.png',
+	'images/flame09.png',
+	'images/flame10.png',
+	'images/flame11.png',
 	'images/flame12.png',
 	'images/flame13.png',
 	'images/flame14.png',

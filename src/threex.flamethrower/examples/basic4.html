@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../threex.textureutils.js'></script>
+<script src='../webaudiox.flamethrower.js'></script>
+<script src='../threex.flamethrowertexture.js'></script>
+<script src='../threex.flamethrowersprite.js'></script>
+<script src='../threex.flamethroweremitter.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor('black')
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000 );
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+// TODO put that in the particle itself ?
+
+	new THREEx.FlameThrowerTexture(function(texture){
+		var flameSprite	= new THREEx.FlameThrowerSprite(texture)
+		scene.add(flameSprite.object3d)
+
+		// create sound
+		var sound	= new WebAudiox.FlameThrower()
+		// update sound
+		updateFcts.push(function(delta, now){ sound.update(delta, now)	}) 
+
+		// create emitter
+		var emitter	= new THREEx.FlameThrowerEmitter(flameSprite, scene)
+		// update emitter
+		updateFcts.push(function(delta, now){ emitter.update(delta, now)	}) 
+
+		var position	= new THREE.Vector3(-3,0,0)
+		//var position	= new THREE.Vector3(0,-1,-2)
+		var position	= new THREE.Vector3(-4,0,-3)
+		var velocity	= new THREE.Vector3(7, 0, 0)
+		emitter.start(15, function(){
+			emitter.emitOne(position, velocity)
+		})
+		// start the trigger and 
+		emitter.trigger.start();
+		sound.trigger.start();
+		document.addEventListener('mousedown'	, function(){
+			emitter.trigger.start()
+			sound.trigger.start();			
+		})
+		document.addEventListener('mouseup'	, function(){
+			emitter.trigger.stop()	
+			sound.trigger.stop()	
+		})
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
