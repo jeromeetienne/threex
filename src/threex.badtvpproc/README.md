@@ -15,12 +15,12 @@ TODO
 * some shader are the same as in three.js distribution. DO NOT DUPLICATE code
   * RGBShiftShader
   * FilmShader
-* TODO externalize the ping in demo
-  * currently this is in 
-* do a bad tv demo with webaudio API sound
+* DONE do a bad tv demo with webaudio API sound
   * find the sound on freesounds
     * this one http://www.freesound.org/people/Bekir_VirtualDJ/sounds/132834/
   * use tween.js for animation
+* DONE externalize the ping in demo
+  * currently this is in dat.gui 
 * DONE change to BatTVPasses.params.badTV
 * DONE do an examples from threex boilerplate
 * DONE do threex.badtvdatgui.js 
@@ -29,21 +29,6 @@ TODO
   * .update() function ?
   * isnt it already done by composer ?
 
-How to implement tweening
-=========================
-* onParamsChange() set a timestamp
-  * lastChangeDate
-  * srcParams.copy(params)
-* tweenDelay
-* in .update()
-  * if lastChangeDate !== null
-  * if( present - lastChangeDate >= tweenDelay ){
-  *    current.copy(targetParam)
-  *    lastChangeDate = null
-  * }else{
-  *    var amount = (present - lastChangeDate) / tweenDelay
-  *    current.lerp(srcParams, dstParams, amount)
-  * }
 
 Show Don't Tell
 ===============

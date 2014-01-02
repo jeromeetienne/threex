@@ -42,7 +42,7 @@ THREEx.BadTVPasses	= function(){
 			var present	= Date.now()/1000
 			if( present - tweenStartDate >= this.tweenDelay ){
 				params.copy(tweenDstParams)
-				lastChangeDate = null
+				tweenStartDate = null
 				this.dispatchEvent({ type: 'tweenCompleted' })
 			}else{
 				var amount = (present - tweenStartDate) / this.tweenDelay
