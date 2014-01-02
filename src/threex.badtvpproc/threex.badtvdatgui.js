@@ -21,6 +21,21 @@ THREEx.addBadTVPasses2DatGui	= function(badTVPasses, datGui){
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
+	var nPingSteps	= 0
+	datGui.add({ ping	: function(){
+		badTVPasses.params.randomize()
+		badTVPasses.onParamsChange()
+		nPingSteps	= 10;
+		badTVPasses.addEventListener('tweenCompleted', function callback(){
+			nPingSteps	-= 1;
+			if( nPingSteps > 0 )	badTVPasses.params.randomize()
+			else{
+				badTVPasses.params.reset()
+				badTVPasses.removeEventListener('tweenCompleted', callback)
+			}
+			badTVPasses.onParamsChange()		
+		})
+	}}, 'ping' )
 	datGui.add({ randomize	: function(){
 		badTVPasses.params.randomize()
 		badTVPasses.onParamsChange()		
@@ -29,6 +44,7 @@ THREEx.addBadTVPasses2DatGui	= function(badTVPasses, datGui){
 		badTVPasses.params.reset()
 		badTVPasses.onParamsChange()		
 	}}, 'reset' )
+	datGui.add(badTVPasses, 'tweenDelay', 0, 2).step(0.1).listen().name("Tween Delay").onChange(onChange);
 
 	var f1 = datGui.addFolder('Bad TV');
 	f1.add(badTVParams, 'distortion', 0.1, 20).step(0.1).listen().name("Thick Distort").onChange(onChange);
@@ -39,7 +55,7 @@ THREEx.addBadTVPasses2DatGui	= function(badTVPasses, datGui){
 
 	var f2 = datGui.addFolder('RGB Shift');
 	f2.add(rgbParams, 'amount', 0.0, 0.1).listen().onChange(onChange);
-	f2.add(rgbParams, 'angle', 0.0, 2.0).listen().onChange(onChange);
+	f2.add(rgbParams, 'angle', 0.0, 2.1).step(0.01).listen().onChange(onChange);
 	f2.open();
 
 	var f4 = datGui.addFolder('Static');

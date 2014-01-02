@@ -5,6 +5,9 @@ var THREEx	= THREEx	|| {}
  * - ideas and shaders by @felixturner
  */
 THREEx.BadTVPasses	= function(){
+	// add EventDispatcher in this object
+	THREE.EventDispatcher.prototype.apply(this)
+	
 	// create shaders passes
 	var badTVPass	= new THREE.ShaderPass( THREE.BadTVShader );
 	this.badTVPass	= badTVPass
@@ -35,7 +38,19 @@ THREEx.BadTVPasses	= function(){
 		filmPass.uniforms[ 'time' ].value	= now
 		staticPass.uniforms[ 'time' ].value	= now
 
-		// params.lerp(dstParams, 0.01)
+		if( tweenStartDate !== null ){
+			var present	= Date.now()/1000
+			if( present - tweenStartDate >= this.tweenDelay ){
+				params.copy(tweenDstParams)
+				lastChangeDate = null
+				this.dispatchEvent({ type: 'tweenCompleted' })
+			}else{
+				var amount = (present - tweenStartDate) / this.tweenDelay
+				// console.log('tweening', amount)
+				params.lerp(tweenSrcParams, tweenDstParams, amount)
+			}
+			updateUniforms()	
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -43,14 +58,14 @@ THREEx.BadTVPasses	= function(){
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var params	= new THREEx.BadTVPasses.Params()
-	this.params	= params
-	// params.randomize()
 
-	// this.lerpSpeed	= 0.1
-
-	// var dstParams	= new THREEx.BadTVPasses.Params()
-	// this.params	= dstParams
-	this.params.randomize()
+	this.tweenDelay		= 0.2
+	
+	var tweenStartDate	= null
+	var tweenSrcParams	= new THREEx.BadTVPasses.Params()
+	var tweenDstParams	= new THREEx.BadTVPasses.Params()
+	
+	this.params	= tweenDstParams
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -58,7 +73,13 @@ THREEx.BadTVPasses	= function(){
 
 	this.onParamsChange	= onParamsChange
 	function onParamsChange() {
+		// update value for tween
+		tweenStartDate	= Date.now()/1000;
+		tweenSrcParams.copy(params)
 		
+		updateUniforms()
+	}
+	function updateUniforms() {
 		//copy gui params into shader uniforms
 		badTVPass.uniforms[ "distortion" ].value	= params.badTV.distortion
 		badTVPass.uniforms[ "distortion2" ].value	= params.badTV.distortion2
@@ -87,17 +108,17 @@ THREEx.BadTVPasses	= function(){
  */
 THREEx.BadTVPasses.Params	= function(){
 	var badTV	= this.badTV	= {
-		distortion	: 3.0,
-		distortion2	: 1.0,
-		speed		: 0.3,
-		rollSpeed	: 0.1
+		distortion	: 0.1,
+		distortion2	: 0.1,
+		speed		: 0.0,
+		rollSpeed	: 0.0
 	}
 	var staticNoise	= this.staticNoise	= {
-		amount		: 0.5,
+		amount		: 0.0,
 		size2		: 4.0
 	}
 	var rgb	= this.rgb	= {
-		amount		: 0.005,
+		amount		: 0.0,
 		angle		: 0.0,
 	}
 	var film	= this.film	= {
@@ -105,27 +126,31 @@ THREEx.BadTVPasses.Params	= function(){
 		sIntensity	: 0.9,
 		nIntensity	: 0.4
 	}
-	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	this.lerp	= function(srcParams, dstParams, amount){
-		console.log('distortion', this.badTV.distortion, dstParams.badTV.distortion)
-		this.badTV.distortion	= (dstParams.badTV.distortion - srcParams.badTV.distortion) * amount
-		this.badTV.distortion2	= (dstParams.badTV.distortion2 - srcParams.badTV.distortion2) * amount
-		this.badTV.speed	= (dstParams.badTV.speed - srcParams.badTV.speed) * amount
-		this.badTV.rollSpeed	= (dstParams.badTV.rollSpeed - srcParams.badTV.rollSpeed) * amount
+		// console.log('angle', this.rgb.angle, dstParams.rgb.angle)
+		this.badTV.distortion	= compute(srcParams.badTV.distortion, dstParams.badTV.distortion)
+		this.badTV.distortion2	= compute(srcParams.badTV.distortion2, dstParams.badTV.distortion2)
+		this.badTV.speed	= compute(srcParams.badTV.speed, dstParams.badTV.speed)
+		this.badTV.rollSpeed	= compute(srcParams.badTV.rollSpeed, dstParams.badTV.rollSpeed)
 
-		this.staticNoise.amount	= (dstParams.staticNoise.amount - srcParams.staticNoise.amount) * amount
-		this.staticNoise.size2	= (dstParams.staticNoise.size2 - srcParams.staticNoise.size2) * amount
+		this.staticNoise.amount	= compute(srcParams.staticNoise.amount, dstParams.staticNoise.amount)
+		this.staticNoise.size2	= compute(srcParams.staticNoise.size2, dstParams.staticNoise.size2)
 
-		this.rgb.amount		= (dstParams.rgb.amount - srcParams.rgb.amount) * amount
-		this.rgb.angle		= (dstParams.rgb.angle - srcParams.rgb.angle) * amount
+		this.rgb.amount		= compute(srcParams.rgb.amount, dstParams.rgb.amount)
+		this.rgb.angle		= compute(srcParams.rgb.angle, dstParams.rgb.angle)
 
-		this.film.count		= (dstParams.film.count - srcParams.film.count) * amount
-		this.film.sIntensity	= (dstParams.film.sIntensity - srcParams.film.sIntensity) * amount
-		this.film.nIntensity	= (dstParams.film.nIntensity - srcParams.film.nIntensity) * amount
+		this.film.count		= compute(srcParams.film.count, dstParams.film.count)
+		this.film.sIntensity	= compute(srcParams.film.sIntensity, dstParams.film.sIntensity)
+		this.film.nIntensity	= compute(srcParams.film.nIntensity, dstParams.film.nIntensity)
+		return
+		
+		function compute(srcValue, dstValue){
+			return srcValue + (dstValue-srcValue)*amount
+		}
 	}
 	
 	this.copy	= function(other){
