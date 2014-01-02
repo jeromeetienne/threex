@@ -12,18 +12,23 @@ THREEx.addBadTVPasses2DatGui	= function(badTVPasses, datGui){
 	onChange()
 	
 	//Init DAT GUI control panel
-	var badTVParams	= badTVPasses.badTVParams
-	var rgbParams	= badTVPasses.rgbParams
-	var filmParams	= badTVPasses.filmParams
-	var staticParams= badTVPasses.staticParams
+	var badTVParams	= badTVPasses.params.badTV
+	var rgbParams	= badTVPasses.params.rgb
+	var filmParams	= badTVPasses.params.film
+	var staticParams= badTVPasses.params.staticNoise
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
 
 	datGui.add({ randomize	: function(){
-		badTVPasses.randomizeParams()
+		badTVPasses.params.randomize()
+		badTVPasses.onParamsChange()		
 	}}, 'randomize' )
+	datGui.add({ reset	: function(){
+		badTVPasses.params.reset()
+		badTVPasses.onParamsChange()		
+	}}, 'reset' )
 
 	var f1 = datGui.addFolder('Bad TV');
 	f1.add(badTVParams, 'distortion', 0.1, 20).step(0.1).listen().name("Thick Distort").onChange(onChange);

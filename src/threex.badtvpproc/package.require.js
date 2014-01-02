@@ -1,10 +1,8 @@
-define( [ './threex.badtvpasses',
-	, './threex.badtvdatgui',
+define( [ './threex.badtvpasses.js',
+	, './threex.badtvdatgui.js',
 	, './shaders/BadTVShader.js',
 	, './shaders/FilmShader.js',
 	, './shaders/RGBShiftShader.js',
 	, './shaders/StaticShader.js',
 	], function(module){
-	// set baseUrl for this plugin
-	//THREEx.ClaraioMaterials.baseURL	= module.uri+'/../';
 });
