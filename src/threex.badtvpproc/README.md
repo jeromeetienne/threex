@@ -5,29 +5,43 @@ threex.badtv is a three.js extension which provide an badtv effect. It is a post
 processing cumulating various effects.
 It is from the excelent [badtv demo](http://www.airtightinteractive.com/demos/js/badtvshader/)
 of [@felixturner](https://twitter.com/felixturner).
-You can see more of what he does on
+You can see more of the good stuff what he does on
 [his blog](http://www.airtightinteractive.com/news).
 
 Status: super early
 
 TODO
 ====
-* TODO change to BatTVPasses.params.badTV
 * BadTVPasses.smoothTransition	= true
-* do an examples from threex boilerplate
 * some shader are the same as in three.js distribution. DO NOT DUPLICATE code
   * RGBShiftShader
   * FilmShader
 * do a bad tv demo with webaudio API sound
   * find the sound on freesounds
   * use tween.js for animation
+* DONE change to BatTVPasses.params.badTV
+* DONE do an examples from threex boilerplate
 * DONE do threex.badtvdatgui.js 
   * see threex.glowkeycolor.postprocdatgui.js or others
 * DONE how to update the time in the shader
   * .update() function ?
   * isnt it already done by composer ?
 
-
+How to implement tweening
+=========================
+* onParamsChange() set a timestamp
+  * lastChangeDate
+  * srcParams.copy(params)
+* tweenDelay
+* in .update()
+  * if lastChangeDate !== null
+  * if( present - lastChangeDate >= tweenDelay ){
+  *    current.copy(targetParam)
+  *    lastChangeDate = null
+  * }else{
+  *    var amount = (present - lastChangeDate) / tweenDelay
+  *    current.lerp(srcParams, dstParams, amount)
+  * }
 
 Show Don't Tell
 ===============
