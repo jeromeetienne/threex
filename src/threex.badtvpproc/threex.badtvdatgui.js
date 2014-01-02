@@ -25,7 +25,7 @@ THREEx.addBadTVPasses2DatGui	= function(badTVPasses, datGui){
 	datGui.add({ ping	: function(){
 		badTVPasses.params.randomize()
 		badTVPasses.onParamsChange()
-		nPingSteps	= 10;
+		nPingSteps	= 40;
 		badTVPasses.addEventListener('tweenCompleted', function callback(){
 			nPingSteps	-= 1;
 			if( nPingSteps > 0 )	badTVPasses.params.randomize()

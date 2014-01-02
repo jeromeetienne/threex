@@ -59,7 +59,7 @@ THREEx.BadTVPasses	= function(){
 	
 	var params	= new THREEx.BadTVPasses.Params()
 
-	this.tweenDelay		= 0.2
+	this.tweenDelay		= 0.1
 	
 	var tweenStartDate	= null
 	var tweenSrcParams	= new THREEx.BadTVPasses.Params()
