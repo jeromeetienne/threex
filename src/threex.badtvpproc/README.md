@@ -15,9 +15,10 @@ TODO
 * some shader are the same as in three.js distribution. DO NOT DUPLICATE code
   * RGBShiftShader
   * FilmShader
+* TODO externalize the ping in demo
+  * currently this is in 
 * do a bad tv demo with webaudio API sound
   * find the sound on freesounds
-    * http://www.freesound.org/people/Halleck/sounds/19487/
     * this one http://www.freesound.org/people/Bekir_VirtualDJ/sounds/132834/
   * use tween.js for animation
 * DONE change to BatTVPasses.params.badTV

@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
-
-<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
-<script src="../../../vendor/three.js/examples/js/libs/stats.min.js"></script>
-
+<!-- include three.js postprocessing  -->
 <script src="../../../vendor/three.js/examples/js/postprocessing/EffectComposer.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/RenderPass.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/ShaderPass.js"></script>
 <script src="../../../vendor/three.js/examples/js/postprocessing/MaskPass.js"></script> 
 <script src="../../../vendor/three.js/examples/js/shaders/CopyShader.js"></script>
-<script src="../../../vendor/three.js/examples/js/ImprovedNoise.js"></script>
-
+<!-- include threex extensions -->
 <script src="../shaders/FilmShader.js"></script>
 <script src="../shaders/BadTVShader.js"></script>
 <script src="../shaders/RGBShiftShader.js"></script>
 <script src="../shaders/StaticShader.js"></script>
-
 <script src="../threex.badtvpasses.js"></script>
+<script src="../threex.badtvsound.js"></script>
+<!-- include dat.gui -->
+<script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 <script src="../threex.badtvdatgui.js"></script>
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+<button type="button" id='pingButton' style='position: absolute;'>Ping</button>
+<script>
 	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
@@ -40,31 +40,57 @@
 		// mesh.rotation.x += 1 * delta;
 		// mesh.rotation.y += 2 * delta;		
 	})
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		badTVPasses							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var badTVPasses	= new THREEx.BadTVPasses();
+	onRenderFcts.push(function(delta, now){
+		badTVPasses.update(delta, now)		
+	})
+	THREEx.addBadTVPasses2DatGui(badTVPasses)
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
+	//		composer 							//
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var composer	= new THREE.EffectComposer(renderer);
-	
 	var renderPass	= new THREE.RenderPass( scene, camera );
 	composer.addPass( renderPass );
-	
-	var badTVPasses	= new THREEx.BadTVPasses();
-	badTVPasses.addPassesTo(composer)
 
-	var copyPass	= new THREE.ShaderPass( THREE.CopyShader );
-	composer.addPass( copyPass );
+	// add badTVPasses to composer	
+	badTVPasses.addPassesTo(composer)
 
 	composer.passes[composer.passes.length -1 ].renderToScreen	= true;
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-	
-	THREEx.addBadTVPasses2DatGui(badTVPasses)
 
-	
+	window.AudioContext	= window.AudioContext || window.webkitAudioContext;
+	var context		= new AudioContext()
+	var badTVSound		= new THREEx.BadTVSound(context, context.destination)
+
+	document.querySelector('#pingButton').addEventListener('click', function(){
+		badTVPasses.params.randomize()
+		badTVPasses.onParamsChange()
+		// NOTE: assume a given badTVPasses
+		var nPingSteps	= 30
+
+		badTVSound.play()
+		badTVPasses.addEventListener('tweenCompleted', function callback(){
+			nPingSteps	-= 1;
+			if( nPingSteps > 0 )	badTVPasses.params.randomize()
+			else{
+				badTVPasses.params.reset()
+				badTVPasses.removeEventListener('tweenCompleted', callback)
+			}
+			badTVPasses.onParamsChange()		
+		})		
+	})
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -79,14 +105,15 @@
 		camera.lookAt( scene.position )
 	})
 
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////
 	onRenderFcts.push(function(delta, now){
-		// renderer.render( scene, camera );		
-		badTVPasses.update(delta, now)
-		composer.render(delta);
+		// disable rendering directly thru renderer 
+		// renderer.render( scene, camera )
+		
+		// render thru composer
+		composer.render(delta)
 	})
 	
 	//////////////////////////////////////////////////////////////////////////////////

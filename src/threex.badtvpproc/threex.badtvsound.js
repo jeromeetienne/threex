@@ -9,7 +9,7 @@ THREEx.BadTVSound	= function(context, destination){
 	var buffer	= null
 	loadSoundWebAudio(url, function(decodedBuffer){
 		buffer	= decodedBuffer
-	}
+	});
 		
 	this.isReady	= function(){
 		return buffer === null ? false : true

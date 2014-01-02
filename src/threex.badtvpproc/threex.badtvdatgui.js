@@ -20,22 +20,6 @@ THREEx.addBadTVPasses2DatGui	= function(badTVPasses, datGui){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-
-	var nPingSteps	= 0
-	datGui.add({ ping	: function(){
-		badTVPasses.params.randomize()
-		badTVPasses.onParamsChange()
-		nPingSteps	= 40;
-		badTVPasses.addEventListener('tweenCompleted', function callback(){
-			nPingSteps	-= 1;
-			if( nPingSteps > 0 )	badTVPasses.params.randomize()
-			else{
-				badTVPasses.params.reset()
-				badTVPasses.removeEventListener('tweenCompleted', callback)
-			}
-			badTVPasses.onParamsChange()		
-		})
-	}}, 'ping' )
 	datGui.add({ randomize	: function(){
 		badTVPasses.params.randomize()
 		badTVPasses.onParamsChange()		
