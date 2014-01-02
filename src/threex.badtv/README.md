@@ -12,10 +12,21 @@ Status: super early
 
 TODO
 ====
+* do threex.badtvdatgui.js 
+  * see threex.glowkeycolor.postprocdatgui.js or others
+* TODO change to BatTVPasses.params.badTV
+* BadTVPasses.smoothTransition	= true
+* do an examples from threex boilerplate
+* how to update the time in the shader
+  * .update() function ?
+  * isnt it already done by composer ?
 * some shader are the same as in three.js distribution. DO NOT DUPLICATE code
   * RGBShiftShader
   * FilmShader
 * do a bad tv demo with webaudio API sound
+  * find the sound on freesounds
+  * use tween.js for animation
+
 
 
 Show Don't Tell

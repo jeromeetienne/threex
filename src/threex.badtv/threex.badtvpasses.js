@@ -22,37 +22,42 @@ THREEx.BadTVPasses	= function(){
 		composer.addPass( rgbPass );
 		composer.addPass( staticPass );	
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	this.update	= function(delta, now){
+		badTVPass.uniforms[ 'time' ].value	= now;
+		filmPass.uniforms[ 'time' ].value	= now;
+		staticPass.uniforms[ 'time' ].value	= now;
+	}
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		init params							//
 	//////////////////////////////////////////////////////////////////////////////////
-	
+// TODO change that to .params.badTV
 	var badTVParams	= {
-		mute:true,
-		show: true,
-		distortion: 3.0,
-		distortion2: 1.0,
-		speed: 0.3,
-		rollSpeed: 0.1
+		distortion	: 3.0,
+		distortion2	: 1.0,
+		speed		: 0.3,
+		rollSpeed	: 0.1
 	}
-	this.badTVParams= badTVParams
+	this.badTVParams	= badTVParams
 	var staticParams	= {
-		show: true,
-		amount:0.5,
-		size2:4.0
+		amount	: 0.5,
+		size2	: 4.0
 	}
 	this.staticParams	= staticParams
 	var rgbParams	= {
-		show: true,
-		amount: 0.005,
-		angle: 0.0,
+		amount	: 0.005,
+		angle	: 0.0,
 	}
 	this.rgbParams	= rgbParams
 	var filmParams	= {
-		show: true,
-		count: 800,
-		sIntensity: 0.9,
-		nIntensity: 0.4
+		count		: 800,
+		sIntensity	: 0.9,
+		nIntensity	: 0.4
 	}
 	this.filmParams	= filmParams
 	
@@ -82,7 +87,7 @@ THREEx.BadTVPasses	= function(){
 	this.randomizeParams	= randomizeParams
 	function randomizeParams() {
 
-		if (Math.random() <0.2){
+		if (Math.random() < 0.2){
 			//you fixed it!
 			badTVParams.distortion = 0.1;
 			badTVParams.distortion2 =0.1;
