@@ -68,7 +68,7 @@ loop, like this one.
  * All Update Functions
  * @type {Array}
  */
-var updateFcts	= []
+var onRenderFcts	= []
 
 /**
  * function to be called at every render update
@@ -76,7 +76,7 @@ var updateFcts	= []
  * @param  {Number} now   Number of seconds since the begining
  */
 this.update	= function(delta, now){
-	updateFcts.forEach(function(updateFct){
+	onRenderFcts.forEach(function(updateFct){
 		updateFct(delta, now)
 	})
 }
@@ -85,7 +85,7 @@ this.update	= function(delta, now){
 To add a function in this update loop, do
 
 ```
-updateFcts.push(function callback(delta, now){
+onRenderFcts.push(function callback(delta, now){
 	// here you update a part of your module
 })
 ```
@@ -93,7 +93,7 @@ updateFcts.push(function callback(delta, now){
 to remove a function in this update loop, you can do
 
 ```
-updateFcts.splice(updateFcts.indexOf(callback),1)
+onRenderFcts.splice(onRenderFcts.indexOf(callback),1)
 ```
 
 ## To Update The Physics Of Your Module
@@ -105,6 +105,9 @@ Same as for updating rendering, but replace ```update``` by ```tick``` everywher
 Some guidelines on how to organize your files:
 
 * ```/examples``` contains the examples for your module
+  * it contains all the files which are used only by the examples. 
+    html files, js files, all files.
+  * in principle the extension must be fully usable without ```/examples``` folder
 * ```/readme.md``` contains a readme about your module. 
 For more on readme, see [Readme Driven Development](http://tom.preston-werner.com/2010/08/23/readme-driven-development.html)
 * maybe a ```/threex.supermodule.js``` file which contains the js code of your module
@@ -113,8 +116,18 @@ For more on readme, see [Readme Driven Development](http://tom.preston-werner.co
     * ```/threex.supermodulecontrols.js``` for the controls of your module
     * ```/threex.supermodulesounds.js``` for the sounds of your module
     * and so on
-* put your images assets in ```/images```, your sounds assets in ```/sounds```
-, your models in ```/models```, you get the idea.
+* you should put extensions assets in ```/```. 
+  your images assets in ```/images```
+  your sounds assets in ```/sounds```
+  your models in ```/models```,
+  you get the idea.
+  * put examples assets in ```/examples```
+  
+### Why i like this organisation ?
+* it is aimed at being clear for a new developper. 
+* thus all the files and directories used by the extension are at the ```/```. 
+  It made it clear for a new developper to see the architecture of your extension.
+* filenames are based on their content. So it is easy to find the code you look for.
 
 ## How To Handle Dependencies
 
