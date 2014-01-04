@@ -1,0 +1,160 @@
+<!DOCTYPE html><html><title>global state automata</title><xmp style="display:none;">
+# How to handle global state automata ?
+
+What is a [state automata](http://en.wikipedia.org/wiki/Finite-state_machine) ? 
+
+## Examples
+Sometime examples are so much faster to understand than a long description.
+* examples of state automata: 
+  * you enter in menu
+  * you have to stop the game itself, the user controls, possibly other animations
+* another examples:
+  * you die
+  * you have to stop the game
+  * you have to play the death cinematic
+  * then you have to trigger a player spawn
+  
+## Tools
+* [gowiththeflow.js](https://github.com/jeromeetienne/gowiththeflow.js) 
+to handle timed steps in the cinematic
+* Dom events at the document level. 
+It provides a global event channel, 
+you can use it to get communication between the various parts of your game.
+
+## Global Event Channel
+* global custom events at the document level
+
+How to listen to it.
+
+```
+document.addEventListener('BadTVJamming', function(){
+	badTVJamming.trigger()		
+})
+```
+
+How to emit on it.
+
+```
+document.dispatchEvent(new CustomEvent('BadTVJamming'));
+```
+
+## Examples Code
+
+### Examples 1
+
+The steps of this cinematic are:
+
+* make Osd appears
+* Wait 0.8 seconds
+* make osd disapears, and go to the menu page
+
+```
+	document.addEventListener('gameLost', function(){
+		Flow().seq(function(next){
+			// Make Osd appears
+			document.querySelector('#gameLostOsd').style.display	= 'block'
+			next()
+		}).seq(function(next){
+			// Wait 0.8 seconds
+			setTimeout(function(){
+				next()
+			}, 1000*0.8)
+		}).seq(function(next){
+			// make osd disapears
+			document.querySelector('#gameLostOsd').style.display	= 'none';
+			// go to the menu page
+			location.href	= '..'
+		})
+	})
+```
+
+### Examples 2
+
+The steps of this cinematic are:
+
+* disable playerControls
+* if there is no more level, swith to 'gameCompleted'
+  * **good examples of state switching**
+* then the sequence... Make osd appears
+* stop physics and wait 2seconds
+* make osd disapears, and reenable player controls
+
+```
+	document.addEventListener('gameWon', function(){
+		// disable playerControls
+		playerControls.disable	= true
+
+		// if there is no more level, swith to 'gameCompleted'
+		if( getNextMapId() === undefined ){
+		document.dispatchEvent(new CustomEvent('gameCompleted'));
+			return;
+		}
+
+		Flow().seq(function(next){
+			// make osd appears
+			document.querySelector('#gameWonOsd').style.display	= 'block'
+			next()
+		}).seq(function(next){
+			// stop physics
+			physicsWorld.stop()
+			// wait 2 seconds
+			setTimeout(function(){
+				next()
+			}, 1000*2)
+		}).seq(function(next){
+			// make osd disapear
+			document.querySelector('#gameWonOsd').style.display	= 'none';
+			// reenable player controls
+			playerControls.disable	= false
+		})
+	})
+```
+
+## States in marbletable2
+
+[marbletable2](http://jeromeetienne.github.io/marbletable2/) automata given here as examples
+
+* on ```gameStart```
+  * disable usercontrols
+  * start cinematic
+  * once cinematic ended, trigger ```spawnPlayer```
+* on ```spawnPlayer```
+  * disable user controls
+  * set player position
+  * make noise for this event
+  * start physics if needed
+  * then let the player play
+* on ```killPlayer```
+  * display osd 'you die'
+  * play sound for this event
+  * start cinematic for this event
+  * if( player.lives === 0 ) dispath('gameLost') and stop there
+  * wait 0.8 seconds
+  * stop physics
+  * wait 0.6 seconds
+  * remove osd
+  * update lives counter
+  * dispatch 'spawnPlayer'
+* on ```gameLost```
+  * display osd dom element
+  * wait 0.8 seconds
+  * stop physics
+  * wait 2.0 seconds
+  * hide osd dom element
+  * goto menu page
+* on ```gameWon```
+  * stop user controls
+  * if there are no next level, dispatch ```gameCompleted``` and stop there
+  * display osd dom element
+  * wait 0.8 seconds
+  * stop physics
+  * wait 2.0 seconds
+  * hide osd dom element
+  * goto next level
+* on ```gamecompleted```
+  * display osd dom element
+  * wait 2.0 seconds
+  * hide osd dom element
+  * goto menu page
+</xmp><script src="strapdownjs/strapdown.js"></script></html>
+
