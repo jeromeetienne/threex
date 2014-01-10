@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<body style='margin: 0px; background-color: #bbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z = 3;
+
+
+	// emit 3 puff every seconds
+	var emitter	= new SphericalBlastEmitter(scene);
+	updateFcts.push(function(delta, now){
+		emitter.update(delta, now)
+	})
+	setInterval(function(){
+		var position	= new THREE.Vector3(0,-1,-2)
+		emitter.emit(position);
+		// emitter.emit(position);
+		// emitter.emit(position);
+	}, 5*1000);
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		updateFcts.forEach(function(updateFn){
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+
+//////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+	
+function SphericalBlastEmitter(container){
+	// load the texture
+	var texture	= THREE.ImageUtils.loadTexture('images/cloud10.png')
+	var updateFcts	= []
+	this.emit	= function(position){
+		// randomize the initial position
+		position	= position.clone()
+		// build mesh
+		var material	= new THREE.MeshPhongMaterial({
+			map	: texture,
+			ambient	: 'cyan'
+		})
+		var geometry	= new THREE.SphereGeometry(0.5, 16, 32)
+		var mesh	= new THREE.Mesh(geometry, material)
+		container.add(mesh)
+
+		var maxAge	= 3 + Math.random()*0
+		// init opacity
+		var age2Opacity	= (function(){
+			var tweenFn	= createTweenMidi(maxAge, 0.05*maxAge, 0.3*maxAge)
+			return function(age){ return 0.2 + tweenFn(age) * 0.5;	}
+		})()
+		material.opacity= age2Opacity(0)
+		// init scale
+		var age2Scale	= (function(){
+			var tweenFn	= createTweenMidi(maxAge, 0.1*maxAge, 0.4*maxAge)
+			return function(age){ return 0.5 + tweenFn(age) * 3;	}
+		})()
+		mesh.scale.set(1,1,1).multiplyScalar( age2Scale(0) )
+		// start updating		
+		var birthDate	= Date.now()/1000
+		updateFcts.push(function callback(delta, now){
+			var age	= Date.now()/1000 - birthDate
+			if( age >= maxAge ){
+				mesh.parent.remove(mesh)
+				updateFcts.splice(updateFcts.indexOf(callback),1)
+				return;	
+			}
+			// make it grow
+			mesh.scale.set(1,1,1).multiplyScalar( age2Scale(age) )
+			// handle opacity
+			material.opacity= age2Opacity(age)
+		})
+	}
+	this.update	= function(delta, now){
+		updateFcts.forEach(function(updateFct){
+			updateFct(delta, now)
+		})
+	}
+	function createTweenMidi(maxAge, attackTime, releaseTime){
+		return function(age){
+			if( age < attackTime ){
+				return age / attackTime
+			}else if( age < maxAge - releaseTime ){
+				return 1;
+			}else{
+				return (maxAge - age) / releaseTime
+			}
+		}	
+	}
+}
+</script></body>

@@ -13,6 +13,28 @@ THREEx.ClaraioMaterials	= {};
 
 THREEx.ClaraioMaterials.baseURL	= '../'
 
+/**
+ * return an array of each texture of the material. usefull when 
+ * setting .repeat/.warpS/.warpT stuff. for example
+ * 
+ * THREEx.ClaraioMaterials.textures(material).forEach(function(texture){
+ *        texture.wrapS        = THREE.RepeatWrapping;
+ *         texture.wrapT        = THREE.RepeatWrapping;
+ *         texture.repeat.set(30,30)
+ *        texture.anisotropy = 16;         
+ * })
+ *         
+ * @return {[THREE.Texture]}            the array of texture
+ */
+THREEx.ClaraioMaterials.textures        = function(material){
+         var textures        = []
+        if( material.map )                textures.push(material.map)        
+        if( material.normalMap )        textures.push(material.normalMap)
+        if( material.specularMap )        textures.push(material.specularMap)
+        if( material.bumpMap )                textures.push(material.bumpMap)
+        return textures
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 //		Fabric								//
 //////////////////////////////////////////////////////////////////////////////////

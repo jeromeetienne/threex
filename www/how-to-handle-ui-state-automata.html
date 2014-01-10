@@ -2,9 +2,11 @@
 # How to handle global state automata ?
 
 What is a [state automata](http://en.wikipedia.org/wiki/Finite-state_machine) ? 
+They are essential for managing high game states.
 
 ## Examples
 Sometime examples are so much faster to understand than a long description.
+
 * examples of state automata: 
   * you enter in menu
   * you have to stop the game itself, the user controls, possibly other animations
@@ -114,6 +116,8 @@ The steps of this cinematic are:
 
 [marbletable2](http://jeromeetienne.github.io/marbletable2/) automata given here as examples
 
+when the page is loaded, ```gameStart``` is triggered
+
 * on ```gameStart```
   * disable usercontrols
   * start cinematic
@@ -128,13 +132,13 @@ The steps of this cinematic are:
   * display osd 'you die'
   * play sound for this event
   * start cinematic for this event
-  * if( player.lives === 0 ) dispath('gameLost') and stop there
+  * if( player.lives === 0 ) dispatch ```gameLost``` and stop there
   * wait 0.8 seconds
   * stop physics
   * wait 0.6 seconds
   * remove osd
   * update lives counter
-  * dispatch 'spawnPlayer'
+  * dispatch ```spawnPlayer```
 * on ```gameLost```
   * display osd dom element
   * wait 0.8 seconds
