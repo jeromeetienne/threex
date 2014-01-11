@@ -9,8 +9,22 @@ THREEx.ToxicPproc.baseURL	= '../'
 //////////////////////////////////////////////////////////////////////////////////
 
 THREEx.ToxicPproc.passesPreset	= {}
+
+//////////////////////////////////////////////////////////////////////////////////
+//		reset preset							//
+//////////////////////////////////////////////////////////////////////////////////
+
+
 THREEx.ToxicPproc.passesPreset['reset']	= {
 	init	: function(){
+		// vBlurPass
+		var uniforms	= this.vBlurPass.uniforms
+		uniforms.v.value	= 0
+
+		// hBlurPass
+		var uniforms	= this.hBlurPass.uniforms
+		uniforms.h.value	= 0
+		
 		// rgbRadialPass
 		var uniforms	= this.rgbRadialPass.uniforms
 		uniforms.factor.value	= 0
@@ -31,8 +45,60 @@ THREEx.ToxicPproc.passesPreset['reset']	= {
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+//		drunk preset							//
+//////////////////////////////////////////////////////////////////////////////////
+
+
 THREEx.ToxicPproc.passesPreset['drunk']	= {
 	init	: function(){
+		// vBlurPass
+		var uniforms	= this.vBlurPass.uniforms
+		uniforms.v.value= 0.001
+
+		// hBlurPass
+		var uniforms	= this.hBlurPass.uniforms
+		uniforms.h.value= 0.001
+
+		// v2ShiftPass
+		var uniforms	= this.v2ShiftPass.uniforms
+		uniforms.offset.value.set(0.02,0.02)
+		uniforms.mixRatio.value	= 0.5
+		uniforms.opacity.value	= 1.0
+
+		// refractionPass
+		var uniforms	= this.refractionPass.uniforms
+		uniforms.speed.value		= 0.25
+		uniforms.Frequency.value	= 1.1
+		uniforms.Amplitude.value	= 40
+	},
+	update	: function(delta, now){
+		// refractionPass
+		var uniforms	= this.refractionPass.uniforms
+		this.refractionPass.uniforms.time.value	= now;
+		
+		// v2ShiftPass
+		var offset	= this.v2ShiftPass.uniforms.offset
+		var angle	= Math.PI*2*now*0.2
+		offset.value.x	= Math.cos(angle)*0.03
+		offset.value.y	= Math.sin(angle*2)*0.03
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//		high preset							//
+//////////////////////////////////////////////////////////////////////////////////
+
+THREEx.ToxicPproc.passesPreset['high']	= {
+	init	: function(){
+		// vBlurPass
+		var uniforms	= this.vBlurPass.uniforms
+		uniforms.v.value	= 0.001
+
+		// hBlurPass
+		var uniforms	= this.hBlurPass.uniforms
+		uniforms.h.value	= 0.001
+		
 		// rgbRadialPass
 		var uniforms	= this.rgbRadialPass.uniforms
 		uniforms.factor.value	= 0.02
@@ -43,6 +109,38 @@ THREEx.ToxicPproc.passesPreset['drunk']	= {
 		uniforms.speed.value		= 0.25
 		uniforms.Frequency.value	= 1.1
 		uniforms.Amplitude.value	= 40
+	},
+	update	: function(delta, now){
+		// refractionPass
+		var uniforms	= this.refractionPass.uniforms
+		this.refractionPass.uniforms.time.value	= now;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+//		wasted preset							//
+//////////////////////////////////////////////////////////////////////////////////
+
+THREEx.ToxicPproc.passesPreset['wasted']	= {
+	init	: function(){
+		// vBlurPass
+		var uniforms	= this.vBlurPass.uniforms
+		uniforms.v.value	= 0.0022
+
+		// hBlurPass
+		var uniforms	= this.hBlurPass.uniforms
+		uniforms.h.value	= 0.0044
+		
+		// rgbRadialPass
+		var uniforms	= this.rgbRadialPass.uniforms
+		uniforms.factor.value	= 0.05
+		uniforms.power.value	= 3
+
+		// refractionPass
+		var uniforms	= this.refractionPass.uniforms
+		uniforms.speed.value		= 0.8
+		uniforms.Frequency.value	= 2.2
+		uniforms.Amplitude.value	= 100
 	},
 	update	: function(delta, now){
 		// refractionPass
@@ -68,14 +166,24 @@ THREEx.ToxicPproc.Passes	= function(presetLabel){
 
 	var preset	= THREEx.ToxicPproc.passesPreset[presetLabel]
 	this.setPreset	= function(label){
-		presetLabel	= label
-		preset		= THREEx.ToxicPproc.passesPreset[presetLabel]
+		// reset of all values
+		THREEx.ToxicPproc.passesPreset['reset'].init.apply(this)
+
+		preset	= THREEx.ToxicPproc.passesPreset[label]
 		preset.init.apply(this)
 	}
 
 	// passes is an array containing all the passes
 	var passes		= []
 	this.passes		= passes
+
+	var hBlurPass	= new THREE.ShaderPass( THREE.HorizontalBlurShader );
+	this.hBlurPass	= hBlurPass
+	passes.push(hBlurPass)
+
+	var vBlurPass	= new THREE.ShaderPass( THREE.VerticalBlurShader );
+	this.vBlurPass	= vBlurPass
+	passes.push(vBlurPass)
 
 	var rgbRadialPass	= new THREE.ShaderPass( THREEx.ToxicPproc.RGBShiftRadialShader)
 	this.rgbRadialPass	= rgbRadialPass
@@ -90,9 +198,9 @@ THREEx.ToxicPproc.Passes	= function(presetLabel){
 	passes.push(refractionPass)
 
 	this.addPassesTo	= function(composer){
-		composer.addPass( rgbRadialPass )	
-		composer.addPass( refractionPass )	
-		composer.addPass( v2ShiftPass )	
+		passes.forEach(function(pass){
+			composer.addPass(pass)
+		})
 	}
 
 	preset.init.apply(this)
