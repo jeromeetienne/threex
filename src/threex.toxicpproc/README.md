@@ -6,8 +6,8 @@ Thus they can copy it and start their own extension.
 
 Links
 =====
-* TODO take the smoothing from threex.coloradjust and put it there
-* have some presets like threex.badtvpproc
+* TODO take the smoothing from threex.badtvpproc and put it there
+* DONE have some presets like threex.badtvpproc
 * http://devmaster.net/posts/3079/shader-effects-refraction#tabs-3
 * http://www.youtube.com/watch?v=puDY0iqHQZI
 * http://www.youtube.com/watch?v=i7tpMcmdT68

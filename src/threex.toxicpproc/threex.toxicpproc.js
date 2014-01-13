@@ -15,29 +15,31 @@ THREEx.ToxicPproc.passesPreset	= {}
 //////////////////////////////////////////////////////////////////////////////////
 
 
-THREEx.ToxicPproc.passesPreset['reset']	= {
+THREEx.ToxicPproc.passesPreset['sober']	= {
 	init	: function(){
-		// vBlurPass
-		var uniforms	= this.vBlurPass.uniforms
-		uniforms.v.value	= 0
-
 		// hBlurPass
-		var uniforms	= this.hBlurPass.uniforms
+		var uniforms	= this.hBlurTween.dstUniforms
 		uniforms.h.value	= 0
 		
-		// rgbRadialPass
-		var uniforms	= this.rgbRadialPass.uniforms
-		uniforms.factor.value	= 0
+		// vBlurPass
+		var uniforms	= this.vBlurTween.dstUniforms
+		uniforms.v.value	= 0
 
-		// v2ShiftPass
-		var uniforms	= this.v2ShiftPass.uniforms
-		uniforms.offset.value.set(0,0)
+		// rgbRadialPass
+		var uniforms	= this.rgbRadialTween.dstUniforms
+		uniforms.factor.value	= 0
+		uniforms.power.value	= 3.0
+
+		// seeDoublePass
+		var uniforms	= this.seeDoubleTween.dstUniforms
+		uniforms.radius.value	= 0
+		uniforms.timeSpeed.value= 0
 		uniforms.mixRatio.value	= 0.5
 		uniforms.opacity.value	= 1.0
                 		
 		// refractionPass
-		var uniforms	= this.refractionPass.uniforms
-		uniforms.speed.value		= 0.0
+		var uniforms	= this.refractionTween.dstUniforms
+		uniforms.timeSpeed.value	= 0
 		uniforms.Frequency.value	= 0.0
 		uniforms.Amplitude.value	= 0
 	},
@@ -52,36 +54,26 @@ THREEx.ToxicPproc.passesPreset['reset']	= {
 
 THREEx.ToxicPproc.passesPreset['drunk']	= {
 	init	: function(){
-		// vBlurPass
-		var uniforms	= this.vBlurPass.uniforms
-		uniforms.v.value= 0.001
-
 		// hBlurPass
-		var uniforms	= this.hBlurPass.uniforms
+		var uniforms	= this.hBlurTween.dstUniforms
 		uniforms.h.value= 0.001
 
-		// v2ShiftPass
-		var uniforms	= this.v2ShiftPass.uniforms
-		uniforms.offset.value.set(0.02,0.02)
-		uniforms.mixRatio.value	= 0.5
-		uniforms.opacity.value	= 1.0
+		// vBlurPass
+		var uniforms	= this.vBlurTween.dstUniforms
+		uniforms.v.value= 0.001
+
+		// seeDoublePass
+		var uniforms	= this.seeDoubleTween.dstUniforms
+		uniforms.radius.value	= 0.03
+		uniforms.timeSpeed.value= 1.0
 
 		// refractionPass
-		var uniforms	= this.refractionPass.uniforms
-		uniforms.speed.value		= 0.25
+		var uniforms	= this.refractionTween.dstUniforms
+		uniforms.timeSpeed.value	= 0.1
 		uniforms.Frequency.value	= 1.1
 		uniforms.Amplitude.value	= 40
 	},
 	update	: function(delta, now){
-		// refractionPass
-		var uniforms	= this.refractionPass.uniforms
-		this.refractionPass.uniforms.time.value	= now;
-		
-		// v2ShiftPass
-		var offset	= this.v2ShiftPass.uniforms.offset
-		var angle	= Math.PI*2*now*0.2
-		offset.value.x	= Math.cos(angle)*0.03
-		offset.value.y	= Math.sin(angle*2)*0.03
 	}
 }
 
@@ -91,29 +83,31 @@ THREEx.ToxicPproc.passesPreset['drunk']	= {
 
 THREEx.ToxicPproc.passesPreset['high']	= {
 	init	: function(){
-		// vBlurPass
-		var uniforms	= this.vBlurPass.uniforms
-		uniforms.v.value	= 0.001
-
 		// hBlurPass
-		var uniforms	= this.hBlurPass.uniforms
-		uniforms.h.value	= 0.001
-		
+		var uniforms	= this.hBlurTween.dstUniforms
+		uniforms.h.value= 0.001
+
+		// vBlurPass
+		var uniforms	= this.vBlurTween.dstUniforms
+		uniforms.v.value= 0.001
+
 		// rgbRadialPass
-		var uniforms	= this.rgbRadialPass.uniforms
+		var uniforms	= this.rgbRadialTween.dstUniforms
 		uniforms.factor.value	= 0.02
-		uniforms.power.value	= 3
+		uniforms.power.value	= 3.0
+
+		// seeDoublePass
+		// var uniforms	= this.seeDoubleTween.dstUniforms
+		// uniforms.radius.value	= 0.03
+		// uniforms.timeSpeed.value= 1.0
 
 		// refractionPass
-		var uniforms	= this.refractionPass.uniforms
-		uniforms.speed.value		= 0.25
+		var uniforms	= this.refractionTween.dstUniforms
+		uniforms.timeSpeed.value	= 0.25
 		uniforms.Frequency.value	= 1.1
 		uniforms.Amplitude.value	= 40
 	},
 	update	: function(delta, now){
-		// refractionPass
-		var uniforms	= this.refractionPass.uniforms
-		this.refractionPass.uniforms.time.value	= now;
 	}
 }
 
@@ -123,29 +117,31 @@ THREEx.ToxicPproc.passesPreset['high']	= {
 
 THREEx.ToxicPproc.passesPreset['wasted']	= {
 	init	: function(){
-		// vBlurPass
-		var uniforms	= this.vBlurPass.uniforms
-		uniforms.v.value	= 0.0022
-
 		// hBlurPass
-		var uniforms	= this.hBlurPass.uniforms
-		uniforms.h.value	= 0.0044
-		
+		var uniforms	= this.hBlurTween.dstUniforms
+		uniforms.h.value= 0.001
+
+		// vBlurPass
+		var uniforms	= this.vBlurTween.dstUniforms
+		uniforms.v.value= 0.001
+
 		// rgbRadialPass
-		var uniforms	= this.rgbRadialPass.uniforms
+		var uniforms	= this.rgbRadialTween.dstUniforms
 		uniforms.factor.value	= 0.05
-		uniforms.power.value	= 3
+		uniforms.power.value	= 3.0
+
+		// seeDoublePass
+		// var uniforms	= this.seeDoubleTween.dstUniforms
+		// uniforms.radius.value	= 0.03
+		// uniforms.timeSpeed.value= 1.0
 
 		// refractionPass
-		var uniforms	= this.refractionPass.uniforms
-		uniforms.speed.value		= 0.8
+		var uniforms	= this.refractionTween.dstUniforms
+		uniforms.timeSpeed.value	= 0.8
 		uniforms.Frequency.value	= 2.2
-		uniforms.Amplitude.value	= 100
+		uniforms.Amplitude.value	= 60
 	},
 	update	: function(delta, now){
-		// refractionPass
-		var uniforms	= this.refractionPass.uniforms
-		this.refractionPass.uniforms.time.value	= now;
 	}
 }
 
@@ -163,54 +159,115 @@ THREEx.ToxicPproc.passesPreset['wasted']	= {
 THREEx.ToxicPproc.Passes	= function(presetLabel){
 	// default value arguments
 	presetLabel	= presetLabel	|| 'drunk'
+	// internal update function
+	var onUpdateFcts= []
+	this.update	= function(delta, now){
+		onUpdateFcts.forEach(function(onUpdateFct){
+			onUpdateFct(delta, now)
+		}.bind(this))
+	} 
 
+	// Presets
 	var preset	= THREEx.ToxicPproc.passesPreset[presetLabel]
 	this.setPreset	= function(label){
 		// reset of all values
-		THREEx.ToxicPproc.passesPreset['reset'].init.apply(this)
+		THREEx.ToxicPproc.passesPreset['sober'].init.apply(this)
 
 		preset	= THREEx.ToxicPproc.passesPreset[label]
 		preset.init.apply(this)
+		
+		hBlurTween.needsUpdate		= true
+		vBlurTween.needsUpdate		= true
+		rgbRadialTween.needsUpdate	= true
+		seeDoubleTween.needsUpdate	= true
+		refractionTween.needsUpdate	= true
 	}
-
-	// passes is an array containing all the passes
-	var passes		= []
-	this.passes		= passes
-
-	var hBlurPass	= new THREE.ShaderPass( THREE.HorizontalBlurShader );
-	this.hBlurPass	= hBlurPass
-	passes.push(hBlurPass)
-
-	var vBlurPass	= new THREE.ShaderPass( THREE.VerticalBlurShader );
-	this.vBlurPass	= vBlurPass
-	passes.push(vBlurPass)
-
-	var rgbRadialPass	= new THREE.ShaderPass( THREEx.ToxicPproc.RGBShiftRadialShader)
-	this.rgbRadialPass	= rgbRadialPass
-	passes.push(rgbRadialPass)
-
-	var v2ShiftPass		= new THREE.ShaderPass( THREEx.ToxicPproc.Vector2ShiftShader)
-	passes.push(v2ShiftPass)
-	this.v2ShiftPass	= v2ShiftPass
 	
-	var refractionPass	= new THREE.ShaderPass( THREEx.ToxicPproc.RefractionShader)
-	this.refractionPass	= refractionPass
-	passes.push(refractionPass)
-
+	// update all tween
+	onUpdateFcts.push(function(delta, now){
+		hBlurTween.update(delta, now)
+		vBlurTween.update(delta, now)
+		rgbRadialTween.update(delta, now)
+		seeDoubleTween.update(delta, now)
+		refractionTween.update(delta, now)
+	})
+	
+	
+	/**
+	 * to add toxicPasses to a THREE.EffectComposer
+	 * @param {THREE.EffectComposer} composer the composer to which it is added
+	 */
 	this.addPassesTo	= function(composer){
-		passes.forEach(function(pass){
-			composer.addPass(pass)
-		})
+		composer.addPass(hBlurPass)
+		composer.addPass(vBlurPass)
+		composer.addPass(rgbRadialPass)
+		composer.addPass(seeDoublePass)
+		composer.addPass(refractionPass)
 	}
-
-	preset.init.apply(this)
-
 	
-	this.update	= function(delta, now){
-		preset.update.apply(this, [delta, now])
-	}
-}
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		init all Passes and Tweens					//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 
+	// hBlurPass
+	var hBlurPass	= this.hBlurPass	= new THREE.ShaderPass( THREE.HorizontalBlurShader );
+	var hBlurTween	= this.hBlurTween	= new THREEx.UniformsTween(hBlurPass.uniforms, {
+		h	: THREEx.UniformsTween.Easing.Linear.None,
+	})
+
+	// vBlurPass
+	var vBlurPass	= this.vBlurPass	= new THREE.ShaderPass( THREE.VerticalBlurShader );
+	var vBlurTween	= this.vBlurTween	= new THREEx.UniformsTween(vBlurPass.uniforms, {
+		v	: THREEx.UniformsTween.Easing.Linear.None,
+	})
+
+	// rgbRadialPass
+	var rgbRadialPass	= this.rgbRadialPass	= new THREE.ShaderPass( THREEx.ToxicPproc.RGBShiftRadialShader)
+	var rgbRadialTween	= this.rgbRadialTween	= new THREEx.UniformsTween(rgbRadialPass.uniforms, {
+		factor		: THREEx.UniformsTween.Easing.Linear.None,
+	})
+
+	// seeDoublePass
+	var seeDoublePass	= this.seeDoublePass	= new THREE.ShaderPass( THREEx.ToxicPproc.SeeDoubleShader)
+	var seeDoubleTween	= this.seeDoubleTween	= new THREEx.UniformsTween(seeDoublePass.uniforms, {
+		radius		: THREEx.UniformsTween.Easing.Linear.None,
+		timeSpeed	: THREEx.UniformsTween.Easing.Linear.None,
+	})
+
+	// refractionPass
+	var refractionPass	= this.refractionPass	= new THREE.ShaderPass( THREEx.ToxicPproc.RefractionShader)
+	var refractionTween	= this.refractionTween	= new THREEx.UniformsTween(refractionPass.uniforms, {
+		timeSpeed	: THREEx.UniformsTween.Easing.Linear.None,
+		RandomNumber	: THREEx.UniformsTween.Easing.Linear.None,
+		Period		: THREEx.UniformsTween.Easing.Linear.None,
+		Frequency	: THREEx.UniformsTween.Easing.Linear.None,
+		Amplitude	: THREEx.UniformsTween.Easing.Linear.None,
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	// reset of all values
+	THREEx.ToxicPproc.passesPreset['sober'].init.apply(this)
+	// init current preset
+	preset.init.apply(this)
+	onUpdateFcts.push(function(delta, now){
+		// seeDoublePass
+		var uniforms	= seeDoublePass.uniforms
+		uniforms.time.value	+= delta * uniforms.timeSpeed.value;
+		// refractionPass
+		var uniforms	= refractionPass.uniforms
+		uniforms.time.value	+= delta * uniforms.timeSpeed.value;		
+
+		// update current preset
+		preset.update.apply(this, [delta, now])		
+	}.bind(this))
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 //		Shaders								//
@@ -269,40 +326,42 @@ THREEx.ToxicPproc.RGBShiftRadialShader = {
 //////////////////////////////////////////////////////////////////////////////////
 
 
-THREEx.ToxicPproc.Vector2ShiftShader = {
-
+THREEx.ToxicPproc.SeeDoubleShader = {
 	uniforms: {
+		tDiffuse	: { type: "t", value: null	},
 
-		"tDiffuse"	: { type: "t", value: null },
-		"offset"	: { type: "v2", value: new THREE.Vector2(0.01,0.01) },
-                "mixRatio"	: { type: "f", value: 0.5 },
-                "opacity"	: { type: "f", value: 1.0 }
+		time		: { type: "f", value: 0.0 	},
+		timeSpeed	: { type: "f", value: 1.0 	},
+
+
+		radius		: { type: "f", value: 0.01 	},
+
+                mixRatio	: { type: "f", value: 0.5	},
+                opacity		: { type: "f", value: 1.0	},
 	},
 
 	vertexShader: [
-
 		"varying vec2 vUv;",
-
 		"void main() {",
 
 			"vUv = uv;",
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
-
 	].join("\n"),
 
 	fragmentShader: [
-
 		"uniform sampler2D tDiffuse;",
 		"varying vec2 vUv;",
+		"uniform float time;",
+		"uniform float radius;",
 
-		"uniform vec2 offset;",
 		"uniform float opacity;",
 		"uniform float mixRatio;",
 
 		"void main() {",
-
+			"float angle	= time;",
+			"vec2 offset	= vec2(cos(angle), sin(angle*2.0))*radius;",
 			"vec4 original	= texture2D(tDiffuse, vUv);",
 			"vec4 shifted	= texture2D(tDiffuse, vUv + offset);",
 			"gl_FragColor	= opacity * mix( original, shifted, mixRatio );",
@@ -318,16 +377,16 @@ THREEx.ToxicPproc.Vector2ShiftShader = {
 // from http://devmaster.net/posts/3079/shader-effects-refraction#tabs-3
 THREEx.ToxicPproc.RefractionShader	= {
 	uniforms	: {
-		tDiffuse	: { type: "t", value: null },
-		ImageSize	: { type : "v2", value: new THREE.Vector2(1440,900) },
-		TexelSize	: { type : "v2", value: new THREE.Vector2(1.0/1440,1.0/900) },
-		time		: { type: "f", value: 0.0 },
-		speed		: { type: "f", value: 1.0 },
+		tDiffuse	: {type: "t", value: null },
+		ImageSize	: {type : "v2", value: new THREE.Vector2(1440,900) },
+		TexelSize	: {type : "v2", value: new THREE.Vector2(1.0/1440,1.0/900) },
+		time		: {type: "f", value: 0.0 		},
+		timeSpeed	: {type: "f", value: 1.0 		},
 
-		Frequency	: {type: 'f', value: 10.0		},
 		RandomNumber	: {type: 'f', value: Math.random()	},
-		Period		: {type: 'f', value: Math.PI/2	},
-		Amplitude	: {type: 'f', value: 20	},
+		Period		: {type: 'f', value: Math.PI/2		},
+		Frequency	: {type: 'f', value: 10.0		},
+		Amplitude	: {type: 'f', value: 0			},
 	},
 	vertexShader	: [
 		'varying vec2 vUv;',
@@ -341,9 +400,9 @@ THREEx.ToxicPproc.RefractionShader	= {
 	].join('\n'),
 
 	fragmentShader	: [
-		'/// <summary>',
-		'/// Shader to refract all pixels with their alpha channel set to 0.',
-		'/// </summary>',
+		'// <summary>',
+		'// Shader to refract all pixels with their alpha channel set to 0.',
+		'// </summary>',
 		'',
 		'',
 		'#ifdef GL_ES',
@@ -353,37 +412,25 @@ THREEx.ToxicPproc.RefractionShader	= {
 		'uniform float time;',
 		'uniform float speed;',
 		'',
-		'/// <summary>',
-		'/// Uniform variables.',
-		'/// <summary>',
+		'// Uniform variables.',
 		'uniform vec2 ImageSize;',
 		'uniform vec2 TexelSize;',
 		'uniform sampler2D tDiffuse;',
 		'',
-		'/// <summary>',
-		'/// Size of the refraction.',
-		'/// <summary>',
+		'// Size of the refraction.',
 		'uniform float Amplitude;',
 		'',
-		'/// <summary>',
-		'/// Frequency of the refraction.',
-		'/// <summary>',
+		'// Frequency of the refraction.',
 		'uniform float Frequency;',
 		'',
-		'/// <summary>',
-		'/// Relative speed (period) of the refraction.',
-		'/// <summary>',
+		'// Relative speed (period) of the refraction.',
 		'uniform float Period;',
 		'',
-		'/// <summary>',
-		'/// Random number to animate or mix up the refracted results.',
-		'/// <summary>',
+		'// Random number to animate or mix up the refracted results.',
 		'uniform float RandomNumber;',
 		'',
 		'',
-		'/// <summary>',
-		'/// Varying variables.',
-		'/// <summary>',
+		'// Varying variables.',
 		'varying vec2 vUv;',
 		'',
 		'',
@@ -473,29 +520,29 @@ THREEx.ToxicPproc.RefractionShader	= {
 		'  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), ',
 		'                                dot(p2,x2), dot(p3,x3) ) );',
 		'}',
-		'',
-		'',
-		'/// <summary>',
-		'/// Compute the normal using a sobel filter on the adjacent noise pixels.',
-		'///',
-		'/// Normally you would output the noise to a texture first and then calculate',
-		'/// the normals on that texture to improve performance; however everthing is',
-		'/// kept in this shader as a single process to help illustrate whats going on.',
-		'/// <summary>',
-		'/// <returns>A normal vector.</returns>',
+
+
+		'// <summary>',
+		'// Compute the normal using a sobel filter on the adjacent noise pixels.',
+		'//',
+		'// Normally you would output the noise to a texture first and then calculate',
+		'// the normals on that texture to improve performance; however everthing is',
+		'// kept in this shader as a single process to help illustrate whats going on.',
+		'// <summary>',
+		'// <returns>A normal vector.</returns>',
 		'vec3 GetNormal ()',
 		'{',
 		'	// Get Sobel values',
 		'	vec2 uv = vUv * Frequency;',
-		'	float z = RandomNumber * Period + time*speed;',
+		'	float z = RandomNumber * Period + time;',
 		'	',
 		'	float tl = snoise(vec3(uv.x - TexelSize.x, uv.y - TexelSize.y, z));',
-		'	float t = snoise(vec3(uv.x, uv.y - TexelSize.y, z));',
+		'	float t  = snoise(vec3(uv.x, uv.y - TexelSize.y, z));',
 		'	float tr = snoise(vec3(uv.x + TexelSize.x, uv.y - TexelSize.y, z));',
-		'	float l = snoise(vec3(uv.x - TexelSize.x, uv.y, z));',
-		'	float r = snoise(vec3(uv.x + TexelSize.x, uv.y, z));',
+		'	float l  = snoise(vec3(uv.x - TexelSize.x, uv.y, z));',
+		'	float r  = snoise(vec3(uv.x + TexelSize.x, uv.y, z));',
 		'	float bl = snoise(vec3(uv.x - TexelSize.x, uv.y + TexelSize.y, z));',
-		'	float b = snoise(vec3(uv.x, uv.y + TexelSize.y, z));',
+		'	float b  = snoise(vec3(uv.x, uv.y + TexelSize.y, z));',
 		'	float br = snoise(vec3(uv.x + TexelSize.x, uv.y + TexelSize.y, z));',
 		'',
 		'	// Sobel filter',
@@ -506,36 +553,24 @@ THREEx.ToxicPproc.RefractionShader	= {
 		'	// Return normalized vector',
 		'	return normalize(normal);',
 		'}',
-		'',
-		'',
-		'/// <summary>',
-		'/// Fragment shader entry.',
-		'/// <summary>',
-		'void main ()',
-		'{',
+
+		'void main (){',
 		'	// Refract only tagged pixels (that is, the alpha channel has been set)',
 		'	vec2 offset;',
-		// '	if ( texture2D(tDiffuse, vUv).w == 0.0 )',
-		// '	{',
-		'		// Method 1: Use noise as the refraction angle.',
-		'		// Fast and good results for some scenarios.',
-		'		const float pi = 3.141592;',
-		'		float noise = snoise(vec3((vUv * Frequency), RandomNumber * Period + time*speed)) * pi;',
-		'		offset = vec2(cos(noise), sin(noise)) * Amplitude * TexelSize;',
-		'		',
-		// '		// Method 2: Get the normal from an animating normalmap to use as the refracted vector.',
-		// '		// Slower, but better results.',
-		// '		vec3 normal = GetNormal();',
-		// '		offset = normal.xy;',
-		// '	}',
+
+		'	// Method 1: Use noise as the refraction angle.',
+		'	// Fast and good results for some scenarios.',
+		'	const float pi = 3.141592;',
+		'	float noise = snoise(vec3((vUv * Frequency), RandomNumber * Period + time)) * pi;',
+		'	offset = vec2(cos(noise), sin(noise)) * Amplitude * TexelSize;',
 		'	',
-		// '	offset.y	= -offset.y;',
+		// '	// Method 2: Get the normal from an animating normalmap to use as the refracted vector.',
+		// '	// Slower, but better results.',
+		// '	vec3 normal = GetNormal();',
+		// '	offset = normal.xy;',
+		'	',
 		'	// Use the colour at the specified offset into the texture',
 		'	gl_FragColor = texture2D(tDiffuse, vUv + offset);',
-		// '	gl_FragColor.w = 1.0;',
-		// '	gl_FragColor.r	= 0.5 + offset.x*50.0;',
-		// '	gl_FragColor.g	= 0.5 + offset.y*50.0;',
-		// '	gl_FragColor.b	= 0.0;',
 		'}',
 	].join('\n')
 };

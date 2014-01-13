@@ -33,18 +33,18 @@ THREEx.addToxicPasses2DatGui	= function(toxicPproc, datGui){
 	folder.add(uniforms['factor'], 'value')	.min(0.0).max(0.1).name("factor").listen();
 	folder.add(uniforms['power'], 'value')	.min(0.0).max(3.0).name("power").listen();
 
-	// v2ShiftPass
-	var folder	= datGui.addFolder('Vector2Shift Pass');
-	var uniforms	= toxicPproc.v2ShiftPass.uniforms
-	folder.add(uniforms['offset'].value, 'x')	.min(0.0).max(1.0).name("offset x").listen();
-	folder.add(uniforms['offset'].value, 'y')	.min(0.0).max(1.0).name("offset y").listen();
-	folder.add(uniforms['mixRatio'], 'value')		.min(0.0).max(1.0).name("mixRatio").listen();
-	folder.add(uniforms['opacity'], 'value')		.min(0.0).max(1.0).name("opacity").listen();
+	// seeDoublePass
+	var folder	= datGui.addFolder('SeeDouble Pass');
+	var uniforms	= toxicPproc.seeDoublePass.uniforms
+	folder.add(uniforms['radius'], 'value')		.min(0.0).max(1.0).name("radius").listen();
+	folder.add(uniforms['timeSpeed'], 'value')	.min(0.0).max(1.0).name("timeSpeed").listen();
+	folder.add(uniforms['mixRatio'], 'value')	.min(0.0).max(1.0).name("mixRatio").listen();
+	folder.add(uniforms['opacity'], 'value')	.min(0.0).max(1.0).name("opacity").listen();
 
 	// refractionPass
 	var folder	= datGui.addFolder('Refraction Pass');
 	var uniforms	= toxicPproc.refractionPass.uniforms
-	folder.add(uniforms['speed'], 'value')		.min(0.0).max(3.0).name("speed").listen();
+	folder.add(uniforms['timeSpeed'], 'value')	.min(0.0).max(3.0).name("timeSpeed").listen();
 	folder.add(uniforms['Frequency'], 'value')	.min(0.0).max(50.0).name("Frequency").listen();
 	folder.add(uniforms['RandomNumber'], 'value')	.min(0.0).max(2.0).name("RandomNumber").listen();
 	folder.add(uniforms['Period'], 'value')		.min(0.0).max(4.0).name("Period").listen();
