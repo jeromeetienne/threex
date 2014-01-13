@@ -69,7 +69,7 @@ THREEx.ToxicPproc.passesPreset['drunk']	= {
 
 		// refractionPass
 		var uniforms	= this.refractionTween.dstUniforms
-		uniforms.timeSpeed.value	= 0.1
+		uniforms.timeSpeed.value	= 0.2
 		uniforms.Frequency.value	= 1.1
 		uniforms.Amplitude.value	= 40
 	},
@@ -137,7 +137,7 @@ THREEx.ToxicPproc.passesPreset['wasted']	= {
 
 		// refractionPass
 		var uniforms	= this.refractionTween.dstUniforms
-		uniforms.timeSpeed.value	= 0.8
+		uniforms.timeSpeed.value	= 0.5
 		uniforms.Frequency.value	= 2.2
 		uniforms.Amplitude.value	= 60
 	},
@@ -158,7 +158,7 @@ THREEx.ToxicPproc.passesPreset['wasted']	= {
 
 THREEx.ToxicPproc.Passes	= function(presetLabel){
 	// default value arguments
-	presetLabel	= presetLabel	|| 'drunk'
+	presetLabel	= presetLabel	|| 'sober'
 	// internal update function
 	var onUpdateFcts= []
 	this.update	= function(delta, now){
@@ -257,6 +257,7 @@ THREEx.ToxicPproc.Passes	= function(presetLabel){
 	// init current preset
 	preset.init.apply(this)
 	onUpdateFcts.push(function(delta, now){
+		// update .time in the needed Pass
 		// seeDoublePass
 		var uniforms	= seeDoublePass.uniforms
 		uniforms.time.value	+= delta * uniforms.timeSpeed.value;
