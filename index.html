@@ -10,10 +10,10 @@
     <title>THREEx - extensions for three.js</title>
 
     <!-- Bootstrap core CSS --> 
-    <link href="www/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="www/bootstrap3.0.2/css/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <!-- <link href="www/bootstrap/css/jumbotron-narrow.css" rel="stylesheet"> -->
+    <!-- <link href="www/bootstrap3.0.2/css/jumbotron-narrow.css" rel="stylesheet"> -->
   </head>
   <body>      
 
@@ -66,9 +66,6 @@
 		/*handle selected item*/
 		#items .item.active {
 			background-color: lightgrey;
-			-webkit-border-radius: 1em;
-			-moz-border-radius: 1em;
-			border-radius: 1em;
 		}
 		/*handle hashLink*/
 		#items .item .hashLink {
@@ -117,9 +114,33 @@
 	================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
 	<script src="www/jquery/jquery-1.10.2.min.js"></script>
-	<script src="www/bootstrap/js/bootstrap.min.js"></script>
+	<script src="www/bootstrap3.0.2/js/bootstrap.min.js"></script>
 	<script src="www/mustache/mustache.js"></script>
 
+	<template id='itemTemplate'>
+		<div class="col-md-4 item" id='{{name}}' data-tag='{{tags}}' style='height: 600px;'>
+			<div class="thumbnail">
+				<a href='{{{demoUrl}}}'>
+					<img src="{{{thumbnailUrl}}}" style='width:100%;'>
+				</a>
+				<div class="caption">
+					<a href='{{{repository}}}'>
+						<h4>
+							{{name}}
+							<small>
+								<a  class='hashLink' href='#{{name}}'>&#x00B6</a>
+							</small>
+						</h4>
+					</a>
+					<p>{{{description}}}</p>
+					<p>
+						<a href="{{{repository}}}" class="btn btn-primary" role="button">Github</a>
+						<strong>Tags:</strong> {{tags}}
+					</p>
+				</div>
+			</div>
+		</div>
+	</template>
 
 	<template id='itemTemplate'>
 	        <!-- {{name}} -->
