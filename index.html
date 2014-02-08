@@ -44,6 +44,9 @@
 			<button type="button" class="btn btn-default" data-tag='input'>Input
 				<span class="badge">?</span>
 			</button>
+			<button type="button" class="btn btn-default" data-tag='physics'>Physics
+				<span class="badge">?</span>
+			</button>
 			<button type="button" class="btn btn-default" data-tag='tool'>Tool
 				<span class="badge">?</span>
 			</button>
@@ -90,6 +93,9 @@
 			display	: block;
 		}
 		#items[data-tag~=shader] .item[data-tag~=shader] {
+			display	: block;
+		}
+		#items[data-tag~=physics] .item[data-tag~=physics] {
 			display	: block;
 		}
 		#items[data-tag~=tool] .item[data-tag~=tool] {
@@ -167,6 +173,22 @@
 	</template>
 <script>
 var items	= []
+
+//////////////////////////////////////////////////////////////////////////////////
+//		threex.oimo						//
+//////////////////////////////////////////////////////////////////////////////////
+items.push({
+	name		: 'threex.oimo',
+	demoUrl		: 'http://jeromeetienne.github.io/threex.oimo/examples/basic.html',
+	thumbnailUrl	: 'www/screenshots/threex.oimo.png',
+	repository	: 'https://github.com/jeromeetienne/threex.oimo',
+	tags		: 'physics',
+	description	: [
+		'It provides a realistic physics easy to include in your own games.',
+		'It is a bunch of helpers for',
+		'<a href="https://github.com/lo-th/Oimo.js">oimo.js</a>(https://github.com/lo-th/Oimo.js)',
+	].join(' ')
+})
 
 //////////////////////////////////////////////////////////////////////////////////
 //		threex.badtvpproc						//
@@ -508,7 +530,7 @@ items.push({
 		"It provides a tunable depth of field to your scene.",
 		"It gives it a nice <a href='http://en.wikipedia.org/wiki/Bokeh'>bokeh</a> effect.",
 		"It is very easy to include.",
-		"It provides realistic physics in your 3d.",
+		"It provides realistic in your 3d.",
 	].join(' ')
 })
 
@@ -520,7 +542,7 @@ items.push({
 	demoUrl		: 'http://jeromeetienne.github.io/threex.cannonjs/examples/domino.html',
 	thumbnailUrl	: 'www/screenshots/threex.cannonjs.png',
 	repository	: 'https://github.com/jeromeetienne/threex.cannonjs',
-	tags		: 'effect',
+	tags		: 'effect physics',
 	description	: [
 		"It provides realistic physics in your 3d.",
 		"It is a wrapper to ease access between",
