@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<script src='vendor/three.js/build/three.js'></script>
+<script src='../vendor/oimo.js'></script>
+<script src='../threex.iomo.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+<style>
+/*#info{ color: white;pointer-events:none; position: absolute; left:10px; top:50px; width: 400px; height: 400px; }
+*/</style>
+<!-- <div id='info'></div> -->
+<script>
+(function(){
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 100;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// oimo init
+    // var stepPerSecond = StepPerSecond || 60;
+    // var broadPhaseType = BroadPhaseType || OIMO.BROAD_PHASE_SWEEP_AND_PRUNE;
+
+	var world	= new OIMO.World(60, OIMO.BROAD_PHASE_BRUTE_FORCE)
+	onRenderFcts.push(function(delta){
+		world.step()
+	})
+window.world	= world
+// 	//add ground
+// 	var ground = new OIMO.Body({
+// 		size	: [50, 40, 50],
+// 		pos	: [0,-20,0],
+// 		world	: world
+// 	});
+// window.ground	= ground
+
+	var geometry	= new THREE.CubeGeometry(100,100,400);	
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	mesh.position.y	= -geometry.height/2
+	scene.add(mesh)
+	
+	var ground	= THREEx.Iomo.createBodyFromMesh(world, mesh, false)
+	// ground.sleep(true)
+window.ground	= ground
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+for(var i = 0; i < 100; i++ ){
+	(function(){
+		if( true || Math.random() < 0.5 ){
+			var width	= 1 + (Math.random()-0.5)*1
+			var height	= 1 + (Math.random()-0.5)*1
+			var depth	= 1 + (Math.random()-0.5)*1
+			var geometry	= new THREE.CubeGeometry(width, height, depth);	
+		}else{
+			var radius	= 3 + (Math.random()-0.5)*0
+			var geometry	= new THREE.SphereGeometry( radius );			
+		}
+		var material	= new THREE.MeshNormalMaterial();
+		var mesh	= new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+
+
+		mesh.position.x	= (Math.random()-0.5)*20
+		mesh.position.y	= 25 + (Math.random()-0.5)*15
+		mesh.position.z	= (Math.random()-0.5)*20
+		//////////////////////////////////////////////////////////////////////////////////
+		//		comment								//
+		//////////////////////////////////////////////////////////////////////////////////
+		
+		var body	= THREEx.Iomo.createBodyFromMesh(world, mesh)
+
+		var updater	= new THREEx.Iomo.Body2MeshUpdater(body, mesh)
+		onRenderFcts.push(function(delta){
+			updater.update()
+		})
+
+		onRenderFcts.push(function(delta){
+			if( mesh.position.y < -20 ){
+				mesh.position.x	= (Math.random()-0.5)*20
+				mesh.position.y	= 25 + (Math.random()-0.5)*15
+				mesh.position.z	= (Math.random()-0.5)*20
+				body.setPosition(mesh.position.x, mesh.position.y, mesh.position.z);	
+			}
+		})
+	})()
+}    
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	
+	var iomoStats	= new THREEx.Iomo.Stats(world)
+	document.body.appendChild(iomoStats.domElement)
+	onRenderFcts.push(function(delta){
+		iomoStats.update()
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*50 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*50 - (camera.position.y - 5)) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+})()
+</script></body>
