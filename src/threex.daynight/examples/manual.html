@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<style>
+	body {
+		margin: 0px;
+		overflow: hidden;
+	}
+</style>
+<body>
+<script src="../../../vendor/three.js/build/three.min.js"></script>
+<script src="../threex.daynight.js"></script>
+<script src="../../../vendor/three.js/examples/js/controls/OrbitControls.js"></script>
+<script>
+
+	var camera, scene, renderer, sky;
+
+	var rotation = 5*Math.PI/6;
+	var frame = 0;
+
+	var cycleDuration = 240;
+	var sunRotation =-2*Math.PI/6;
+
+	var parameters = {
+	    width: 2000,
+	    height: 2000,
+	    widthSegments: 250,
+	    heightSegments: 250,
+	    depth: 1500,
+	    param: 4,
+	    filterparam: 1
+	}
+
+	var onRenderFcts= [];
+
+
+	// RENDERER
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	scene = new THREE.Scene();
+
+	camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 3000000 );
+
+	camera.position.set( 0, Math.max( parameters.width * 1.5, parameters.height ) / 8, parameters.height );
+	camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	onRenderFcts.push(function(delta, now){
+		controls.update()
+	})
+
+
+	onRenderFcts.push(function(delta, now){
+		sunRotation += Math.PI / cycleDuration;
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		sunSphere							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var sunSphere	= new THREEx.DayNight.SunSphere()
+	scene.add( sunSphere.object3d )
+	onRenderFcts.push(function(delta, now){
+		sunSphere.update(sunRotation)
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		directionalLight						//
+	//////////////////////////////////////////////////////////////////////////////////
+        
+
+	var sunLight	= new THREEx.DayNight.SunLight()
+	scene.add( sunLight.object3d )
+	onRenderFcts.push(function(delta, now){
+		sunLight.update(sunRotation)
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var geometry	= new THREE.TorusKnotGeometry()
+	var material	= new THREE.MeshPhongMaterial({
+		color	: 0x202020,
+		shading	: THREE.SmoothShading,
+	});
+	var mesh	= new THREE.Mesh( geometry, material )
+	scene.add( mesh )
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		skydom								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var skydom	= new THREEx.DayNight.Skydom()
+	scene.add( skydom.object3d )
+	onRenderFcts.push(function(delta, now){
+		skydom.update(sunRotation)
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Render								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+
+	onRenderFcts.push(function(delta, now){
+		renderer.render( scene, camera );		
+	})
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body></html>
