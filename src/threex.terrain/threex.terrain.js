@@ -86,17 +86,20 @@ THREEx.Terrain.heightMapToPlaneGeometry	= function(heightMap){
 			var height	= heightMap[x][z]
 			var vertex	= geometry.vertices[x+z*width]
 			vertex.z	= (height-0.5)*2
+			// vertex.z	= x/width*2
 		}
 	}
 	geometry.verticesNeedUpdate	= true
 
 geometry.computeCentroids()
-geometry.computeTangents()
-geometry.tangentsNeedUpdate	= true
-geometry.elementsNeedUpdate	= true
+// geometry.computeTangents()
+// geometry.tangentsNeedUpdate	= true
+// geometry.elementsNeedUpdate	= true
+
 	geometry.computeFaceNormals()
 	geometry.computeVertexNormals()
 	geometry.normalsNeedUpdate	= true
+
 	return geometry
 }
 
