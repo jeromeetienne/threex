@@ -12,25 +12,51 @@
 	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 10;
+	camera.position.z = 5;
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		set 3 point lighting						//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	;(function(){
+		// add a ambient light
+		var light	= new THREE.AmbientLight( 0x202020 )
+		scene.add( light )
+		// add a light in front
+		var light	= new THREE.DirectionalLight('white', 5)
+		light.position.set(0.5, 0.0, 2)
+		scene.add( light )
+		// add a light behind
+		var light	= new THREE.DirectionalLight('white', 0.75*2)
+		light.position.set(-0.5, -0.5, -2)
+		scene.add( light )		
+	})()
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 
-	var heightMap	= THREEx.Terrain.allocateHeightMap(64,256)
+	var heightMap	= THREEx.Terrain.allocateHeightMap(128,256)
+	// var heightMap	= THREEx.Terrain.allocateHeightMap(4, 4)
 	THREEx.Terrain.simplexHeightMap(heightMap)
 	var geometry	= THREEx.Terrain.heightMapToPlaneGeometry(heightMap)
 
-	var material	= new THREE.MeshNormalMaterial({
-		shading: THREE.SmoothShading 
+	THREEx.Terrain.heightMapToVertexColor(heightMap, geometry)
+	
+	var material	= new THREE.MeshBasicMaterial({
+		shading		: THREE.SmoothShading,
+		vertexColors 	: THREE.VertexColors,
 	});
+	// var material	= new THREE.MeshNormalMaterial({
+	// 	shading		: THREE.SmoothShading,
+	// })
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 	mesh.lookAt(new THREE.Vector3(0,1,0))
-	mesh.scale.y	= 4
-	mesh.scale.z	= 0.4
-	mesh.scale.multiplyScalar(10)
+	mesh.scale.y	= 2
+	mesh.scale.z	= 0.2
+	mesh.scale.multiplyScalar(10) 
 	
 	// onRenderFcts.push(function(delta, now){
 	// 	// mesh.rotation.x += 1 * delta;
@@ -47,7 +73,7 @@
 	}, false)
 	onRenderFcts.push(function(delta, now){
 		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - (camera.position.y-15)) * (delta*3)
+		camera.position.y += (mouse.y*5 - (camera.position.y-4)) * (delta*3)
 		camera.lookAt( scene.position )
 	})
 
