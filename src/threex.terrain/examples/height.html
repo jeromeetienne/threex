@@ -5,16 +5,14 @@
 <script src='../threex.terrain.js'></script>
 
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
-	var renderer	= new THREE.WebGLRenderer({
-		antialias	: true
-	});
+	var renderer	= new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
 	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 10;
+	camera.position.z = 2;
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -39,45 +37,75 @@
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 
-	var heightMap	= THREEx.Terrain.allocateHeightMap(256,256)
-	// var heightMap	= THREEx.Terrain.allocateHeightMap(64,64)
-	// var heightMap	= THREEx.Terrain.allocateHeightMap(4, 4)
-	// var heightMap	= THREEx.Terrain.allocateHeightMap(16,16)
+	var heightMap	= THREEx.Terrain.allocateHeightMap(4, 4)
 	THREEx.Terrain.simplexHeightMap(heightMap)
 	
 	var geometry	= THREEx.Terrain.heightMapToPlaneGeometry(heightMap)
-
 	THREEx.Terrain.heightMapToVertexColor(heightMap, geometry)
-	
 	
 	
 	var material	= new THREE.MeshPhongMaterial({
 		shading		: THREE.SmoothShading,
 		vertexColors 	: THREE.VertexColors,
 	});
-	// var material	= new THREE.MeshNormalMaterial({
-	// 	shading		: THREE.SmoothShading,
-	// })
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 	mesh.lookAt(new THREE.Vector3(0,1,0))
-	mesh.scale.y	= 2
-	mesh.scale.x	= 2
-	mesh.scale.z	= 0.2
-	mesh.scale.multiplyScalar(10) 
+	// mesh.scale.y	= 4
+	// mesh.scale.x	= 4
+	// mesh.scale.z	= 0.2
+	// mesh.scale.multiplyScalar(10) 
 	
 	
 	onRenderFcts.push(function(delta, now){
-		mesh.rotation.z += 0.2 * delta;
-		// mesh.rotation.y += 2 * delta;		
+		// mesh.rotation.z += 0.5 * delta;
 	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+;(function(planeMesh, testPosition){
+	// TODO assert no rotation in planeMesh ... how to do that ?
+
+	var geometry	= new THREE.CubeGeometry(0.01, 3, 0.01)
+	// var geometry	= new THREE.SphereGeometry(0.05)
+	var material	= new THREE.MeshNormalMaterial()
+	var mesh	= new THREE.Mesh(geometry, material)
+	mesh.position	= testPosition
+	scene.add(mesh)
+
+	var mesh	= new THREE.Mesh(new THREE.SphereGeometry(0.05), new THREE.MeshNormalMaterial())
+	mesh.position	= testPosition
+	scene.add(mesh)
+
+	// put testPosition relative to planeMesh
+	// testPosition.sub(planeMesh.position);
+console.log('testPosition.x', testPosition.x)
+	// testPosition.x	-= planeMesh.geometry.width/2;
+
+	// testPosition.x	-= planeMesh.geometry.width/2;
+	// testPosition.z	-= planeMesh.geometry.height/2;
+
+	// testPosition.x	+= planeMesh.geometry
+
+console.log('testPosition.x', testPosition, planeMesh)
+	// testPosition.clone().sub(planeMesh.geom);
+
+	// var position	= new THREE.Vector3(-,0,0);
+	// onRenderFcts.push(function(delta){
+	// 	position.x	+= 
+	// })
+
+	THREEx.Terrain.planeToHeightMapCoords(testPosition.clone(), heightMap, planeMesh)
+
+})(mesh, new THREE.Vector3(-0.2,0,0))
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		helpers to debug						//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	// var helper	= new THREE.WireframeHelper(mesh)
-	// scene.add(helper)
+	var helper	= new THREE.WireframeHelper(mesh)
+	scene.add(helper)
 
 	// var helper	= new THREE.FaceNormalsHelper(mesh)
 	// scene.add(helper)
