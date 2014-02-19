@@ -1,6 +1,5 @@
 var THREEx	= THREEx	|| {}
 
-
 THREEx.Terrain	= {}
 
 /**
@@ -11,13 +10,14 @@ THREEx.Terrain	= {}
  * @return {Array} the allocated heightmap
  */
 THREEx.Terrain.allocateHeightMap	= function(width, depth){
-	// TODO use typedarray
+	var ArrayClass	= THREEx.Terrain.allocateHeightMap.ArrayClass
 	var heightMap	= new Array(width)
 	for(var x = 0; x < width; x++){
-		heightMap[x]	= new Array(depth)		
+		heightMap[x]	= new ArrayClass(depth)		
 	}
 	return heightMap
 }
+THREEx.Terrain.allocateHeightMap.ArrayClass	= window.Float64Array	|| window.Array
 
 /**
  * generate a heightmap using a simplex noise
@@ -33,6 +33,7 @@ THREEx.Terrain.simplexHeightMap	= function(heightMap){
 	var simplex	= new SimplexNoise()
 	for(var x = 0; x < width; x++){
 		for(var z = 0; z < depth; z++){
+			// compute the height
 			var height	= 0
 			var level	= 8
 			height	+= (simplex.noise(x/level, z/level)/2 + 0.5) * 0.125
@@ -43,6 +44,7 @@ THREEx.Terrain.simplexHeightMap	= function(heightMap){
 			level	*= 2
 			height	+= (simplex.noise(x/level, z/level)/2 + 0.5) * 1
 			height	/= 1+0.5+0.25+0.125
+			// put the height in the heightMap
 			heightMap[x][z]	= height
 		}
 	}
@@ -91,23 +93,20 @@ THREEx.Terrain.heightMapToPlaneGeometry	= function(heightMap){
 	// loop on each vertex of the geometry
 	for(var x = 0; x < width; x++){
 		for(var z = 0; z < depth; z++){
+			// get the height from heightMap
 			var height	= heightMap[x][z]
-			var vertex	= geometry.vertices[x+z*width]
+			// set the vertex.z to a normalized height
+			var vertex	= geometry.vertices[x + z * width]			
 			vertex.z	= (height-0.5)*2
-			// vertex.z	= x/width*2
 		}
 	}
+	// notify the geometry need to update vertices
 	geometry.verticesNeedUpdate	= true
-
-	// geometry.computeCentroids()
-	// geometry.computeTangents()
-	// geometry.tangentsNeedUpdate	= true
-	// geometry.elementsNeedUpdate	= true
-
+	// notify the geometry need to update normals
 	geometry.computeFaceNormals()
 	geometry.computeVertexNormals()
 	geometry.normalsNeedUpdate	= true
-
+	// return the just built geometry
 	return geometry
 }
 
@@ -116,40 +115,74 @@ THREEx.Terrain.heightMapToHeight	= function(heightMap, x, z){
 	var width	= heightMap.length
 	var depth	= heightMap[0].length
 	// sanity check - boundaries
-	console.assert( x >= 0 && x <= width )
-	console.assert( z >= 0 && z <= depth )
-	
+	console.assert( x >= 0 && x < width )
+	console.assert( z >= 0 && z < depth )
+
+	// get the delta within a single segment
 	var deltaX	= x - Math.floor(x)
 	var deltaZ	= z - Math.floor(z)
 
+	// get the height of each corner of the segment
 	var heightNW	= heightMap[Math.floor(x)][Math.floor(z)]
 	var heightNE	= heightMap[Math.ceil (x)][Math.floor(z)]
 	var heightSW	= heightMap[Math.floor(x)][Math.ceil (z)]
 	var heightSE	= heightMap[Math.ceil (x)][Math.ceil (z)]
 
-	// debugger;
-
-	// - what is in the ne triangle, what is in sw triangle
-	// - computation depends on that
+	// test in which triangle the point is. north-east or south-west
 	var inTriangleNE= deltaX > deltaZ ? true : false
-	console.log('inTriangleNE', inTriangleNE)
-
 	if( inTriangleNE ){
-		deltaX		= 1 - deltaX
-
-		var heightX	= heightNW + (heightNE-heightNW)*(deltaX)
-		var heightZ	= heightNW + (heightSW-heightNW)*(deltaZ)
-
-		return heightNW
+		var height	= heightNE 
+			+ (heightNW - heightNE) * (1 - deltaX)
+			+ (heightSE - heightNE) * deltaZ
 	}else{
-		return heightNW
+		var height	= heightSW
+			+ (heightSE - heightSW) * deltaX
+			+ (heightNW - heightSW) * (1-deltaZ)
 	}
-
+	// return the height
 	return height
 }
 
-THREEx.Terrain.planeToHeightMapCoords	= function(position, heightMap, planeMesh){
+THREEx.Terrain.planeToHeightMapCoords	= function(heightMap, planeMesh, x, z){
+
 	// TODO assert no rotation in planeMesh
+	// - how can i check that ? with euler ?
+
+	var position	= new THREE.Vector3(x, 0, z)
+
+	// set position relative to planeMesh position
+	position.sub(planeMesh.position)
+
+	// heightMap origin is at its top-left, while planeMesh origin is at its center
+	position.x	+= planeMesh.geometry.width /2 * planeMesh.scale.x
+	position.z	+= planeMesh.geometry.height/2 * planeMesh.scale.y
+
+	// normalize it from [0,1] for the heightmap
+	position.x	/= planeMesh.geometry.width * planeMesh.scale.x
+	position.z	/= planeMesh.geometry.height* planeMesh.scale.y
+
+	// get heightMap dimensions
+	var width	= heightMap.length
+	var depth	= heightMap[0].length
+	
+	// convert it in heightMap coordinate
+	position.x	*= (width-1)
+	position.z	*= (depth-1)
+
+	position.y	= THREEx.Terrain.heightMapToHeight(heightMap, position.x, position.z)
+// console.log('height', height, position)
+	position.y	= (position.y-0.5)*2
+
+	return position.y
+}
+
+
+
+
+THREEx.Terrain.planeToHeightMapCoords0	= function(position, heightMap, planeMesh){
+
+	// TODO assert no rotation in planeMesh
+	// - how can i check that ? with euler ?
 
 	// set position relative to planeMesh position
 	position.sub(planeMesh.position)
@@ -158,11 +191,21 @@ THREEx.Terrain.planeToHeightMapCoords	= function(position, heightMap, planeMesh)
 	position.x	+= planeMesh.geometry.width/2
 	position.z	+= planeMesh.geometry.height/2
 
+	// normalize it from [0,1] for the heightmap
 	position.x	/= planeMesh.geometry.width
 	position.z	/= planeMesh.geometry.height
 
+	// get heightMap dimensions
+	var width	= heightMap.length
+	var depth	= heightMap[0].length
+	
+	// convert it in heightMap coordinate
+	position.x	*= (width-1)
+	position.z	*= (depth-1)
+
 	var height	= THREEx.Terrain.heightMapToHeight(heightMap, position.x, position.z)
-console.log('height', height)
+// console.log('height', height, position)
+	position.y	= (height-0.5)*2
 
 	return position;
 }
