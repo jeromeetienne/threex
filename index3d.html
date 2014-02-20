@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<script src='vendor/three.js/build/three.min.js'></script>
+<script src='vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
+<script src='threex-extensions.js'></script>
+<body style='margin: 0px; background-color: #020202; overflow: hidden;'><script>
+	var renderer	= new THREE.CSS3DRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 2.5;
+
+	
+	var container	= new THREE.Object3D()
+	scene.add(container)
+	
+	// var nImages	= 20
+	// var nLngImages	= 15
+	// for(var i = 0; i < nImages; i++){
+	// 	;(function(){
+	// 		var domElement	= document.createElement('img')
+	// 		domElement.src	= 'www/screenshots/threex.daynight.png'
+	// 		domElement.style.width	= "64px";
+	// 		domElement.style.height	= "64px";
+			
+	// 		var object3d	= new THREE.CSS3DObject( domElement )
+	// 		object3d.scale.multiplyScalar(1/64)
+	// 		container.add(object3d)
+			
+	// 		var radius		= 3
+	// 		var angle		= Math.PI*2 * (i/nLngImages)
+	// 		object3d.position.x	= Math.cos(angle)*radius
+	// 		object3d.position.z	= Math.sin(angle)*radius
+
+	// 		object3d.position.y	= i * 0.1
+			
+	// 		var target	= new THREE.Vector3(0,object3d.position.y,0)
+	// 		object3d.lookAt(target)
+	// 	})()	
+	// }
+
+	var nRows	= 6
+	for(var i = 0; i < nRows; i++){
+		var angle	= (i-nRows/2) * Math.PI/6
+		var radius	= Math.cos(angle) * 3
+		var positionY	= Math.sin(angle) * 3
+		var circumfernce= radius * 2 * Math.PI
+		var nImages	= Math.floor( 4 * radius )
+		console.log('nImages', nImages, 'row', i)
+		sphereRow(nImages, positionY, radius)		
+	}
+		
+	function sphereRow(nImages, positionY, radius){
+		for(var i = 0; i < nImages; i++){
+			;(function(){
+				var imageW	= 64
+
+				var domElement	= document.createElement('img')
+				domElement.src	= 'www/screenshots/threex.daynight.png'
+				domElement.style.width	= imageW + "px";
+				domElement.style.height	= imageW + "px";
+				
+				var object3d	= new THREE.CSS3DObject( domElement )
+				object3d.scale.multiplyScalar(1/imageW)
+				container.add(object3d)
+
+				var angle		= Math.PI*2 * (i/nImages)
+				object3d.position.x	= Math.cos(angle)*radius
+				object3d.position.z	= Math.sin(angle)*radius
+
+				object3d.position.y	= positionY
+				
+				var target	= new THREE.Vector3(0, 0,0)
+				object3d.lookAt(target)
+			})()	
+		}		
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var inputs	= {
+		left	: false,
+		right	: false,
+	}
+	document.body.addEventListener('keydown', function(event){
+		if( event.keyCode === 'A'.charCodeAt(0) )	inputs.left	= true
+		if( event.keyCode === 'D'.charCodeAt(0) )	inputs.right	= true
+	})
+	document.body.addEventListener('keyup', function(event){
+		if( event.keyCode === 'A'.charCodeAt(0) )	inputs.left	= false
+		if( event.keyCode === 'D'.charCodeAt(0) )	inputs.right	= false
+	})
+	
+	var angularSpeed	= 0;
+	var angularAcceleration	= 0.008;
+	var angularDump		= 0.96;
+	onRenderFcts.push(function(delta){
+		console.log(inputs.right)
+		if( inputs.right )	angularSpeed	+= angularAcceleration
+		if( inputs.left )	angularSpeed	-= angularAcceleration
+		angularSpeed	*= angularDump
+		container.rotateY(angularSpeed)			
+	})
+	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// onRenderFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*1)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*1)
+	// 	camera.lookAt( scene.position )
+	// })
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
