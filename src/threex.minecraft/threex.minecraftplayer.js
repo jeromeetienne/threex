@@ -52,19 +52,6 @@ THREEx.MinecraftPlayer	= function(){
 		}
 	})
 	
-	// var previousPos	= new THREE.Vector3();
-	// updateFcts.push(function(delta, now){
-	// 	var object3d	= character.root;
-	// 	var velocity	= object3d.position.clone().sub(previousPos);
-	// 	if( velocity.length() ){
-	// 		bodyAnims.start('run');
-	// 	}else{
-	// 		bodyAnims.start('stand');
-	//  	}
-	// 	// update player.previousPos/player.prevRotation
-	// 	previousPos.copy( object3d.position )
-	// })
-
 	//////////////////////////////////////////////////////////////////////////////////
 	//		controls							//
 	//////////////////////////////////////////////////////////////////////////////////	
