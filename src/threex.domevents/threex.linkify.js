@@ -17,7 +17,7 @@ THREEx.linkify	= function(domEvents, mesh, url){
 	underline.position.y	+= -size.y/2 - deltaY - underlineH/2
 
 	// make it invisible by default
-	// underline.visible	= false;
+	underline.visible	= false;
 
 	// add it to the mesh
 	mesh.add(underline)
