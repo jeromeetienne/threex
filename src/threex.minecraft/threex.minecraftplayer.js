@@ -41,18 +41,29 @@ THREEx.MinecraftPlayer	= function(){
 	//		animation based on velocity					//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	var previousPos	= new THREE.Vector3();
 	updateFcts.push(function(delta, now){
-		var object3d	= character.root;
-		var velocity	= object3d.position.clone().sub(previousPos);
-		if( velocity.length() ){
-			bodyAnims.start('run');
-		}else{
-			bodyAnims.start('stand');
-	 	}
-		// update player.previousPos/player.prevRotation
-		previousPos.copy( object3d.position )
+		var input	= controls.input
+		if( input.up || input.down ){
+			bodyAnims.start('run');			
+		}else if( input.strafeLeft || input.strafeRight ){
+			bodyAnims.start('strafe');
+		}else {
+			bodyAnims.start('stand');			
+		}
 	})
+	
+	// var previousPos	= new THREE.Vector3();
+	// updateFcts.push(function(delta, now){
+	// 	var object3d	= character.root;
+	// 	var velocity	= object3d.position.clone().sub(previousPos);
+	// 	if( velocity.length() ){
+	// 		bodyAnims.start('run');
+	// 	}else{
+	// 		bodyAnims.start('stand');
+	//  	}
+	// 	// update player.previousPos/player.prevRotation
+	// 	previousPos.copy( object3d.position )
+	// })
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		controls							//

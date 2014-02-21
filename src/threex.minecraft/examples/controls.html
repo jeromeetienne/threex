@@ -38,12 +38,16 @@
 		if( event.keyCode === 'S'.charCodeAt(0) )	controls.input.down	= true
 		if( event.keyCode === 'A'.charCodeAt(0) )	controls.input.left	= true
 		if( event.keyCode === 'D'.charCodeAt(0) )	controls.input.right	= true
+		if( event.keyCode === 'Q'.charCodeAt(0) )	controls.input.strafeLeft= true
+		if( event.keyCode === 'E'.charCodeAt(0) )	controls.input.strafeRight= true
 	})
 	document.body.addEventListener('keyup', function(event){
 		if( event.keyCode === 'W'.charCodeAt(0) )	controls.input.up	= false
 		if( event.keyCode === 'S'.charCodeAt(0) )	controls.input.down	= false
 		if( event.keyCode === 'A'.charCodeAt(0) )	controls.input.left	= false
 		if( event.keyCode === 'D'.charCodeAt(0) )	controls.input.right	= false
+		if( event.keyCode === 'Q'.charCodeAt(0) )	controls.input.strafeLeft= false
+		if( event.keyCode === 'E'.charCodeAt(0) )	controls.input.strafeRight= false
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
