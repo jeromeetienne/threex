@@ -21,7 +21,7 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
-	var geometry	= new THREE.CubeGeometry( 1, 1, 1)
+	var geometry	= new THREE.SphereGeometry( 0.5 )
 	var material	= new THREE.MeshNormalMaterial()
 	var mesh	= new THREE.Mesh( geometry, material )
 	scene.add( mesh )
@@ -30,7 +30,8 @@
 	//		linkify our cube						//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	THREEx.linkify(domEvents, mesh, 'http://jeromeetienne.github.io/threex/')
+	var url	= 'http://jeromeetienne.github.io/threex/'
+	THREEx.Linkify(domEvents, mesh, url)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
