@@ -24,8 +24,8 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	var domEvents	= new THREEx.DomEvents(camera, renderer.domElement);
-	domEvents.bind(mesh, 'click', function(event){
-		console.log(arguments)
+	domEvents.addEventListener(mesh, 'click', function(event){
+		console.log('you clicked on mesh', mesh)
 	}, false)
 
 	//////////////////////////////////////////////////////////////////////////////////

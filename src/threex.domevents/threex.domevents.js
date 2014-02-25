@@ -212,6 +212,7 @@ THREEx.DomEvents.prototype.bind	= function(object3d, eventName, callback, useCap
 	}
 	this._boundObjs[eventName].push(object3d);
 }
+THREEx.DomEvents.prototype.addEventListener	= THREEx.DomEvents.prototype.bind
 
 THREEx.DomEvents.prototype.unbind	= function(object3d, eventName, callback, useCapture)
 {
@@ -235,6 +236,7 @@ THREEx.DomEvents.prototype.unbind	= function(object3d, eventName, callback, useC
 	console.assert( index !== -1 );
 	this._boundObjs[eventName].splice(index, 1);
 }
+THREEx.DomEvents.prototype.removeEventListener	= THREEx.DomEvents.prototype.bind
 
 THREEx.DomEvents.prototype._bound	= function(eventName, object3d)
 {

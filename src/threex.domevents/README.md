@@ -1,8 +1,13 @@
 threex.domevents
 ================
 
-threex.domevents is a three.js extension which provide an domevents for other developpers.
-Thus they can copy it and start their own extension.
+threex.domevents is a three.js extension which provide dom events inside your 3d scene.
+Always in a effort to stay close to usual pratices, the events name are the same as in DOM.
+The semantic is the same too, which makes it all very easy to learn.
+Currently, the available events are
+[click, dblclick, mouseup, mousedown](http://www.quirksmode.org/dom/events/click.html),
+[mouseover and mouse out](http://www.quirksmode.org/dom/events/mouseover.html).
+
 
 Show Don't Tell
 ===============
@@ -31,12 +36,42 @@ bower install threex.domevents
 How To Use It
 =============
 
-there is no real use as it is only a boilerplate for your own extension.
+First you need to instanciate the layer, like this.
 
-```javascript
-var instance	= new THREEx.Sample()
+```
+var domEvents	= new THREEx.DomEvents(camera, renderer.domElement)
 ```
 
+Always in a effort to stay close to usual pratices, the events name are the same as in DOM.
+The semantic is the same too.
+Currently, the available events are
+[click, dblclick, mouseup, mousedown](http://www.quirksmode.org/dom/events/click.html),
+[mouseover and mouse out](http://www.quirksmode.org/dom/events/mouseover.html).
+Then you bind an event on a mesh like this
+
+```
+domEvents.addEventListener(mesh, 'click', function(event){
+	console.log('you clicked on the mesh')
+}, false)
+```
+
+You can remove an event listener too, here is the whole cycle
+
+```
+// define the callback
+function callback(event){
+	console.log('you clicked on the mesh')	
+}
+
+// add an event listener for this callback
+domEvents.addEventListener(mesh, 'click', callback, false)
+
+// remove an event listener for this callback
+domEvents.removeEventListener(mesh, 'click', callback, false)
+```
+
+If the camera changes, you can use ```domEvents.camera(camera)``` to set the new one.
+Now that you got the 
 
 ## THREEx.Linkify.js
 
@@ -55,9 +90,15 @@ var linkify	= THREEx.Linkify(domEvents, mesh, url, true)
 ```
 
 The parameters are 
+* ```domEvents```: an instance of ```THREEx.DomEvents```
+* ```mesh```: an instance of ```THREE.Mesh```
+* ```url```: a string of the url
+* ```withBoundingBox```: true if you bind the bounding box and not the mesh itself. It 
+may be useful when your mesh is complex. useful because it is faster to test for 
+simple mesh, usefull as it make the detections less flacky for the users for complex meshes.
 
-```linkify.destroy()``` to stop listening on those events
 
+Additionnaly you can use ```linkify.destroy()``` to stop listening on those events.
 The exposed properties are 
 
 * ```linkify.underline``` is the mesh for the underline
