@@ -36,6 +36,10 @@ bower install threex.domevents
 How To Use It
 =============
 
+Let's start by bindinf dom events like on 3d objects.
+
+## THREEx.DomEvent.js
+
 First you need to instanciate the layer, like this.
 
 ```
