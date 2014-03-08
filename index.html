@@ -140,36 +140,13 @@
 					</a>
 					<p>{{{description}}}</p>
 					<p>
-						<a href="{{{demoUrl}}}" class="btn btn-primary" role="button">Demo</a>
+						<a href="{{{demoUrl}}}" class="demo btn btn-primary" role="button">Demo</a>
 						<a href="{{{repository}}}" class="btn btn-primary" role="button">Github</a>
 						<strong>Tags:</strong> {{tags}}
 					</p>
 				</div>
 			</div>
 		</div>
-	</template>
-
-	<template id='itemTemplate'>
-	        <!-- {{name}} -->
-	        <div class="col-lg-6 item" id='{{name}}' data-tag='{{tags}}'>
-			<div class="col-lg-4">
-				<a href='{{{demoUrl}}}'>
-					<img src="{{{thumbnailUrl}}}" class="img-rounded thumbnail">
-				</a>
-			</div>
-			<div class="col-lg-8">
-				<a href='{{{repository}}}'>
-					<h2>
-						{{name}}
-						<small>
-							<a  class='hashLink'href='#{{name}}'>&#x00B6</a>
-						</small>
-					</h2>
-				</a>
-				{{{description}}}
-				<br/>
-			</div>
-	        </div>
 	</template>
 <script>
 var items	= []
