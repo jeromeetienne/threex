@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.min.js'></script>
 <script src='../threex.md2character.js'></script>
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
-	var renderer	= new THREE.WebGLRenderer();
+<!-- <script src='../threex.md2character.ratamahatta.js'></script> -->
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer({
+		antialias	: true
+	});
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
@@ -10,6 +13,23 @@
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
 	camera.position.z = 3;
+	//////////////////////////////////////////////////////////////////////////////////
+	//		set 3 point lighting						//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	;(function(){
+		// add a ambient light
+		var light	= new THREE.AmbientLight( 0x020202 )
+		scene.add( light )
+		// add a light in front
+		var light	= new THREE.DirectionalLight('white', 1)
+		light.position.set(0.5, 0.5, 2)
+		scene.add( light )
+		// add a light behind
+		var light	= new THREE.DirectionalLight('white', 0.75)
+		light.position.set(-0.5, -0.5, -2)
+		scene.add( light )		
+	})()
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -17,15 +37,49 @@
 	
 
 	var character	= new THREEx.MD2Character()
+	// load the data
+	character.load({
+		baseUrl	: '../models/ratamahatta/',
+		body	: "ratamahatta.js",
+		//skins	: [ "ratamahatta.png"],
+		skins	: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
+		weapons	: [
+			[ "weapon.js"		, "weapon.png" ],
+			[ "w_bfg.js"		, "w_bfg.png" ],
+			[ "w_blaster.js"	, "w_blaster.png" ],
+			[ "w_chaingun.js"	, "w_chaingun.png" ],
+			[ "w_glauncher.js"	, "w_glauncher.png" ],
+			[ "w_hyperblaster.js"	, "w_hyperblaster.png" ],
+			[ "w_machinegun.js"	, "w_machinegun.png" ],
+			[ "w_railgun.js"	, "w_railgun.png" ],
+			[ "w_rlauncher.js"	, "w_rlauncher.png" ],
+			[ "w_shotgun.js"	, "w_shotgun.png" ],
+			[ "w_sshotgun.js"	, "w_sshotgun.png" ],
+		]
+	});
+	character.object3d.position.y	= -2
+	scene.add(character.object3d)
+	onRenderFcts.push(function(delta){
+		character.update(delta)
+	})
 	
+// */
+// THREEx.MD2Character.prototype.setSkin	= function( index )
+// {
+// 	if ( this._meshBody && this._meshBody.material.wireframe === false ) {
+// 		console.assert( index < this._skinsBody.length );
+		
+	window.character	= character;
 	
+	// character.setSkin(1)
+	// character.setWeapon()		
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
 	var material	= new THREE.MeshNormalMaterial();
 	var mesh	= new THREE.Mesh( geometry, material );
-	scene.add( mesh );
+	// scene.add( mesh );
 	
 	onRenderFcts.push(function(delta, now){
 		// mesh.rotation.x += 1 * delta;

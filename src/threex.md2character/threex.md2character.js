@@ -16,10 +16,12 @@ var THREEx	= THREEx || {}
  * @class
 */
 THREEx.MD2Character	= function(){
-	this._scale		= 1;
+	this._scale		= 0.03;
 	this.animationFPS	= 6;
 
 	this._root		= new THREE.Object3D();
+	this.object3d		= this._root
+
 	this._meshBody		= null;
 	this._meshWeapon	= null;
 
@@ -50,24 +52,22 @@ THREEx.MD2Character.prototype.destroy	= function()
 /**
  * Update the animation
  * 
- * @param {Number} deltaSeconds nb seconds since the last update
+ * @param {Number} delta nb seconds since the last update
 */
-THREEx.MD2Character.prototype.update	= function( deltaSeconds )
-{
+THREEx.MD2Character.prototype.update	= function( delta ){
 	if ( this._meshBody ) {
 		var direction	= this._meshBody.direction;
 		var timeBefore	= this._meshBody.time;
 		// update the animation
-		this._meshBody.updateAnimation( 1000 * deltaSeconds );
+		this._meshBody.updateAnimation( 1000 * delta );
 		// ugly kludge to get an event 'animationCompleted'
 		var timeAfter	= this._meshBody.time;
 		if( (direction === 1 && timeBefore > timeAfter) || (direction === -1 && timeAfter < timeBefore) ){
-			this.trigger("animationCompleted", this, this._curAnimation)
-			//console.log("endofanim", this._curAnimation)
+			// this.trigger("animationCompleted", this, this._curAnimation)
 		}
 	}
 	if ( this._meshWeapon ) {
-		this._meshWeapon.updateAnimation( 1000 * deltaSeconds );
+		this._meshWeapon.updateAnimation( 1000 * delta );
 	}
 	return this;	// for chained API
 };
@@ -326,7 +326,7 @@ THREEx.MD2Character.prototype._checkLoadingComplete	= function()
 {
 	this._nLoadInProgress--;
 	if( this._nLoadInProgress === 0 ){
-		this.trigger('loaded');
+		// this.trigger('loaded');
 	}
 }
 
