@@ -16,22 +16,21 @@ var THREEx	= THREEx || {}
  * @class
 */
 THREEx.MD2Character	= function(){
-	this._scale		= 0.03;
+	this.scale		= 1/49;
 	this.animationFPS	= 6;
 
-	this._root		= new THREE.Object3D();
-	this.object3d		= this._root
+	this.object3d		= new THREE.Object3D();
 
-	this._meshBody		= null;
-	this._meshWeapon	= null;
+	this.meshBody		= null;
+	this.meshWeapon		= null;
 
-	this._skinsBody		= [];
-	this._skinsWeapon	= [];
+	this.texturesBody	= [];
+	this.texturesWeapon	= [];
 
 	this._weapons		= [];
 
 	this._curAnimation	= null;
-	this._nLoadInProgress	= 0;
+	this.nLoadInProgress	= 0;
 }
 
 // make it eventable
@@ -46,6 +45,37 @@ THREEx.MD2Character.prototype.destroy	= function()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+//		comment								//
+//////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * microevents.js - https://github.com/jeromeetienne/microevent.js
+*/
+;(function(destObj){
+	destObj.addEventListener	= function(event, fct){
+		if(this._events === undefined) 	this._events	= {};
+		this._events[event] = this._events[event]	|| [];
+		this._events[event].push(fct);
+		return fct;
+	};
+	destObj.removeEventListener	= function(event, fct){
+		if(this._events === undefined) 	this._events	= {};
+		if( event in this._events === false  )	return;
+		this._events[event].splice(this._events[event].indexOf(fct), 1);
+	};
+	destObj.dispatchEvent	= function(event /* , args... */){
+		if(this._events === undefined) 	this._events	= {};
+		if( this._events[event] === undefined )	return;
+		var tmpArray	= this._events[event].slice(); 
+		for(var i = 0; i < tmpArray.length; i++){
+			var result	= tmpArray[i].apply(this, Array.prototype.slice.call(arguments, 1))
+			if( result !== undefined )	return result;
+		}
+		return undefined;
+	};
+})(THREEx.MD2Character.prototype)
+
+//////////////////////////////////////////////////////////////////////////////////
 //										//
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -55,44 +85,28 @@ THREEx.MD2Character.prototype.destroy	= function()
  * @param {Number} delta nb seconds since the last update
 */
 THREEx.MD2Character.prototype.update	= function( delta ){
-	if ( this._meshBody ) {
-		var direction	= this._meshBody.direction;
-		var timeBefore	= this._meshBody.time;
+	if ( this.meshBody ) {
+		var direction	= this.meshBody.direction;
+		var timeBefore	= this.meshBody.time;
 		// update the animation
-		this._meshBody.updateAnimation( 1000 * delta );
+		this.meshBody.updateAnimation( 1000 * delta );
 		// ugly kludge to get an event 'animationCompleted'
-		var timeAfter	= this._meshBody.time;
+		var timeAfter	= this.meshBody.time;
 		if( (direction === 1 && timeBefore > timeAfter) || (direction === -1 && timeAfter < timeBefore) ){
-			// this.trigger("animationCompleted", this, this._curAnimation)
+			this.dispatchEvent("animationCompleted", this, this._curAnimation)
 		}
 	}
-	if ( this._meshWeapon ) {
-		this._meshWeapon.updateAnimation( 1000 * delta );
+	if ( this.meshWeapon ) {
+		this.meshWeapon.updateAnimation( 1000 * delta );
 	}
 	return this;	// for chained API
 };
 
 /**
- * @returns {THREE.Object3D} the object3D containing the object
-*/
-THREEx.MD2Character.prototype.container	= function(){
-	return this._root;
-}
-
-/**
  * @return {Boolean} true if the character is loaded, false otherwise
 */
 THREEx.MD2Character.prototype.isLoaded	= function(){
-	return this._nLoadInProgress === 0 ? true : false;
-}
-
-/**
- * Getter/setter for the scale of the object
-*/
-THREEx.MD2Character.prototype.scale	= function(value){
-	if( value === undefined )	return this._scale;
-	this._scale	= value;
-	return this;
+	return this.nLoadInProgress === 0 ? true : false;
 }
 
 
@@ -103,15 +117,14 @@ THREEx.MD2Character.prototype.scale	= function(value){
 /**
  * @param {Boolean} enable true to enable wireframe, false otherwise
 */
-THREEx.MD2Character.prototype.setWireframe = function ( enable )
-{
+THREEx.MD2Character.prototype.setWireframe = function( enable ){
 	// TODO remove the added property on THREE.Mesh
 	if( enable ){
-		if ( this._meshBody )	this._meshBody.material	= this._meshBody.materialWireframe;
-		if ( this._meshWeapon )	this._meshWeapon.material= this._meshWeapon.materialWireframe;
+		if ( this.meshBody )	this.meshBody.material	= this.meshBody.materialWireframe;
+		if ( this.meshWeapon )	this.meshWeapon.material= this.meshWeapon.materialWireframe;
 	} else {
-		if ( this._meshBody )	this._meshBody.material	= this._meshBody.materialTexture;
-		if ( this._meshWeapon )	this._meshWeapon.material= this._meshWeapon.materialTexture;
+		if ( this.meshBody )	this.meshBody.material	= this.meshBody.materialTexture;
+		if ( this.meshWeapon )	this.meshWeapon.material= this.meshWeapon.materialTexture;
 	}
 	return this;	// for chained API
 };
@@ -121,8 +134,7 @@ THREEx.MD2Character.prototype.setWireframe = function ( enable )
  *
  * @param {Number} index the index of the animations
 */
-THREEx.MD2Character.prototype.setWeapon = function ( index )
-{
+THREEx.MD2Character.prototype.setWeapon = function( index ){
 	// make all weapons invisible
 	for ( var i = 0; i < this._weapons.length; i ++ ){
 		this._weapons[ i ].visible = false;
@@ -132,14 +144,14 @@ THREEx.MD2Character.prototype.setWeapon = function ( index )
 
 	if( activeWeapon ){
 		activeWeapon.visible	= true;
-		this._meshWeapon		= activeWeapon;
+		this.meshWeapon		= activeWeapon;
 
 		activeWeapon.playAnimation( this._curAnimation, this.animationFPS );
 
-		this._meshWeapon.baseDuration	= this._meshWeapon.duration;
+		this.meshWeapon.baseDuration	= this.meshWeapon.duration;
 
-		this._meshWeapon.time		= this._meshBody.time;
-		this._meshWeapon.duration	= this._meshBody.duration;
+		this.meshWeapon.time		= this.meshBody.time;
+		this.meshWeapon.duration	= this.meshBody.duration;
 	}
 	return this;	// for chained API
 };
@@ -149,8 +161,7 @@ THREEx.MD2Character.prototype.setWeapon = function ( index )
  *
  * @param {string} animationName the animation name to set
 */
-THREEx.MD2Character.prototype.animation = function( animationName )
-{
+THREEx.MD2Character.prototype.animation = function( animationName ){
 	// for getter
 	if( animationName === undefined ){
 		return this._curAnimation;
@@ -160,17 +171,17 @@ THREEx.MD2Character.prototype.animation = function( animationName )
 		return this;	// for chained API
 	}
 	// sanity check
-	console.assert( Object.keys(this._meshBody.geometry.animations).indexOf(animationName) !== -1 );
-	// setter on this._meshBody
-	if ( this._meshBody ) {
-		this._meshBody.playAnimation( animationName, this.animationFPS );
-		this._meshBody.baseDuration	= this._meshBody.duration;
+	console.assert( Object.keys(this.meshBody.geometry.animations).indexOf(animationName) !== -1 );
+	// setter on this.meshBody
+	if ( this.meshBody ) {
+		this.meshBody.playAnimation( animationName, this.animationFPS );
+		this.meshBody.baseDuration	= this.meshBody.duration;
 	}
-	// setter on this._meshWeapon
-	if ( this._meshWeapon ) {
-		this._meshWeapon.playAnimation( animationName, this.animationFPS );
-		this._meshWeapon.baseDuration	= this._meshWeapon.duration;
-		this._meshWeapon.time		= this._meshBody.time;
+	// setter on this.meshWeapon
+	if ( this.meshWeapon ) {
+		this.meshWeapon.playAnimation( animationName, this.animationFPS );
+		this.meshWeapon.baseDuration	= this.meshWeapon.duration;
+		this.meshWeapon.time		= this.meshBody.time;
 	}
 	// set the animation itself
 	this._curAnimation = animationName;
@@ -180,13 +191,12 @@ THREEx.MD2Character.prototype.animation = function( animationName )
 /**
  * @param {number} rate the rate to play the object
 */
-THREEx.MD2Character.prototype.setPlaybackRate	= function( rate )
-{
-	if ( this._meshBody ){
-		this._meshBody.duration = this._meshBody.baseDuration / rate;
+THREEx.MD2Character.prototype.setPlaybackRate	= function( rate ){
+	if ( this.meshBody ){
+		this.meshBody.duration = this.meshBody.baseDuration / rate;
 	}
-	if ( this._meshWeapon ){
-		this._meshWeapon.duration = this._meshWeapon.baseDuration / rate;
+	if ( this.meshWeapon ){
+		this.meshWeapon.duration = this.meshWeapon.baseDuration / rate;
 	}
 	return this;	// for chained API
 };
@@ -194,11 +204,10 @@ THREEx.MD2Character.prototype.setPlaybackRate	= function( rate )
 /**
  * @param {Number} index set the index of the skin
 */
-THREEx.MD2Character.prototype.setSkin	= function( index )
-{
-	if ( this._meshBody && this._meshBody.material.wireframe === false ) {
-		console.assert( index < this._skinsBody.length );
-		this._meshBody.material.map	= this._skinsBody[ index ];
+THREEx.MD2Character.prototype.setSkin	= function( index ){
+	if ( this.meshBody && this.meshBody.material.wireframe === false ) {
+		console.assert( index < this.texturesBody.length );
+		this.meshBody.material.map	= this.texturesBody[ index ];
 	}
 	return this;	// for chained API
 };
@@ -212,8 +221,7 @@ THREEx.MD2Character.prototype.setSkin	= function( index )
 */
 THREEx.MD2Character.prototype.load		= function ( config )
 {
-	var _this		= this;
-	this._nLoadInProgress	= config.weapons.length * 2 + config.skins.length + 1;
+	this.nLoadInProgress	= config.weapons.length * 2 + config.skins.length + 1;
 
 	var weaponsTextures = []
 	for ( var i = 0; i < config.weapons.length; i ++ ){
@@ -221,42 +229,45 @@ THREEx.MD2Character.prototype.load		= function ( config )
 	}
 
 	// SKINS
-	this._skinsBody		= this._loadTextures( config.baseUrl + "skins/", config.skins );
-	this._skinsWeapon	= this._loadTextures( config.baseUrl + "skins/", weaponsTextures );
+	this.texturesBody	= this._loadTextures( config.baseUrl + "skins/", config.skins );
+	this.texturesWeapon	= this._loadTextures( config.baseUrl + "skins/", weaponsTextures );
 
 	// BODY
 	var loader	= new THREE.JSONLoader();
 
 	loader.load( config.baseUrl + config.body, function( geometry ) {
 		geometry.computeBoundingBox();
-		_this._root.position.y	= - _this._scale * geometry.boundingBox.min.y;
+console.log('boundingBox', geometry.boundingBox)
+console.log('boundingBox h', geometry.boundingBox.max.y - geometry.boundingBox.min.y)
 
-		var mesh	= createPart( geometry, _this._skinsBody[ 0 ] );
-		mesh.scale.set( _this._scale, _this._scale, _this._scale );
+		var mesh	= createPart( geometry, this.texturesBody[ 0 ] );
+		mesh.scale.set( this.scale, this.scale, this.scale );
+		mesh.position.y	= 0.5
 
-		_this._root.add( mesh );
+		this.object3d.add( mesh );
 
-		_this._meshBody		= mesh;
-		_this._curAnimation	= geometry.firstAnimation;
+		this.meshBody		= mesh;
+		this._curAnimation	= geometry.firstAnimation;
 
-		_this._checkLoadingComplete();
-	} );
+		this._checkLoadingComplete();
+	}.bind(this));
 
 	// WEAPONS
 	var generateCallback = function( index, name ){
 		return function( geometry ) {
-			var mesh	= createPart( geometry, _this._skinsWeapon[ index ] );
-			mesh.scale.set( _this._scale, _this._scale, _this._scale );
+			var mesh	= createPart( geometry, this.texturesWeapon[ index ] );
+			mesh.scale.set( this.scale, this.scale, this.scale );
 			mesh.visible	= false;
+			mesh.position.y	= 0.5
 
 			mesh.name	= name;
 
-			_this._root.add( mesh );
+			this.object3d.add( mesh );
 
-			_this._weapons[ index ] = mesh;
-			_this._meshWeapon = mesh;
+			this._weapons[ index ] = mesh;
+			this.meshWeapon = mesh;
 
-			_this._checkLoadingComplete();
+			this._checkLoadingComplete();
 		}.bind(this);
 	}.bind(this);
 
@@ -314,7 +325,7 @@ THREEx.MD2Character.prototype.load		= function ( config )
 
 		mesh.parseAnimations();
 
-		mesh.playAnimation( geometry.firstAnimation, _this.animationFPS );
+		mesh.playAnimation( geometry.firstAnimation, this.animationFPS );
 		mesh.baseDuration	= mesh.duration;
 
 		return mesh;
@@ -324,9 +335,9 @@ THREEx.MD2Character.prototype.load		= function ( config )
 
 THREEx.MD2Character.prototype._checkLoadingComplete	= function()
 {
-	this._nLoadInProgress--;
-	if( this._nLoadInProgress === 0 ){
-		// this.trigger('loaded');
+	this.nLoadInProgress--;
+	if( this.nLoadInProgress === 0 ){
+		this.dispatchEvent('loaded');
 	}
 }
 

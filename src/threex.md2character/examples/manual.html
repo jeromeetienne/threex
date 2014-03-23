@@ -13,6 +13,7 @@
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
 	camera.position.z = 3;
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		set 3 point lighting						//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +35,6 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-	
 
 	var character	= new THREEx.MD2Character()
 	// load the data
@@ -57,48 +57,35 @@
 			[ "w_sshotgun.js"	, "w_sshotgun.png" ],
 		]
 	});
-	character.object3d.position.y	= -2
+	// character.object3d.position.y	= -10
 	scene.add(character.object3d)
+	character.addEventListener('loaded', function(){
+		character.setSkin(1)
+		character.setWeapon(1)
+		character.animation('run')
+	})
 	onRenderFcts.push(function(delta){
 		character.update(delta)
 	})
 	
-// */
-// THREEx.MD2Character.prototype.setSkin	= function( index )
-// {
-// 	if ( this._meshBody && this._meshBody.material.wireframe === false ) {
-// 		console.assert( index < this._skinsBody.length );
-		
 	window.character	= character;
 	
 	// character.setSkin(1)
 	// character.setWeapon()		
-	//////////////////////////////////////////////////////////////////////////////////
-	//		add an object and make it move					//
-	//////////////////////////////////////////////////////////////////////////////////	
-	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
-	var material	= new THREE.MeshNormalMaterial();
-	var mesh	= new THREE.Mesh( geometry, material );
-	// scene.add( mesh );
-	
-	onRenderFcts.push(function(delta, now){
-		// mesh.rotation.x += 1 * delta;
-		// mesh.rotation.y += 2 * delta;		
-	})
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
-	var mouse	= {x : 0, y : 0}
-	document.addEventListener('mousemove', function(event){
-		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
-		mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	}, false)
-	onRenderFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
-		camera.lookAt( scene.position )
-	})
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// onRenderFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
 
 
 	//////////////////////////////////////////////////////////////////////////////////
