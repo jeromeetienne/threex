@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../threex.magnetcontrols.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 10;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		set 3 point lighting						//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	;(function(){
+		// add a ambient light
+		var light	= new THREE.AmbientLight( 0x020202 )
+		scene.add( light )
+		// add a light in front
+		var light	= new THREE.DirectionalLight('white', 1)
+		light.position.set(0.5, 0.5, 2)
+		scene.add( light )
+		// add a light behind
+		var light	= new THREE.DirectionalLight('white', 0.75)
+		light.position.set(-0.5, -0.5, -2)
+		scene.add( light )		
+	})()
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		handle window resize						//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	// handle resize events
+	window.addEventListener( 'resize', function() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+	}, false);
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.CubeGeometry(1,1,1);
+	var geometry	= new THREE.SphereGeometry(0.5);
+	var material	= new THREE.MeshNormalMaterial();
+	var baseObject3d= new THREE.Mesh( geometry, material );
+
+	var bodiesControls	= []
+	var nBodies		= 20
+	for(var i = 0; i < nBodies; i++){
+		;(function(){
+			// create the body
+			var object3d	= baseObject3d.clone()
+			object3d.material	= new THREE.MeshPhongMaterial({
+				color	: 'cyan'
+			});
+			scene.add( object3d );
+			// set body position		
+			object3d.position.x	= (Math.random()-0.5)*4
+			object3d.position.y	= (Math.random()-0.5)*4
+			
+			// init controls for body
+			var controls	= new THREEx.MagnetControls(object3d)
+			// centralize all controls in bodiesControls
+			bodiesControls.push(controls)
+			
+			object3d.userData.controls	= controls
+		})()
+	}
+
+	onRenderFcts.push(function(delta){
+		bodiesControls.forEach(function(controls, idx){
+			controls.computeForces(delta, bodiesControls, idx+1)
+		})
+
+		bodiesControls.forEach(function(controls){
+			controls.applyForces(delta)
+		})
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var mouse	= new THREE.Vector3()
+	document.body.addEventListener('mousemove', function( event ){
+		event.preventDefault();
+
+		mouse.x =   ( event.clientX / window.innerWidth ) * 2 - 1;
+		mouse.y = - ( event.clientY / window.innerHeight) * 2 + 1;
+	})			
+	
+	var interacting	= false
+	var pickedObject= null
+	
+	function interactingStart(object3d){
+		console.assert(interacting === false)
+
+		interacting	= true
+		pickedObject	= object3d
+	}
+	function interactingStop(){
+		console.assert(interacting === true)
+		interacting	= false
+		pickedObject	= null		
+	}
+	onRenderFcts.push(function(delta, now){
+		if( !interacting )	return
+		var object3d	= pickedObject
+		var position	= object3d.position
+		var controls	= object3d.userData.controls
+
+		var projector	= this.projector || new THREE.Projector();
+		var screenPos	= projector.projectVector(position.clone(), camera );
+		screenPos.z	= 0
+		
+		// compute the force
+		var force	= mouse.clone().sub(screenPos)
+				.multiplyScalar(0.5)
+		// add it in acceleration
+		controls.acceleration.add(force)
+	})
+	
+
+	var projector	= new THREE.Projector()
+	var raycaster	= new THREE.Raycaster()
+	var intersected	= null
+	document.addEventListener('mouseup', function(){
+		if( interacting	)	interactingStop()
+		if( intersected ){
+			intersected.material.color.setHex( intersected.currentHex );
+		}
+
+		intersected = null;
+	}, false)
+
+	document.addEventListener('mousedown', function(){
+		// TODO strange conflict with the camera controls. not sure what
+	
+		var vector	= new THREE.Vector3(mouse.x, mouse.y, 1);
+		projector.unprojectVector( vector, camera );
+		raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
+
+		var intersects = raycaster.intersectObjects( scene.children );
+
+		if ( intersects.length > 0 ) {
+			if ( intersected != intersects[ 0 ].object ) {
+				
+				if( !interacting )	interactingStart(intersects[ 0 ].object)
+				
+				if ( intersected ){
+					intersected.material.color.setHex( intersected.currentHex );				
+				}
+
+				intersected = intersects[ 0 ].object;
+				intersected.currentHex = intersected.material.color.getHex();
+				intersected.material.color.setHex( 0xff0000 );
+			}
+		}
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// onRenderFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
