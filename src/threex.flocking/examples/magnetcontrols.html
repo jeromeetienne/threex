@@ -9,7 +9,7 @@
 	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 10;
+	camera.position.z = 25;
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		set 3 point lighting						//
@@ -50,7 +50,7 @@
 	var baseObject3d= new THREE.Mesh( geometry, material );
 
 	var bodiesControls	= []
-	var nBodies		= 20
+	var nBodies		= 200
 	for(var i = 0; i < nBodies; i++){
 		;(function(){
 			// create the body
@@ -72,18 +72,18 @@
 		})()
 	}
 
-	onRenderFcts.push(function(delta){
-		bodiesControls.forEach(function(controls, idx){
-			controls.computeForces(delta, bodiesControls, idx+1)
+	setInterval(function(){
+		bodiesControls.forEach(function(controls, controlsIdx){
+			controls.computeForces(bodiesControls, controlsIdx)
 		})
 
 		bodiesControls.forEach(function(controls){
-			controls.applyForces(delta)
-		})
-	})
+			controls.applyForces()
+		})		
+	}, 1000/60)
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
+	//		keep mouse coordinates						//
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var mouse	= new THREE.Vector3()
@@ -92,75 +92,97 @@
 
 		mouse.x =   ( event.clientX / window.innerWidth ) * 2 - 1;
 		mouse.y = - ( event.clientY / window.innerHeight) * 2 + 1;
-	})			
+	})
 	
-	var interacting	= false
-	var pickedObject= null
+	//////////////////////////////////////////////////////////////////////////////////
+	//		handle the drag force						//
+	//////////////////////////////////////////////////////////////////////////////////
 	
-	function interactingStart(object3d){
-		console.assert(interacting === false)
+	var draggingState	= false
+	var draggedObject	= null
+	
+	function draggingStart(object3d){
+		console.assert(draggingState === false)
 
-		interacting	= true
-		pickedObject	= object3d
+		draggingState	= true
+		draggedObject	= object3d
 	}
-	function interactingStop(){
-		console.assert(interacting === true)
-		interacting	= false
-		pickedObject	= null		
+	function draggingStop(){
+		console.assert(draggingState === true)
+		draggingState	= false
+		draggedObject	= null		
 	}
+	
 	onRenderFcts.push(function(delta, now){
-		if( !interacting )	return
-		var object3d	= pickedObject
+		// if not draggingState, do nothing
+		if( !draggingState )	return
+		// set some variables
+		var object3d	= draggedObject
 		var position	= object3d.position
 		var controls	= object3d.userData.controls
-
-		var projector	= this.projector || new THREE.Projector();
+		// compute screen position
 		var screenPos	= projector.projectVector(position.clone(), camera );
 		screenPos.z	= 0
 		
-		// compute the force
-		var force	= mouse.clone().sub(screenPos)
-				.multiplyScalar(0.5)
+		// compute the force based on mouse screen position, and the object screen position
+		// - thus the strength of the force 
+		var force	= mouse.clone().sub(screenPos).multiplyScalar(0.5)
 		// add it in acceleration
 		controls.acceleration.add(force)
+		// add it to the position directly
+		// controls.object3d.position.add(force)
 	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		object selector							//
+	//////////////////////////////////////////////////////////////////////////////////
 	
 
 	var projector	= new THREE.Projector()
 	var raycaster	= new THREE.Raycaster()
 	var intersected	= null
 	document.addEventListener('mouseup', function(){
-		if( interacting	)	interactingStop()
+		// if draggingState, and mouseup, stop dragging
+		if( draggingState	)	draggingStop()
+		// reset the color of the intersected
 		if( intersected ){
-			intersected.material.color.setHex( intersected.currentHex );
+			intersected.material.color.setHex( intersected.backupColor );
+			intersected = null;
 		}
-
-		intersected = null;
 	}, false)
 
 	document.addEventListener('mousedown', function(){
-		// TODO strange conflict with the camera controls. not sure what
+		// TODO strange conflict with the camera controls. not sure why
+		// - maybe moving the camera make it fails ?
+		// - to experience more
 	
+		// setup projector and raycaster
 		var vector	= new THREE.Vector3(mouse.x, mouse.y, 1);
 		projector.unprojectVector( vector, camera );
 		raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 
-		var intersects = raycaster.intersectObjects( scene.children );
+		// compute intersection with all scene.children
+		var intersects	= raycaster.intersectObjects( scene.children );
 
-		if ( intersects.length > 0 ) {
-			if ( intersected != intersects[ 0 ].object ) {
-				
-				if( !interacting )	interactingStart(intersects[ 0 ].object)
-				
-				if ( intersected ){
-					intersected.material.color.setHex( intersected.currentHex );				
-				}
+		// if there is no intersection, return now
+		if( intersects.length === 0 )			return
+		// if the intersection is on the same object, return now
+		if( intersected === intersects[ 0 ].object )	return
 
-				intersected = intersects[ 0 ].object;
-				intersected.currentHex = intersected.material.color.getHex();
-				intersected.material.color.setHex( 0xff0000 );
-			}
+		// if not yet draggin, do it now				
+		if( !draggingState ){
+			draggingStart(intersects[ 0 ].object)				
 		}
+		// 
+		if( intersected ){
+			intersected.material.color.setHex( intersected.backupColor );		
+		}
+		// set intersected
+		intersected = intersects[ 0 ].object;
+		// backup current color
+		intersected.backupColor = intersected.material.color.getHex();
+		// change the color to mark it as intersected
+		intersected.material.color.setHex( 0xff0000 );
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////

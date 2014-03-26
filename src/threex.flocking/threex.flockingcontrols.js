@@ -1,18 +1,21 @@
 var THREEx	= THREEx	|| {}
 
-THREEx.MagnetControls	= function(object3d){
+THREEx.FlockingControls	= function(object3d){
 	// export object3d
 	this.object3d	= object3d
 	
-	this.id		= THREEx.MagnetControls.nextId++
-
 	// physics constant
 	var velocity	= new THREE.Vector3()
 	this.velocity	= velocity
 	var acceleration= new THREE.Vector3()
 	this.acceleration=acceleration
-	var damping	= new THREE.Vector3().set(1,1,1).multiplyScalar(0.9)
+	var damping	= new THREE.Vector3(1,1,1)
 	this.damping	= damping
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
 	this.applyForces	= function(){
 		// handle physics
 		velocity.multiply(damping)
@@ -23,50 +26,115 @@ THREEx.MagnetControls	= function(object3d){
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		force 								//
+	//		computeForces functions stack					//
 	//////////////////////////////////////////////////////////////////////////////////
 
-/**
-* * queue bunch of funciton for physics
-* * onComputeForces = []
-* * this.computeForces run all of them
-*/
+	var onComputeForces	= []
 	this.computeForces	= function(others, controlsIdx){
-		for(var i = controlsIdx+1; i < others.length; i++){
-			var other	= others[i]
-			computeInteraction(this, others[i])
-		}
-
-		function computeInteraction(controls1, controls2){
-			var object3d1	= controls1.object3d
-			var object3d2	= controls2.object3d
-
-			var distance	= object3d1.position.distanceTo(object3d2.position)
-			var maxDistance	= 2
-			if( distance > maxDistance )	return
-			// compute force intensity
-			var proximity	= distance/maxDistance
-			// console.assert(proximity>= 0 && proximity <= 1)
-			var easing	= THREEx.MagnetControls.Easing
-			var intensity	= easing.Cubic.In(1-proximity)*0.1
-			// compute force vector
-			var force	= object3d1.position.clone()
-						.sub(object3d2.position)
-						.multiplyScalar(intensity)
-			// apply the force to acceleration
-			controls1.acceleration.add(force)
-			
-			controls2.acceleration.sub(force)
-		}
+		onComputeForces.forEach(function(fn){
+			fn(others, controlsIdx)
+		})
 	}
-	
-}
 
-THREEx.MagnetControls.nextId	= 0
+	//////////////////////////////////////////////////////////////////////////////////
+	//		constant							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var neighbourRadius	= 3
+	var maxSteerForce	= 0.001;
+	var desiredSeparation	= 0.3
+	var separationFactor	= 0.005
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		alignement							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	onComputeForces.push(function(others, controlsIdx){
+// return
+		var velSum	= new THREE.Vector3()
+		var count	= 0;
+
+		for(var i = 0; i < others.length; i++){
+			// if ( Math.random() > 0.6 ) continue;
+
+			var other	= others[i];
+			var distance	= other.object3d.position.distanceTo( object3d.position );
+
+			if( distance > 0 && distance <= neighbourRadius ){
+				velSum.add( other.velocity );
+				count++;
+			}
+		}
+		// compute the average
+		velSum.divideScalar( count !== 0 ? count : 1);
+
+		if( velSum.length() > maxSteerForce )	velSum.setLength(maxSteerForce)
+
+		// apply the force to acceleration
+		this.acceleration.add(velSum)
+	}.bind(this))
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		cohesion							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	onComputeForces.push(function(others, controlsIdx){
+// return
+		var posSum	= new THREE.Vector3();
+		var count	= 0;
+
+		for(var i = 0; i < others.length; i++){
+			// if( Math.random() > 0.6 ) continue;
+
+			var other	= others[i];
+			var distance	= other.object3d.position.distanceTo( object3d.position );
+
+			if( distance > 0 && distance <= neighbourRadius ){
+				posSum.add( other.object3d.position );
+				count++;
+			}
+		}
+		// compute the average
+		posSum.divideScalar( count !== 0 ? count : 1);
+
+		var force	= posSum.clone().sub(this.object3d.position);
+		if( force.length() > maxSteerForce )	force.setLength(maxSteerForce)
+
+		// apply the force to acceleration
+		this.acceleration.add(force)
+	}.bind(this))
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		separation							//
+	//////////////////////////////////////////////////////////////////////////////////
+	onComputeForces.push(function(others, controlsIdx){
+		var posSum	= new THREE.Vector3();
+		var count	= 0;
+		var repulse	= new THREE.Vector3();
+// return
+		for(var i = 0; i < others.length; i++ ){
+			// if( Math.random() > 0.6 )	continue;
+			var other	= others[i];
+			var distance	= other.object3d.position.distanceTo( object3d.position );
+
+			if( distance > 0 && distance <= desiredSeparation ){
+				repulse.subVectors( object3d.position, other.object3d.position );
+				repulse.normalize();
+				repulse.divideScalar( distance );
+				posSum.add( repulse );
+				count++;
+			}
+		}
+		// compute the average
+		posSum.divideScalar( count !== 0 ? count : 1);
+		posSum.multiplyScalar(separationFactor)
+		// apply the force to acceleration
+		this.acceleration.add(posSum)
+	}.bind(this))
+}
 
 
 // directly from tween.js
-THREEx.MagnetControls.Easing = {
+THREEx.FlockingControls.Easing = {
 
 	Linear: {
 
