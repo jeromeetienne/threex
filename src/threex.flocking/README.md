@@ -1,6 +1,13 @@
 threex.flocking
 ===============
 
+## TODO
+
+* put a weight for each force cohesion/alignement/separation
+* when estimating neighboors, do a weighted average using a tween function
+* make debug info
+
+## Notes
 * boid are based from bird demo by mrdoob
   * [demo](http://threejs.org/examples/canvas_geometry_birds.html)
 
@@ -11,6 +18,7 @@ threex.flocking
 
 * good tutorial on flocking
   * http://harry.me/blog/2011/02/17/neat-algorithms-flocking/
+
 
 
 ===

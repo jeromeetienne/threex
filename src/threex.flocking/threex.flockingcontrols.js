@@ -1,12 +1,14 @@
 var THREEx	= THREEx	|| {}
 
-THREEx.FlockingControls	= function(object3d){
+THREEx.FlockingControls	= function(object3d, debug){
 	// export object3d
 	this.object3d	= object3d
+	
 	
 	// physics constant
 	var velocity	= new THREE.Vector3()
 	this.velocity	= velocity
+	this.maxSpeed	= 1
 	var acceleration= new THREE.Vector3()
 	this.acceleration=acceleration
 	var damping	= new THREE.Vector3(1,1,1)
@@ -20,9 +22,16 @@ THREEx.FlockingControls	= function(object3d){
 		// handle physics
 		velocity.multiply(damping)
 		velocity.add(acceleration)
-		acceleration.set(0,0,0)
+		// honor maxSpeed
+		if( velocity.length() > this.maxSpeed ){
+			velocity.setLength(this.maxSpeed)
+		}
 		// update object3d position
 		object3d.position.add(velocity)
+		// update debug
+		if( debug )	updateDebug()
+		// reset acceleration
+		acceleration.set(0,0,0)
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -39,68 +48,80 @@ THREEx.FlockingControls	= function(object3d){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		constant							//
 	//////////////////////////////////////////////////////////////////////////////////
-	var neighbourRadius	= 3
-	var maxSteerForce	= 0.001;
-	var desiredSeparation	= 0.3
-	var separationFactor	= 0.005
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		alignement							//
-	//////////////////////////////////////////////////////////////////////////////////
-	
-	onComputeForces.push(function(others, controlsIdx){
-// return
-		var velSum	= new THREE.Vector3()
-		var count	= 0;
+	var neighbourRadius	= 2
+	var separationRadius	= 0.5
 
-		for(var i = 0; i < others.length; i++){
-			// if ( Math.random() > 0.6 ) continue;
+	var maxAlignementForce	= 0.005
 
-			var other	= others[i];
-			var distance	= other.object3d.position.distanceTo( object3d.position );
+	var maxCohesionForce	= 0.001
 
-			if( distance > 0 && distance <= neighbourRadius ){
-				velSum.add( other.velocity );
-				count++;
-			}
-		}
-		// compute the average
-		velSum.divideScalar( count !== 0 ? count : 1);
+	var maxSeparationForce	= 0.01
 
-		if( velSum.length() > maxSteerForce )	velSum.setLength(maxSteerForce)
-
-		// apply the force to acceleration
-		this.acceleration.add(velSum)
-	}.bind(this))
+	damping.set(1,1,1).multiplyScalar(0.95)
+	this.maxSpeed	= 0.05
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		cohesion							//
 	//////////////////////////////////////////////////////////////////////////////////
 	
 	onComputeForces.push(function(others, controlsIdx){
-// return
-		var posSum	= new THREE.Vector3();
+		var positionSum	= new THREE.Vector3();
 		var count	= 0;
 
 		for(var i = 0; i < others.length; i++){
-			// if( Math.random() > 0.6 ) continue;
+			// dont interact with myself
+			if( others[i] === this )	continue;
 
 			var other	= others[i];
 			var distance	= other.object3d.position.distanceTo( object3d.position );
 
 			if( distance > 0 && distance <= neighbourRadius ){
-				posSum.add( other.object3d.position );
+				positionSum.add( other.object3d.position );
 				count++;
 			}
 		}
 		// compute the average
-		posSum.divideScalar( count !== 0 ? count : 1);
+		positionSum.divideScalar( count !== 0 ? count : 1);
 
-		var force	= posSum.clone().sub(this.object3d.position);
-		if( force.length() > maxSteerForce )	force.setLength(maxSteerForce)
+		var cohesionForce	= positionSum.clone().sub(this.object3d.position);
+		if( cohesionForce.length() > maxCohesionForce ){
+			cohesionForce.setLength(maxCohesionForce)			
+		}
+		cohesionForce.multiplyScalar(maxCohesionForce)			
 
+		// apply the cohesionForce to acceleration
+		this.acceleration.add(cohesionForce)
+	}.bind(this))
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		alignement							//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	onComputeForces.push(function(others, controlsIdx){
+		var velocitySum	= new THREE.Vector3()
+		var count	= 0;
+
+		for(var i = 0; i < others.length; i++){
+			// dont interact with myself
+			if( others[i] === this )	continue;
+
+			var other	= others[i];
+			var distance	= other.object3d.position.distanceTo( object3d.position );
+
+			if( distance > 0 && distance <= neighbourRadius ){
+				velocitySum.add( other.velocity );
+				count++;
+			}
+		}
+		// compute the average
+		velocitySum.divideScalar( count !== 0 ? count : 1);
+
+		if( velocitySum.length() > maxAlignementForce ){
+			velocitySum.setLength(maxAlignementForce)
+		}
+		
 		// apply the force to acceleration
-		this.acceleration.add(force)
+		this.acceleration.add(velocitySum)
 	}.bind(this))
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -110,13 +131,16 @@ THREEx.FlockingControls	= function(object3d){
 		var posSum	= new THREE.Vector3();
 		var count	= 0;
 		var repulse	= new THREE.Vector3();
-// return
+
 		for(var i = 0; i < others.length; i++ ){
-			// if( Math.random() > 0.6 )	continue;
+			// dont interact with myself
+			if( others[i] === this )	continue;
+
+			// set some variables
 			var other	= others[i];
 			var distance	= other.object3d.position.distanceTo( object3d.position );
 
-			if( distance > 0 && distance <= desiredSeparation ){
+			if( distance > 0 && distance <= separationRadius ){
 				repulse.subVectors( object3d.position, other.object3d.position );
 				repulse.normalize();
 				repulse.divideScalar( distance );
@@ -126,289 +150,67 @@ THREEx.FlockingControls	= function(object3d){
 		}
 		// compute the average
 		posSum.divideScalar( count !== 0 ? count : 1);
-		posSum.multiplyScalar(separationFactor)
+		posSum.multiplyScalar(1.2)
+		if( posSum.length() > maxSeparationForce ){
+			posSum.setLength(maxSeparationForce)			
+		}
 		// apply the force to acceleration
 		this.acceleration.add(posSum)
 	}.bind(this))
-}
 
 
-// directly from tween.js
-THREEx.FlockingControls.Easing = {
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	if( debug ){
+		this.debugObject3d	= new THREE.Object3D()
+		this.debugObject3d.position.z	= 0.2
 
-	Linear: {
+		// velocity arrow
+		var velocityArrow	= new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3, 1, 'blue')
+		// this.debugObject3d.add(velocityArrow)
+		
+		// acceleration arrow
+		var accelerationArrow	= new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3, 1, 'green')
+		// this.debugObject3d.add(accelerationArrow)
+		
+		// separationSphere		
+		var geometry	= new THREE.SphereGeometry(separationRadius)
+		var material	= new THREE.MeshBasicMaterial({
+			color		: 'green',
+			wireframe	: true,
+			side		: THREE.BackSide,
+		})
+		var separationSphere	= new THREE.Mesh(geometry, material)
+		this.debugObject3d.add(separationSphere)
 
-		None: function ( k ) {
+		// neighboorSphere
+		var geometry	= new THREE.SphereGeometry(neighbourRadius)
+		var material	= new THREE.MeshBasicMaterial({
+			color		: 'red',
+			// wireframe	: true,
+			side		: THREE.BackSide,
+		})
+		var neighboorSphere	= new THREE.Mesh(geometry, material)
+		this.debugObject3d.add(neighboorSphere)
+		
+		function updateDebug(){
+			// velocity
+			velocityArrow.position.copy(object3d.position)
+			// velocityArrow.setDirection(velocity.clone().multiplyScalar(300))
+			velocityArrow.lookAt(object3d.position.clone().add(velocity.clone().multiplyScalar(300)))
+			// velocityArrow.lookAt(object3d.position.clone().add(new THREE.Vector3(1,0,0)))
+			velocityArrow.setLength(1)
+			// velocityArrow.setLength(velocity.length()*20)
+			
+			// accelerationArrow.position.copy(object3d.position)
+			// accelerationArrow.setDirection(acceleration.clone().multiplyScalar(3000))
+			// accelerationArrow.setLength(acceleration.length()*100)
 
-			return k;
+			neighboorSphere.position.copy(object3d.position)
 
+			separationSphere.position.copy(object3d.position)
 		}
-
-	},
-
-	Quadratic: {
-
-		In: function ( k ) {
-
-			return k * k;
-
-		},
-
-		Out: function ( k ) {
-
-			return k * ( 2 - k );
-
-		},
-
-		InOut: function ( k ) {
-
-			if ( ( k *= 2 ) < 1 ) return 0.5 * k * k;
-			return - 0.5 * ( --k * ( k - 2 ) - 1 );
-
-		}
-
-	},
-
-	Cubic: {
-
-		In: function ( k ) {
-
-			return k * k * k;
-
-		},
-
-		Out: function ( k ) {
-
-			return --k * k * k + 1;
-
-		},
-
-		InOut: function ( k ) {
-
-			if ( ( k *= 2 ) < 1 ) return 0.5 * k * k * k;
-			return 0.5 * ( ( k -= 2 ) * k * k + 2 );
-
-		}
-
-	},
-
-	Quartic: {
-
-		In: function ( k ) {
-
-			return k * k * k * k;
-
-		},
-
-		Out: function ( k ) {
-
-			return 1 - ( --k * k * k * k );
-
-		},
-
-		InOut: function ( k ) {
-
-			if ( ( k *= 2 ) < 1) return 0.5 * k * k * k * k;
-			return - 0.5 * ( ( k -= 2 ) * k * k * k - 2 );
-
-		}
-
-	},
-
-	Quintic: {
-
-		In: function ( k ) {
-
-			return k * k * k * k * k;
-
-		},
-
-		Out: function ( k ) {
-
-			return --k * k * k * k * k + 1;
-
-		},
-
-		InOut: function ( k ) {
-
-			if ( ( k *= 2 ) < 1 ) return 0.5 * k * k * k * k * k;
-			return 0.5 * ( ( k -= 2 ) * k * k * k * k + 2 );
-
-		}
-
-	},
-
-	Sinusoidal: {
-
-		In: function ( k ) {
-
-			return 1 - Math.cos( k * Math.PI / 2 );
-
-		},
-
-		Out: function ( k ) {
-
-			return Math.sin( k * Math.PI / 2 );
-
-		},
-
-		InOut: function ( k ) {
-
-			return 0.5 * ( 1 - Math.cos( Math.PI * k ) );
-
-		}
-
-	},
-
-	Exponential: {
-
-		In: function ( k ) {
-
-			return k === 0 ? 0 : Math.pow( 1024, k - 1 );
-
-		},
-
-		Out: function ( k ) {
-
-			return k === 1 ? 1 : 1 - Math.pow( 2, - 10 * k );
-
-		},
-
-		InOut: function ( k ) {
-
-			if ( k === 0 ) return 0;
-			if ( k === 1 ) return 1;
-			if ( ( k *= 2 ) < 1 ) return 0.5 * Math.pow( 1024, k - 1 );
-			return 0.5 * ( - Math.pow( 2, - 10 * ( k - 1 ) ) + 2 );
-
-		}
-
-	},
-
-	Circular: {
-
-		In: function ( k ) {
-
-			return 1 - Math.sqrt( 1 - k * k );
-
-		},
-
-		Out: function ( k ) {
-
-			return Math.sqrt( 1 - ( --k * k ) );
-
-		},
-
-		InOut: function ( k ) {
-
-			if ( ( k *= 2 ) < 1) return - 0.5 * ( Math.sqrt( 1 - k * k) - 1);
-			return 0.5 * ( Math.sqrt( 1 - ( k -= 2) * k) + 1);
-
-		}
-
-	},
-
-	Elastic: {
-
-		In: function ( k ) {
-
-			var s, a = 0.1, p = 0.4;
-			if ( k === 0 ) return 0;
-			if ( k === 1 ) return 1;
-			if ( !a || a < 1 ) { a = 1; s = p / 4; }
-			else s = p * Math.asin( 1 / a ) / ( 2 * Math.PI );
-			return - ( a * Math.pow( 2, 10 * ( k -= 1 ) ) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) );
-
-		},
-
-		Out: function ( k ) {
-
-			var s, a = 0.1, p = 0.4;
-			if ( k === 0 ) return 0;
-			if ( k === 1 ) return 1;
-			if ( !a || a < 1 ) { a = 1; s = p / 4; }
-			else s = p * Math.asin( 1 / a ) / ( 2 * Math.PI );
-			return ( a * Math.pow( 2, - 10 * k) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) + 1 );
-
-		},
-
-		InOut: function ( k ) {
-
-			var s, a = 0.1, p = 0.4;
-			if ( k === 0 ) return 0;
-			if ( k === 1 ) return 1;
-			if ( !a || a < 1 ) { a = 1; s = p / 4; }
-			else s = p * Math.asin( 1 / a ) / ( 2 * Math.PI );
-			if ( ( k *= 2 ) < 1 ) return - 0.5 * ( a * Math.pow( 2, 10 * ( k -= 1 ) ) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) );
-			return a * Math.pow( 2, -10 * ( k -= 1 ) ) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) * 0.5 + 1;
-
-		}
-
-	},
-
-	Back: {
-
-		In: function ( k ) {
-
-			var s = 1.70158;
-			return k * k * ( ( s + 1 ) * k - s );
-
-		},
-
-		Out: function ( k ) {
-
-			var s = 1.70158;
-			return --k * k * ( ( s + 1 ) * k + s ) + 1;
-
-		},
-
-		InOut: function ( k ) {
-
-			var s = 1.70158 * 1.525;
-			if ( ( k *= 2 ) < 1 ) return 0.5 * ( k * k * ( ( s + 1 ) * k - s ) );
-			return 0.5 * ( ( k -= 2 ) * k * ( ( s + 1 ) * k + s ) + 2 );
-
-		}
-
-	},
-
-	Bounce: {
-
-		In: function ( k ) {
-
-			return 1 - TWEEN.Easing.Bounce.Out( 1 - k );
-
-		},
-
-		Out: function ( k ) {
-
-			if ( k < ( 1 / 2.75 ) ) {
-
-				return 7.5625 * k * k;
-
-			} else if ( k < ( 2 / 2.75 ) ) {
-
-				return 7.5625 * ( k -= ( 1.5 / 2.75 ) ) * k + 0.75;
-
-			} else if ( k < ( 2.5 / 2.75 ) ) {
-
-				return 7.5625 * ( k -= ( 2.25 / 2.75 ) ) * k + 0.9375;
-
-			} else {
-
-				return 7.5625 * ( k -= ( 2.625 / 2.75 ) ) * k + 0.984375;
-
-			}
-
-		},
-
-		InOut: function ( k ) {
-
-			if ( k < 0.5 ) return TWEEN.Easing.Bounce.In( k * 2 ) * 0.5;
-			return TWEEN.Easing.Bounce.Out( k * 2 - 1 ) * 0.5 + 0.5;
-
-		}
-
 	}
-
-};
+}

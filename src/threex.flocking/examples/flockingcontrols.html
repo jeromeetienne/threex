@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../../../vendor/three.js/build/three.js'></script>
 <script src='../threex.flockingcontrols.js'></script>
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer();
@@ -44,19 +44,24 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
+
 	var geometry	= new THREE.CubeGeometry(1,1,1);
 	var geometry	= new THREE.SphereGeometry(0.1);
+	var geometry	= new THREE.CylinderGeometry(0, 0.2, 0.5)
+	var geometry	= new THREE.CylinderGeometry(0, 0.2, 0.5)
+	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI/2 ) );
+	// geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0,0, -0.5 ) );
 	var material	= new THREE.MeshNormalMaterial();
 	var baseObject3d= new THREE.Mesh( geometry, material );
 
 	var bodiesControls	= []
-	var nBodies		= 200
+	var nBodies		= 100
 	for(var i = 0; i < nBodies; i++){
 		;(function(){
 			// create the body
 			var object3d	= baseObject3d.clone()
 			object3d.material	= new THREE.MeshPhongMaterial({
-				color	: 'cyan'
+				color	: 'cyan',
 			});
 			scene.add( object3d );
 			// set body position		
@@ -64,15 +69,20 @@
 			object3d.position.y	= (Math.random()-0.5)*10
 			
 			// init controls for body
-			var controls	= new THREEx.FlockingControls(object3d)
-			controls.damping.set(1,1,1).multiplyScalar(0.95)
+			var controls	= new THREEx.FlockingControls(object3d, false)
+			scene.add( controls.debugObject3d )
 			// centralize all controls in bodiesControls
 			bodiesControls.push(controls)
 
-			controls.velocity.x	= (Math.random()-0.5)*1
-			controls.velocity.y	= (Math.random()-0.5)*1
+			// init initial velocity
+			controls.velocity.x	= (Math.random()-0.5)*2
+			controls.velocity.y	= (Math.random()-0.5)*2
 			controls.velocity.z	= (Math.random()-0.5)*0
 
+			// make object3d look at the velocity
+			onRenderFcts.push(function(){
+				object3d.lookAt(object3d.position.clone().add(controls.velocity))
+			})
 			
 			object3d.userData.controls	= controls
 		})()
