@@ -55,20 +55,20 @@ THREEx.FlockingControls	= function(object3d, debug){
 	var neighbourRadius	= 1
 	var separationRadius	= 0.5
 	this.maxSpeed		= 0.1
-	damping.set(1,1,1).multiplyScalar(0.95)
+	// damping.set(1,1,1).multiplyScalar(0.95)
 
 	var opts	= {
 		cohesion	: {
 			maxLength	: 0.001,
-			weight		: 1/3,
+			weight		: 3,
 		},
 		alignement	: {
 			maxLength	: 0.005,
-			weight		: 1/3,
+			weight		: 1,
 		},
 		separation	: {
 			maxLength	: 0.01,
-			weight		: 1/3,
+			weight		: 1,
 		},
 	}
 
@@ -100,14 +100,17 @@ THREEx.FlockingControls	= function(object3d, debug){
 		positionSum.divideScalar(count);
 
 		var force	= positionSum.clone().sub(this.position);
-		// honor maximum bound		
+		// honor maximum length for this force		
 		if( force.length() > opts.cohesion.maxLength ){
 			force.setLength(opts.cohesion.maxLength)			
 		}
+		// honor weight for this force
+		force.multiplyScalar(opts.cohesion.weight)
 
 		// apply the force to acceleration
 		this.acceleration.add(force)
 	}.bind(this))
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		alignement							//
@@ -140,10 +143,12 @@ THREEx.FlockingControls	= function(object3d, debug){
 		if( force.length() > opts.alignement.maxLength ){
 			force.setLength(opts.alignement.maxLength)
 		}
+		// honor weight for this force
+		force.multiplyScalar(opts.alignement.weight)
 		// apply the force to acceleration
 		this.acceleration.add(force)
 	}.bind(this))
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		separation							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +182,8 @@ THREEx.FlockingControls	= function(object3d, debug){
 		if( force.length() > opts.separation.maxLength ){
 			force.setLength(opts.separation.maxLength)			
 		}
+		// honor weight for this force
+		force.multiplyScalar(opts.separation.weight)
 		// apply the force to acceleration
 		this.acceleration.add(force)
 	}.bind(this))
