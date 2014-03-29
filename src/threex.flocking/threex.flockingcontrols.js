@@ -58,18 +58,12 @@ THREEx.FlockingControls	= function(object3d, debug){
 	// damping.set(1,1,1).multiplyScalar(0.95)
 
 	var opts	= {
-		cohesion	: {
-			maxLength	: 0.001,
-			weight		: 3,
-		},
-		alignement	: {
-			maxLength	: 0.005,
-			weight		: 1,
-		},
-		separation	: {
-			maxLength	: 0.01,
-			weight		: 1,
-		},
+		cohesionMaxLength	: 0.001,
+		cohesionWeight		: 3,
+		alignementMaxLength	: 0.005,
+		alignementWeight	: 1,
+		separationMaxLength	: 0.01,
+		separationWeight	: 1,
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -101,11 +95,11 @@ THREEx.FlockingControls	= function(object3d, debug){
 
 		var force	= positionSum.clone().sub(this.position);
 		// honor maximum length for this force		
-		if( force.length() > opts.cohesion.maxLength ){
-			force.setLength(opts.cohesion.maxLength)			
+		if( force.length() > opts.cohesionMaxLength ){
+			force.setLength(opts.cohesionMaxLength)			
 		}
 		// honor weight for this force
-		force.multiplyScalar(opts.cohesion.weight)
+		force.multiplyScalar(opts.cohesionWeight)
 
 		// apply the force to acceleration
 		this.acceleration.add(force)
@@ -140,11 +134,11 @@ THREEx.FlockingControls	= function(object3d, debug){
 		velocitySum.divideScalar( count );
 		var force	= velocitySum
 		// honor maximum bound
-		if( force.length() > opts.alignement.maxLength ){
-			force.setLength(opts.alignement.maxLength)
+		if( force.length() > opts.alignementMaxLength ){
+			force.setLength(opts.alignementMaxLength)
 		}
 		// honor weight for this force
-		force.multiplyScalar(opts.alignement.weight)
+		force.multiplyScalar(opts.alignementWeight)
 		// apply the force to acceleration
 		this.acceleration.add(force)
 	}.bind(this))
@@ -179,11 +173,11 @@ THREEx.FlockingControls	= function(object3d, debug){
 		positionSum.divideScalar( count );
 		var force	= positionSum
 		// honor maximum bound
-		if( force.length() > opts.separation.maxLength ){
-			force.setLength(opts.separation.maxLength)			
+		if( force.length() > opts.separationMaxLength ){
+			force.setLength(opts.separationMaxLength)			
 		}
 		// honor weight for this force
-		force.multiplyScalar(opts.separation.weight)
+		force.multiplyScalar(opts.separationWeight)
 		// apply the force to acceleration
 		this.acceleration.add(force)
 	}.bind(this))

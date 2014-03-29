@@ -121,7 +121,21 @@
 		separationMaxLength	: 0.01,
 		separationWeight	: 1,
 	}
-	datGui.add(options, 'cohesionMaxLength')
+	datGui.add(options, 'cohesionMaxLength')	.min(0.0).max(0.1)
+	datGui.add(options, 'cohesionWeight')		.min(0.0).max(4)
+	datGui.add(options, 'alignementMaxLength')	.min(0.0).max(0.1)
+	datGui.add(options, 'alignementWeight')		.min(0.0).max(4)
+	datGui.add(options, 'separationMaxLength')	.min(0.0).max(0.1)
+	datGui.add(options, 'separationWeight')		.min(0.0).max(4)
+	
+	datGui.onChange(function(value){
+		Object.keys(options).forEach(function(property){
+			var value	= options[property]
+			bodiesControls.forEach(function(controls){
+				controls.opts[property]	= value
+			})			
+		})
+	})
 })()
 	
 
