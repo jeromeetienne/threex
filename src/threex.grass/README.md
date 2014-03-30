@@ -1,3 +1,10 @@
+## TODO
+* reduce image scale DONE
+* make it in a threex.grass
+  * with list of points to get position
+  * return merged geometry
+* make a demo with minecraft walking in it, with daynight cycle and later swarm
+
 ## Reference
 * http://www.kevinboulanger.net/grass.html
 * http://http.developer.nvidia.com/GPUGems/gpugems_ch07.html
@@ -7,6 +14,8 @@
 ## Tech
 * some LOD
 * some normal tweaking
+
+
 
 ## talks with bai
 [07:20am] jetienne: bai: oh cool

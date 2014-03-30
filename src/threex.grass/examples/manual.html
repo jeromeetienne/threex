@@ -19,16 +19,16 @@
 
 	;(function(){
 		// add a ambient light
-		// var light	= new THREE.AmbientLight( 0x020202 )
-		// scene.add( light )
-		// // add a light in front
-		// var light	= new THREE.DirectionalLight('white', 1)
-		// light.position.set(0.5, 0.5, 2)
-		// scene.add( light )
-		// // add a light behind
-		// var light	= new THREE.DirectionalLight('white', 0.75)
-		// light.position.set(-0.5, -0.5, -2)
-		// scene.add( light )		
+		var light	= new THREE.AmbientLight( 0x020202 )
+		scene.add( light )
+		// add a light in front
+		var light	= new THREE.DirectionalLight('white', 1)
+		light.position.set(0.5, 0.5, 2)
+		scene.add( light )
+		// add a light behind
+		var light	= new THREE.DirectionalLight('white', 0.75)
+		light.position.set(-0.5, -0.5, -2)
+		scene.add( light )		
 	})()
 	
 	// add a light behind
@@ -88,12 +88,9 @@
 
 	var material	= new THREE.MeshPhongMaterial({
 		map		: THREE.ImageUtils.loadTexture('../images/grass01.png'),
-
 		color		: 'grey',
 		emissive	: 'darkgreen',
 		alphaTest	: 0.7,
-		// shading		: THREE.FlatShading,
-		// transparent	: true,
 	})
 window.material	= material
 	var mergedGeo	= new THREE.Geometry();
