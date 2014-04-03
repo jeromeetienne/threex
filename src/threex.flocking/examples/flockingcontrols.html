@@ -2,6 +2,7 @@
 <script src='../../../vendor/three.js/build/three.js'></script>
 <script src='../threex.flockingcontrols.js'></script>
 <!-- include for threex.glowdatgui -->
+<script src='../threex.flockingcontrolsdatgui.js'></script>
 <script src='../../../vendor/three.js/examples/js/libs/dat.gui.min.js'></script>
 
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
@@ -64,7 +65,7 @@
 
 	var bodiesControls	= []
 	var nBodies		= 400
-	// var nBodies		= 2
+	// var nBodies		= 3
 	for(var i = 0; i < nBodies; i++){
 		;(function(){
 			// create the body
@@ -80,7 +81,10 @@
 			object3d.position.z	= (Math.random()-0.5)*0
 			
 			// init controls for body
-			var controls	= new THREEx.FlockingControls(object3d, false)
+			if( i === 0 )	var controls	= new THREEx.FlockingControls(object3d, undefined, true)
+			else		var controls	= new THREEx.FlockingControls(object3d)
+			// make sure all controls are on the same ```.opts``` object, it helps dat.gui tunning 
+			if( i !== 0 )		controls.opts	= bodiesControls[0].opts
 			// attach debug if needed
 			if( controls.debug )	scene.add( controls.debugObject3d )
 			// centralize all controls in bodiesControls
@@ -102,41 +106,47 @@
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	//		comment								//
+	//		dat.gui tuning							//
 	//////////////////////////////////////////////////////////////////////////////////
 
-;(function(){
-	var datGui	= new dat.GUI({
-		autoPlace: false
-	})
-	document.body.appendChild(datGui.domElement)
-	datGui.domElement.style.position	= 'absolute'
-	datGui.domElement.style.top		= '0px'
-
-	var options	= {
-		cohesionMaxLength	: 0.001,
-		cohesionWeight		: 3,
-		alignementMaxLength	: 0.005,
-		alignementWeight	: 1,
-		separationMaxLength	: 0.01,
-		separationWeight	: 1,
-	}
-	datGui.add(options, 'cohesionMaxLength')	.min(0.0).max(0.1)
-	datGui.add(options, 'cohesionWeight')		.min(0.0).max(4)
-	datGui.add(options, 'alignementMaxLength')	.min(0.0).max(0.1)
-	datGui.add(options, 'alignementWeight')		.min(0.0).max(4)
-	datGui.add(options, 'separationMaxLength')	.min(0.0).max(0.1)
-	datGui.add(options, 'separationWeight')		.min(0.0).max(4)
-	
-	datGui.onChange(function(value){
-		Object.keys(options).forEach(function(property){
-			var value	= options[property]
-			bodiesControls.forEach(function(controls){
-				controls.opts[property]	= value
-			})			
+	;(function(){
+		var datGui	= new dat.GUI({
+			autoPlace: false
 		})
-	})
-})()
+		document.body.appendChild(datGui.domElement)
+		datGui.domElement.style.position	= 'absolute'
+		datGui.domElement.style.top		= '0px'
+
+		var controls	= bodiesControls[0]
+		new THREEx.addFlockingControls2DatGui(controls, datGui)
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//		actions								//
+		//////////////////////////////////////////////////////////////////////////////////
+		
+		var actions	= {
+			reset	: function(){
+				bodiesControls.forEach(function(controls){
+					var object3d	= controls.object3d
+					// set body position		
+					object3d.position.x	= (Math.random()-0.5)*20
+					object3d.position.y	= (Math.random()-0.5)*20
+					object3d.position.z	= (Math.random()-0.5)*5
+					object3d.position.z	= (Math.random()-0.5)*0
+					
+					// init initial velocity
+					controls.velocity.x	= (Math.random()-0.5)*2
+					controls.velocity.y	= (Math.random()-0.5)*2
+					controls.velocity.z	= (Math.random()-0.5)*2
+					controls.velocity.z	= (Math.random()-0.5)*0
+				})			
+			}
+		}
+		
+		var folder	= datGui.addFolder('Actions');
+		folder.add(actions, 'reset')
+		folder.open()
+	})()
 	
 
 	//////////////////////////////////////////////////////////////////////////////////

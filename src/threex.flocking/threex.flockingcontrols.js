@@ -1,20 +1,28 @@
 var THREEx	= THREEx	|| {}
 
-THREEx.FlockingControls	= function(object3d, debug){
+THREEx.FlockingControls	= function(object3d, opts, debug){
 	// export object3d
 	this.object3d	= object3d
-	
-	this.debug	= debug ? true : false
-	
+	this.debug	= debug !== undefined ? debug : false
+	this.opts	= opts	|| {
+		cohesionMaxLength	: 0.001,
+		cohesionWeight		: 3,
+		alignementMaxLength	: 0.005,
+		alignementWeight	: 1,
+		separationMaxLength	: 0.01,
+		separationWeight	: 1,		
+		
+		neighbourRadius		: 1,
+		separationRadius	: 0.5,
+		maxSpeed		: 0.1,
+		damping			: 1,
+	}
+
 	// physics constant
 	var velocity	= new THREE.Vector3()
 	this.velocity	= velocity
-	this.maxSpeed	= 1
 	var acceleration= new THREE.Vector3()
 	this.acceleration=acceleration
-	var damping	= new THREE.Vector3(1,1,1)
-	this.damping	= damping
-	
 	var position	= object3d.position
 	this.position	= position
 
@@ -24,16 +32,16 @@ THREEx.FlockingControls	= function(object3d, debug){
 	
 	this.applyForces	= function(){
 		// handle physics
-		velocity.multiply(damping)
+		velocity.multiplyScalar(this.opts.damping)
 		velocity.add(acceleration)
 		// honor maxSpeed
-		if( velocity.length() > this.maxSpeed ){
-			velocity.setLength(this.maxSpeed)
+		if( velocity.length() > this.opts.maxSpeed ){
+			velocity.setLength(this.opts.maxSpeed)
 		}
 		// update object3d position
 		object3d.position.add(velocity)
 		// update debug
-		if( debug )	updateDebug()
+		if( debug )	this.updateDebug()
 		// reset acceleration
 		acceleration.set(0,0,0)
 	}
@@ -47,23 +55,6 @@ THREEx.FlockingControls	= function(object3d, debug){
 		onComputeForces.forEach(function(fn){
 			fn(others, controlsIdx)
 		})
-	}
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		constant							//
-	//////////////////////////////////////////////////////////////////////////////////
-	var neighbourRadius	= 1
-	var separationRadius	= 0.5
-	this.maxSpeed		= 0.1
-	// damping.set(1,1,1).multiplyScalar(0.95)
-
-	var opts	= {
-		cohesionMaxLength	: 0.001,
-		cohesionWeight		: 3,
-		alignementMaxLength	: 0.005,
-		alignementWeight	: 1,
-		separationMaxLength	: 0.01,
-		separationWeight	: 1,
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +73,7 @@ THREEx.FlockingControls	= function(object3d, debug){
 			var other	= others[i];
 			var distance	= other.position.distanceTo( position );
 
-			if( distance > 0 && distance <= neighbourRadius ){
+			if( distance > 0 && distance <= this.opts.neighbourRadius ){
 				positionSum.add( other.position );
 				count++;
 			}
@@ -95,11 +86,11 @@ THREEx.FlockingControls	= function(object3d, debug){
 
 		var force	= positionSum.clone().sub(this.position);
 		// honor maximum length for this force		
-		if( force.length() > opts.cohesionMaxLength ){
-			force.setLength(opts.cohesionMaxLength)			
+		if( force.length() > this.opts.cohesionMaxLength ){
+			force.setLength(this.opts.cohesionMaxLength)			
 		}
 		// honor weight for this force
-		force.multiplyScalar(opts.cohesionWeight)
+		force.multiplyScalar(this.opts.cohesionWeight)
 
 		// apply the force to acceleration
 		this.acceleration.add(force)
@@ -121,7 +112,7 @@ THREEx.FlockingControls	= function(object3d, debug){
 			var other	= others[i];
 			var distance	= other.position.distanceTo( position );
 
-			if( distance > 0 && distance <= neighbourRadius ){
+			if( distance > 0 && distance <= this.opts.neighbourRadius ){
 				velocitySum.add( other.velocity );
 				count++;
 			}
@@ -134,11 +125,11 @@ THREEx.FlockingControls	= function(object3d, debug){
 		velocitySum.divideScalar( count );
 		var force	= velocitySum
 		// honor maximum bound
-		if( force.length() > opts.alignementMaxLength ){
-			force.setLength(opts.alignementMaxLength)
+		if( force.length() > this.opts.alignementMaxLength ){
+			force.setLength(this.opts.alignementMaxLength)
 		}
 		// honor weight for this force
-		force.multiplyScalar(opts.alignementWeight)
+		force.multiplyScalar(this.opts.alignementWeight)
 		// apply the force to acceleration
 		this.acceleration.add(force)
 	}.bind(this))
@@ -159,7 +150,7 @@ THREEx.FlockingControls	= function(object3d, debug){
 			var other	= others[i];
 			var distance	= other.position.distanceTo( position );
 
-			if( distance > 0 && distance <= separationRadius ){
+			if( distance > 0 && distance <= this.opts.separationRadius ){
 				repulse.subVectors( position, other.position );
 				repulse.normalize();
 				repulse.divideScalar( distance );
@@ -173,11 +164,11 @@ THREEx.FlockingControls	= function(object3d, debug){
 		positionSum.divideScalar( count );
 		var force	= positionSum
 		// honor maximum bound
-		if( force.length() > opts.separationMaxLength ){
-			force.setLength(opts.separationMaxLength)			
+		if( force.length() > this.opts.separationMaxLength ){
+			force.setLength(this.opts.separationMaxLength)			
 		}
 		// honor weight for this force
-		force.multiplyScalar(opts.separationWeight)
+		force.multiplyScalar(this.opts.separationWeight)
 		// apply the force to acceleration
 		this.acceleration.add(force)
 	}.bind(this))
@@ -197,29 +188,29 @@ THREEx.FlockingControls	= function(object3d, debug){
 		
 		// acceleration arrow
 		var accelerationArrow	= new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3, 1, 'green')
-		// this.debugObject3d.add(accelerationArrow)
+		this.debugObject3d.add(accelerationArrow)
 		
 		// separationSphere		
-		var geometry	= new THREE.SphereGeometry(separationRadius)
+		var geometry	= new THREE.SphereGeometry(1)
 		var material	= new THREE.MeshBasicMaterial({
 			color		: 'green',
-			wireframe	: true,
+			// wireframe	: true,
 			side		: THREE.BackSide,
 		})
 		var separationSphere	= new THREE.Mesh(geometry, material)
-		// this.debugObject3d.add(separationSphere)
+		this.debugObject3d.add(separationSphere)
 
-		// neighboorSphere
-		var geometry	= new THREE.SphereGeometry(neighbourRadius)
+		// neighbourSphere
+		var geometry	= new THREE.SphereGeometry(1)
 		var material	= new THREE.MeshBasicMaterial({
 			color		: 'red',
-			wireframe	: true,
-			// side		: THREE.BackSide,
+			// wireframe	: true,
+			side		: THREE.BackSide,
 		})
-		var neighboorSphere	= new THREE.Mesh(geometry, material)
-		// this.debugObject3d.add(neighboorSphere)
+		var neighbourSphere	= new THREE.Mesh(geometry, material)
+		this.debugObject3d.add(neighbourSphere)
 		
-		function updateDebug(){
+		this.updateDebug	= function(){
 			// velocity
 			velocityArrow.position.copy(object3d.position)
 			velocityArrow.setDirection(velocity.clone().normalize())
@@ -232,9 +223,11 @@ THREEx.FlockingControls	= function(object3d, debug){
 			// accelerationArrow.setDirection(acceleration.clone().multiplyScalar(3000))
 			// accelerationArrow.setLength(acceleration.length()*100)
 
-			neighboorSphere.position.copy(object3d.position)
+			neighbourSphere.position.copy(object3d.position)
+			neighbourSphere.scale.set(1,1,1).multiplyScalar(this.opts.neighbourRadius)
 
 			separationSphere.position.copy(object3d.position)
+			separationSphere.scale.set(1,1,1).multiplyScalar(this.opts.separationRadius)
 		}
 	}
 }
