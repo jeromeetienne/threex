@@ -162,7 +162,7 @@
 				<div class="caption">
 					<a href='{{{repository}}}'>
 						<h4>
-							<a  class='hashLink' href='#{{name}}' target=''>{{name}}</a>
+							<a  class='hashLink' href='#{{name}}' target='_top'>{{name}}</a>
 						</h4>
 					</a>
 					<p>{{{description}}}</p>
@@ -920,8 +920,20 @@ jQuery(function(){
 	if( window.location.hash.substr(1) ){
 		var selectedId	= window.location.hash.substr(1);
 		// element.classList.add('active')
-		$('#modals [data-name="'+selectedId+'"]').modal()
+		jQuery('#modals [data-name="'+selectedId+'"]').modal()
 	}
+
+	// handle click on hashLink	
+	jQuery('.hashLink').click(function(event){
+		var selectedId	= event.target.innerText
+		// update url
+		window.location.hash	= '#'+selectedId;
+		// open model
+		jQuery('#modals [data-name="'+selectedId+'"]').modal()
+		// prevent default
+		event.preventDefault();			
+	})
+	
 
 	// // honor location.hash as active	
 	// if( window.location.hash.substr(1) ){
