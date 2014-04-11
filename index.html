@@ -67,19 +67,12 @@
           <a href='https://github.com/jeromeetienne/threex.sample'>three.sample</a>
           to start with. Look at <a href='www/how-to-write-a-threex-module.html'>"How to write a threex module"</a>.
         </div>
+      </div>
       <br/>
 	<style>
 		/*handle selected item*/
 		#items .item.active {
 			background-color: lightgrey;
-		}
-		/*handle hashLink*/
-		#items .item .hashLink {
-			visibility	: hidden;
-		}
-		#items .item:hover .hashLink {
-			visibility	: visible;
-			text-decoration	: none;
 		}
 
 		/*handle tags filter*/
@@ -114,11 +107,45 @@
 
 	<div class="row" id='items' data-tag=''>  
 	</div> <!-- /row -->
+	<div class="row" id='modals' data-tag=''>  
+	</div> <!-- /row -->
 
 	<!-- github ribbon -->
 	<a href="https://github.com/jeromeetienne/threex"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 
 
+	<template id='modalTemplate'>
+		<!-- Modal -->
+		<div class="modal fade" data-name="{{name}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        <h4 class="modal-title" id="myModalLabel">{{name}} Game Extension</h4>
+		      </div>
+		      <div class="modal-body">
+		      		<div style='text-align:center;'>
+					<a href='{{{demoUrl}}}'>
+						<img src="{{{thumbnailUrl}}}">
+					</a>
+				</div>
+				<a href='{{{repository}}}'>
+					<h4>
+						{{name}}
+					</h4>
+				</a>
+				<p>{{{description}}}</p>
+				<p>
+					<a href="{{{demoUrl}}}" class="demo btn btn-primary" role="button">Demo</a>
+					<a href="{{{repository}}}" class="btn btn-primary" role="button">Github</a>
+					<strong>Tags:</strong> {{tags}}
+				</p>
+			</div>
+		    </div>
+		  </div>
+		</div>
+	</template>
+	
 	<!-- Bootstrap core JavaScript
 	================================================== -->
 	<!-- Placed at the end of the document so the pages load faster -->
@@ -135,10 +162,7 @@
 				<div class="caption">
 					<a href='{{{repository}}}'>
 						<h4>
-							{{name}}
-							<small>
-								<a  class='hashLink' href='#{{name}}'>&#x00B6</a>
-							</small>
+							<a  class='hashLink' href='#{{name}}'>{{name}}</a>
 						</h4>
 					</a>
 					<p>{{{description}}}</p>
@@ -884,12 +908,27 @@ jQuery(function(){
 	})
 	jQuery(output).appendTo('#items')
 
+	// get template modals
+	var htmlTemplate= jQuery('#modalTemplate').html()
+	var output	= ''
+	items.forEach(function(item){
+		output	+= Mustache.render(htmlTemplate, item);
+	})
+	jQuery(output).appendTo('#modals')
+
 	// honor location.hash as active	
 	if( window.location.hash.substr(1) ){
 		var selectedId	= window.location.hash.substr(1);
-		var element	= document.getElementById(selectedId)
-		element.classList.add('active')
+		// element.classList.add('active')
+		$('#modals [data-name="'+selectedId+'"]').modal()
 	}
+
+	// // honor location.hash as active	
+	// if( window.location.hash.substr(1) ){
+	// 	var selectedId	= window.location.hash.substr(1);
+	// 	var element	= document.getElementById(selectedId)
+	// 	element.classList.add('active')
+	// }
 })
 </script>
 <script>
