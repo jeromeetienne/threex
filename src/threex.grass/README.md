@@ -1,33 +1,67 @@
+threex.grass
+===================
+
+threex.grass is a three.js extension which provides fast grass tufts. 
+It has [tweaked normals](http://simonschreibt.de/gat/airborn-trees/) for better lighting,
+and a [merged geometry](http://learningthreejs.com/blog/2011/10/05/performance-merging-geometry/)
+to better performance.
+It is loosely based on 
+["Rendering Countless Blades of Waving Grass" GPUGem](http://http.developer.nvidia.com/GPUGems/gpugems_ch07.html).
+
+
+Show Don't Tell
+===============
+* [examples/basic.html](http://jeromeetienne.github.io/threex.grass/examples/basic.html)
+\[[view source](https://github.com/jeromeetienne/threex.grass/blob/master/examples/basic.html)\] :
+It shows 3 basic characters
+
+How To Install It
+=================
+
+You can install it via script tag
+
+```html
+<script src='threex.grass.js'></script>
+```
+
+Or you can install with [bower](http://bower.io/), as you wish.
+
+```bash
+bower install threex.grass
+```
+
+How To Use It
+=============
+
+To create a full grass, first you determine the positions of each grass tufts you want
+and put that in a array. Like this.
+
+```javascript
+var positions	= []
+positions.push(new THREE.Vector3(-1,0,0))
+positions.push(new THREE.Vector3(+1,0,0))
+```
+
+So you got one tuft on the left at (-1,0,0)
+and another on the right at (+1,0,0).
+Now let's create a mesh with a tufts at each of those positions.
+
+
+```javascript
+var mesh	= new THREEx.createGrassTufts(positions)
+scene.add(mesh)
+```
+
+You are done! 
+
+References and Credits
+======================
+* thanks a lot to [bai](http://baicoianu.com/) on irc for the textures and the helps during the tunning
+* ["Rendering Grass in Real Time with Dynamic Lighting"](http://www.kevinboulanger.net/grass.html)
+* ["Rendering Countless Blades of Waving Grass" GPUGem](http://http.developer.nvidia.com/GPUGems/gpugems_ch07.html)
+* ["Procedural grass rendering"](http://outerra.blogspot.fr/2012/05/procedural-grass-rendering.html]
+* ["Airborn – Trees" post](http://simonschreibt.de/gat/airborn-trees/] for normal tweaking
+
 ## TODO
-* reduce image scale DONE
-* make it in a threex.grass
-  * with list of points to get position
-  * return merged geometry
 * make a demo with minecraft walking in it, with daynight cycle and later swarm
 
-## Reference
-* http://www.kevinboulanger.net/grass.html
-* http://http.developer.nvidia.com/GPUGems/gpugems_ch07.html
-* http://outerra.blogspot.fr/2012/05/procedural-grass-rendering.html
-* http://simonschreibt.de/gat/airborn-trees/ for normal tweaking
-
-## Tech
-* some LOD
-* some normal tweaking
-
-
-
-## talks with bai
-[07:20am] jetienne: bai: oh cool
-[07:20am] bai: I found http://bai.dev.supcrit.com/media/space/textures/grass/grass01.png http://bai.dev.supcrit.com/media/space/textures/grass/grass02.png http://bai.dev.supcrit.com/media/space/textures/grass/flowers01.png and http://bai.dev.supcrit.com/media/space/textures/grass/flowers02.png in an article, I'll see if I can track that url down...
-[07:20am] bai: they should probably be sized down for real world use
-[07:21am] jetienne: tt_mike: expansive but REAL nice 
-[07:21am] jetienne: bai: nice! thanks
-[07:21am] bai: but with those I got grass which looked like this http://baicoianu.com/~bai/webgl/elation-engine-proctree-grass3.png
-[07:22am] jetienne: bai: oh cool you already worked on the subject. can i pick you brain ?
-[07:22am] bai: sure
-[07:24am] bai: I based my approach loosely on http://http.developer.nvidia.com/GPUGems/gpugems_ch07.html
-[07:24am] bai: basically three intersecting planes in an equilateral triangle standing on end
-[07:25am] jetienne: bai: looking
-[07:25am] bai: and you tile those at random across the area you want to have covered in grass, you can vary density etc
-[07:26am] bai: what I did was use THREE.Shape which lets me define any sort of boundary, then THREE.GeometryUtils.randomPointsInGeometry() to get a nice distribution
