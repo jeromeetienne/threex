@@ -62,7 +62,7 @@ THREEx.Pacman	= function(opts){
 		// build the robe
 		var geometry	= new THREE.CylinderGeometry(0.49, 0.5, 0.75, 16)
 		var material	= new THREE.MeshLambertMaterial({
-			color	: 0xffff00,
+			color	: opts.color,
 		})
 		var mesh	= new THREE.Mesh(geometry, material)
 		mesh.position.y = 0.5
@@ -367,7 +367,7 @@ THREEx.Pacman.drawShaddow = function(canvas, color){
 	var xtx		= THREEx.Pacman.xCanvas.create(ctx);
 
 	
-	ctx.fillStyle	= "#333333";
+	ctx.fillStyle	= "rgba(127,127,127,0.5)";
 
 	var circleW	= 8*w/8;
 	var circleH	= 8*w/8;

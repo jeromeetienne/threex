@@ -63,6 +63,11 @@
 	var material	= new THREE.MeshNormalMaterial();
 	var baseObject3d= new THREE.Mesh( geometry, material );
 
+
+	var mapWidth	= 20
+	var mapHeight	= 20
+	var mapDepth	= 0
+
 	var bodiesControls	= []
 	var nBodies		= 400
 	// var nBodies		= 3
@@ -75,10 +80,9 @@
 			});
 			scene.add( object3d );
 			// set body position		
-			object3d.position.x	= (Math.random()-0.5)*20
-			object3d.position.y	= (Math.random()-0.5)*20
-			object3d.position.z	= (Math.random()-0.5)*5
-			object3d.position.z	= (Math.random()-0.5)*0
+			object3d.position.x	= (Math.random()-0.5)*mapWidth
+			object3d.position.y	= (Math.random()-0.5)*mapHeight
+			object3d.position.z	= (Math.random()-0.5)*mapDepth
 			
 			// init controls for body
 			if( i === 0 )	var controls	= new THREEx.FlockingControls(object3d, undefined, true)
@@ -129,10 +133,9 @@
 				bodiesControls.forEach(function(controls){
 					var object3d	= controls.object3d
 					// set body position		
-					object3d.position.x	= (Math.random()-0.5)*20
-					object3d.position.y	= (Math.random()-0.5)*20
-					object3d.position.z	= (Math.random()-0.5)*5
-					object3d.position.z	= (Math.random()-0.5)*0
+					object3d.position.x	= (Math.random()-0.5)*mapWidth
+					object3d.position.y	= (Math.random()-0.5)*mapHeight
+					object3d.position.z	= (Math.random()-0.5)*mapDepth
 					
 					// init initial velocity
 					controls.velocity.x	= (Math.random()-0.5)*2
@@ -165,20 +168,12 @@
 		// clamp all boids within a cube
 		bodiesControls.forEach(function(controls){
 			var position	= controls.position			
-			var width	= 20
-			// var width	= 2
-			if( position.x < width/2 )	position.x	+= width	
-			if( position.x > width/2 )	position.x	-= width	
-
-			var height	= 20
-			// var height	= 2
-			if( position.y < height/2 )	position.y	+= height	
-			if( position.y > height/2 )	position.y	-= height	
-
-			var depth	= 0
-			// var depth	= 5
-			if( position.z < depth/2 )	position.z	+= depth	
-			if( position.z > depth/2 )	position.z	-= depth	
+			if( position.x < mapWidth /2 )	position.x	+= mapWidth	
+			if( position.x > mapWidth /2 )	position.x	-= mapWidth	
+			if( position.y < mapHeight/2 )	position.y	+= mapHeight	
+			if( position.y > mapHeight/2 )	position.y	-= mapHeight	
+			if( position.z < mapDepth /2 )	position.z	+= mapDepth	
+			if( position.z > mapDepth /2 )	position.z	-= mapDepth	
 		})		
 	}, 1000/60)
 	

@@ -51,9 +51,9 @@ THREEx.FlockingControls	= function(object3d, opts, debug){
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var onComputeForces	= []
-	this.computeForces	= function(others, controlsIdx){
+	this.computeForces	= function(others){
 		onComputeForces.forEach(function(fn){
-			fn(others, controlsIdx)
+			fn(others)
 		})
 	}
 
@@ -61,7 +61,7 @@ THREEx.FlockingControls	= function(object3d, opts, debug){
 	//		cohesion							//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	onComputeForces.push(function(others, controlsIdx){
+	onComputeForces.push(function(others){
 // return
 		var positionSum	= new THREE.Vector3();
 		var count	= 0;
@@ -101,7 +101,7 @@ THREEx.FlockingControls	= function(object3d, opts, debug){
 	//		alignement							//
 	//////////////////////////////////////////////////////////////////////////////////
 	
-	onComputeForces.push(function(others, controlsIdx){
+	onComputeForces.push(function(others){
 		var velocitySum	= new THREE.Vector3()
 		var count	= 0;
 
@@ -137,7 +137,7 @@ THREEx.FlockingControls	= function(object3d, opts, debug){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		separation							//
 	//////////////////////////////////////////////////////////////////////////////////
-	onComputeForces.push(function(others, controlsIdx){
+	onComputeForces.push(function(others){
 		var repulse	= new THREE.Vector3();
 		var positionSum	= new THREE.Vector3();
 		var count	= 0;
@@ -219,9 +219,9 @@ THREEx.FlockingControls	= function(object3d, opts, debug){
 			// velocityArrow.lookAt(object3d.position.clone().add(new THREE.Vector3(1,0,0)))
 			// velocityArrow.setLength(1)
 			
-			// accelerationArrow.position.copy(object3d.position)
-			// accelerationArrow.setDirection(acceleration.clone().multiplyScalar(3000))
-			// accelerationArrow.setLength(acceleration.length()*100)
+			accelerationArrow.position.copy(object3d.position)
+			accelerationArrow.setDirection(acceleration.clone().multiplyScalar(3000))
+			accelerationArrow.setLength(acceleration.length()*100)
 
 			neighbourSphere.position.copy(object3d.position)
 			neighbourSphere.scale.set(1,1,1).multiplyScalar(this.opts.neighbourRadius)
