@@ -6,7 +6,7 @@ THREEx.CSS3DJoint	= function(srcPosition, dstPosition, margin){
 	var domElement	= document.createElement( 'div' );
 	domElement.className	= "bond";
 	var objectBlade1= new THREE.CSS3DObject( domElement );
-	this.object3d.add(objectBlade1)
+	this.object3d	= objectBlade1
 
 	// var domElement	= document.createElement( 'div' );
 	// domElement.className	= "bond";

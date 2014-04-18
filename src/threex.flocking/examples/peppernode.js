@@ -15,7 +15,9 @@ function PepperNode(name, scene){
 	// visualisation build object3d
 	var domElement	= document.createElement( 'img' );
 	domElement.src	= 'css3d_molecules/images/ball.png';
-	domElement.title= 'blabal'
+	// domElement.width	= 128
+	// domElement.height	= 128
+	domElement.title= name
 	var object3d	= new THREE.CSS3DSprite( domElement );
 	this.object3d	= object3d
 	scene.add(object3d)
@@ -29,7 +31,10 @@ function PepperNode(name, scene){
 	}.bind(this))
 
 	this.setParent	= function(newParent){
-		if( css3DJoint )	scene.remove(css3DJoint.object3d)
+		if( css3DJoint ){
+			scene.remove(css3DJoint.object3d)
+			css3DJoint	= null
+		}
 
 		// remove this node from parent.children
 		if( this.parent ){
@@ -39,40 +44,18 @@ function PepperNode(name, scene){
 		}
 		// update local parent reference
 		this.parent	= newParent
+
 		// add this node into newParent if any
 		if( this.parent )	this.parent.children.push(this)
+
 		// add a joint between this node and the parent
 		if( this.parent ){
-			css3DJoint	= new THREEx.CSS3DJoint(this.position, this.parent.position, 55)
-			scene.add(css3DJoint.object3d)			
+			console.assert(css3DJoint === null)
+			css3DJoint	= new THREEx.CSS3DJoint(this.position, this.parent.position, 55 )
+			scene.add(css3DJoint.object3d)
 		}
 	}
-
-
 }
 
 PepperNode.prototype.destroy	= function(){
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-//										//
-//////////////////////////////////////////////////////////////////////////////////
-
-
-
-//////////////////////////////////////////////////////////////////////////////////
-//										//
-//////////////////////////////////////////////////////////////////////////////////
-
-PepperNode.prototype.addChildren= function(node){
-	if( this.hasChildren(node) )	return
-	node.setParent(this)
-	this._children.push(node)
-}
-PepperNode.prototype.removeChildren= function(node){
-	console.assert( this.hasChildren(node) )
-	node.setParent(null)
-}
-PepperNode.prototype.hasChildren= function(node){
-	return this._children.indexOf(node) !== -1 ? true : false
 }

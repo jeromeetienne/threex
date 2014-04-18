@@ -3,6 +3,7 @@
 <script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
 <script src='peppernode.js'></script>
 <script src='threex.css3djoint.js'></script>
+<script src='../threex.basicphysicscontrols.js'></script>
 <body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
 <style>
 .bond {
@@ -26,10 +27,13 @@
 	// declare the rendering loop
 	var onRenderFcts= [];
 
-	
+
+	var nodes	= []
+	var controls	= []
 
 	// build the tree
 	var nodeGranPa	= new PepperNode('parent', scene)
+	nodes.push(nodeGranPa)
 	onRenderFcts.push(function(delta, now){
 		nodeGranPa.update(delta, now)
 	})
@@ -37,6 +41,7 @@
 
 	var nodeCurrent	= new PepperNode('myself', scene)
 	nodeCurrent.setParent( nodeGranPa )
+	nodes.push(nodeCurrent)
 	onRenderFcts.push(function(delta, now){
 		nodeCurrent.update(delta, now)
 	})
@@ -47,28 +52,36 @@
 		nodeCurrent.position.y	= Math.sin(angle)*50
 	})
 
-
 	var nodeChild1	= new PepperNode('child1', scene)
 	nodeChild1.setParent( nodeCurrent )
+	nodes.push(nodeChild1)
 	onRenderFcts.push(function(delta, now){
 		nodeChild1.update(delta, now)
 	})
+	nodeChild1.position.x	= +150
 	nodeChild1.position.y	= +80
 
 	var nodeChild2	= new PepperNode('child2', scene)
 	nodeChild2.setParent( nodeCurrent )
+	nodes.push(nodeChild2)
 	onRenderFcts.push(function(delta, now){
 		nodeChild2.update(delta, now)
 	})
+	nodeChild2.position.x	= +150
 	nodeChild2.position.y	= -80
 
 
-	// var css3DJoint	= new THREEx.CSS3DJoint(srcObject.position, dstObject.position, 50)
-	// scene.add( css3DJoint.object3d )
-	// onRenderFcts.push(function(delta, now){
-	// 	css3DJoint.update()
-	// })
 
+
+	// setInterval(function(){
+	// 	controls.forEach(function(controls){
+	// 		controls.computeForces(bodiesControls)
+	// 	})
+
+	// 	controls.forEach(function(controls){
+	// 		controls.applyForces()
+	// 	})
+	// }, 1000/60)
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
