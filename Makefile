@@ -1,8 +1,8 @@
  # makefile to automatize simple operations
 
 server:
-	#python -m SimpleHTTPServer
-	lighttpd -D -f lighttpd.conf
+	python -m SimpleHTTPServer
+	#lighttpd -D -f lighttpd.conf
 
 deploy:
 	# assume there is something to commit

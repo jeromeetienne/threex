@@ -3,6 +3,11 @@ threex.flocking
 
 ## TODO
 
+* do a threex.physicsControls.js
+    - with the base of threex.flockingcontrols.js
+    - with position, acceleration, velocity, damping
+* have threex.flockingcontrols.js on top of threex.physicsControls.js
+
 * put a weight for each force cohesion/alignement/separation
 * when estimating neighboors, do a weighted average using a tween function
 * make debug info

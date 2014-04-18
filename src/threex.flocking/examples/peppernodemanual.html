@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.js'></script>
+<script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
+<script src='peppernode.js'></script>
+<script src='threex.css3djoint.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+<style>
+.bond {
+	width		: 5px;
+	height		: 10px;
+	background	: #eee;
+	display		: block;
+}
+</style><script>
+	// setup webgl renderer full page
+	var renderer	= new THREE.CSS3DRenderer();
+	// var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight )
+	// document.body.appendChild( renderer.domElement )
+	document.body.appendChild( renderer.domElement )
+	// setup a scene and camera
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 250*2;
+
+	// declare the rendering loop
+	var onRenderFcts= [];
+
+	
+
+	// build the tree
+	var nodeGranPa	= new PepperNode('parent', scene)
+	onRenderFcts.push(function(delta, now){
+		nodeGranPa.update(delta, now)
+	})
+	nodeGranPa.position.x	= -80
+
+	var nodeCurrent	= new PepperNode('myself', scene)
+	nodeCurrent.setParent( nodeGranPa )
+	onRenderFcts.push(function(delta, now){
+		nodeCurrent.update(delta, now)
+	})
+
+	nodeCurrent.position.x	= +80
+	onRenderFcts.push(function(delta, now){
+		var angle	= now * Math.PI*2*0.3
+		nodeCurrent.position.y	= Math.sin(angle)*50
+	})
+
+
+	var nodeChild1	= new PepperNode('child1', scene)
+	nodeChild1.setParent( nodeCurrent )
+	onRenderFcts.push(function(delta, now){
+		nodeChild1.update(delta, now)
+	})
+	nodeChild1.position.y	= +80
+
+	var nodeChild2	= new PepperNode('child2', scene)
+	nodeChild2.setParent( nodeCurrent )
+	onRenderFcts.push(function(delta, now){
+		nodeChild2.update(delta, now)
+	})
+	nodeChild2.position.y	= -80
+
+
+	// var css3DJoint	= new THREEx.CSS3DJoint(srcObject.position, dstObject.position, 50)
+	// scene.add( css3DJoint.object3d )
+	// onRenderFcts.push(function(delta, now){
+	// 	css3DJoint.update()
+	// })
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*512 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*512 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Rendering Loop runner						//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

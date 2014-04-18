@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.js'></script>
+<script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+
+<style>
+.bond {
+	width: 5px;
+	height: 10px;
+	background: #eee;
+	display: block;
+}
+</style>
+<script>
+	// setup webgl renderer full page
+	var renderer	= new THREE.CSS3DRenderer();
+	// var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight )
+	// document.body.appendChild( renderer.domElement )
+	document.body.appendChild( renderer.domElement )
+	// setup a scene and camera
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 250;
+
+	// declare the rendering loop
+	var onRenderFcts= [];
+
+
+	var domElement	= document.createElement( 'img' );
+	domElement.src	= 'css3d_molecules/images/ball.png';
+	var srcObject	= new THREE.CSS3DSprite( domElement );
+	srcObject.position.set(+80,50,0 );
+	scene.add( srcObject );
+
+	var domElement	= document.createElement( 'img' );
+	domElement.src	= 'css3d_molecules/images/ball.png';
+	var dstObject	= new THREE.CSS3DSprite( domElement );
+	dstObject.position.set(-80,0,0 );
+	scene.add( dstObject );
+
+;(function(){
+	return
+	var srcPosition	= srcObject.position
+	var dstPosition	= dstObject.position
+
+	// srcPosition.multiplyScalar( 75 );
+	// dstPosition.multiplyScalar( 75 );
+	var tmpVec1	= new THREE.Vector3
+	var tmpVec2	= new THREE.Vector3
+	var tmpVec3	= new THREE.Vector3
+	var tmpVec4	= new THREE.Vector3
+	tmpVec1.subVectors( dstPosition, srcPosition );
+
+	var bondLength = tmpVec1.length();
+
+	var bond = document.createElement( 'div' );
+	bond.className = "bond";
+	bond.style.height = (bondLength-55) + "px";
+	console.log('bondLength', bondLength)
+
+	var object = new THREE.CSS3DObject( bond );
+	object.position.copy( srcPosition ).add( dstPosition ).multiplyScalar(0.5)
+console.dir(object)
+	object.userData.bondLengthShort	= (bondLength-55) + "px";
+	object.userData.bondLengthFull	=  bondLength + "px";
+
+	//
+	var axis	= tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
+	var radians	= Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
+
+	// setup rotation
+	var objMatrix	= new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+	object.matrix	= objMatrix;
+	object.rotation.setFromRotationMatrix( object.matrix, object.rotation.order );
+
+	// object.matrixAutoUpdate = false;
+	// object.updateMatrix();
+
+	scene.add( object )
+
+	// add another one with Math.PI/2 thus it appears as a tube
+})()
+
+	
+
+	var THREEx	= THREEx	|| {}
+	THREEx.CSS3DJoint	= function(srcPosition, dstPosition, margin){
+
+		this.object3d	= new THREE.Object3D()
+
+		var domElement	= document.createElement( 'div' );
+		domElement.className	= "bond";
+		var objectBlade1= new THREE.CSS3DObject( domElement );
+		this.object3d.add(objectBlade1)
+
+		// var domElement	= document.createElement( 'div' );
+		// domElement.className	= "bond";
+		// var objectBlade2= new THREE.CSS3DObject( domElement );
+		// this.object3d.add(objectBlade2)
+
+		var tmpVec1	= new THREE.Vector3
+		var tmpVec2	= new THREE.Vector3
+		var tmpVec3	= new THREE.Vector3
+		var tmpVec4	= new THREE.Vector3
+		this.update	= function(){
+			var objectCSS3d	= objectBlade1
+
+			tmpVec1.subVectors( dstPosition, srcPosition );
+
+			var bondLength		= tmpVec1.length();
+
+			var domElement		= objectCSS3d.element
+			domElement.style.height	= (bondLength-margin) + "px";
+
+			objectCSS3d.position.copy( srcPosition ).add( dstPosition ).multiplyScalar(0.5)
+
+			//
+			var axis	= tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
+			var radians	= Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
+
+			// setup rotation
+			var matrix	= new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+			objectCSS3d.matrix	= matrix;
+			objectCSS3d.rotation.setFromRotationMatrix( objectCSS3d.matrix, objectCSS3d.rotation.order );
+		}
+	}
+
+
+	var css3DJoint	= new THREEx.CSS3DJoint(srcObject.position, dstObject.position, 50)
+	scene.add( css3DJoint.object3d )
+	// onRenderFcts.push(function(delta, now){
+		css3DJoint.update()
+	// })
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*512 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*512 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Rendering Loop runner						//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
