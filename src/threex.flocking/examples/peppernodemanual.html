@@ -4,7 +4,7 @@
 <script src='peppernode.js'></script>
 <script src='threex.css3djoint.js'></script>
 <script src='../threex.basicphysicscontrols.js'></script>
-<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'>
+<body style='margin: 0px; background-color: #333333; overflow: hidden;'>
 <style>
 .bond {
 	width		: 5px;
@@ -22,66 +22,173 @@
 	// setup a scene and camera
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 250*2;
+	camera.position.z = 250*3;
 
 	// declare the rendering loop
 	var onRenderFcts= [];
 
 
-	var nodes	= []
-	var controls	= []
+	var nodes		= []
+	var nodesControls	= []
 
+;(function(){
+	return
 	// build the tree
-	var nodeGranPa	= new PepperNode('parent', scene)
-	nodes.push(nodeGranPa)
-	onRenderFcts.push(function(delta, now){
-		nodeGranPa.update(delta, now)
-	})
-	nodeGranPa.position.x	= -80
+	var nodeParent	= createNode('nodeParent',  1, null)
+	nodeParent.position.x	= -80
 
-	var nodeCurrent	= new PepperNode('myself', scene)
-	nodeCurrent.setParent( nodeGranPa )
-	nodes.push(nodeCurrent)
-	onRenderFcts.push(function(delta, now){
-		nodeCurrent.update(delta, now)
-	})
-
+	var nodeCurrent	= createNode('nodeCurrent', 0, nodeParent)
 	nodeCurrent.position.x	= +80
 	onRenderFcts.push(function(delta, now){
 		var angle	= now * Math.PI*2*0.3
 		nodeCurrent.position.y	= Math.sin(angle)*50
 	})
 
-	var nodeChild1	= new PepperNode('child1', scene)
-	nodeChild1.setParent( nodeCurrent )
-	nodes.push(nodeChild1)
-	onRenderFcts.push(function(delta, now){
-		nodeChild1.update(delta, now)
-	})
+	var nodeChild1	= createNode('child1', 1, nodeCurrent)
 	nodeChild1.position.x	= +150
 	nodeChild1.position.y	= +80
 
-	var nodeChild2	= new PepperNode('child2', scene)
-	nodeChild2.setParent( nodeCurrent )
-	nodes.push(nodeChild2)
-	onRenderFcts.push(function(delta, now){
-		nodeChild2.update(delta, now)
-	})
+	var nodeChild2	= createNode('child2', 1, nodeCurrent)
 	nodeChild2.position.x	= +150
 	nodeChild2.position.y	= -80
+})()
 
 
+;(function(){
+	// build the tree
+	var nodeFocus	= createNode('nodeFocus', 0, null)
+
+	var nChildren		= 5
+	var nGrandChildren	= 5
+	for(var i = 0; i < nChildren; i++){
+		var nodeChild	= createNode('child'+i, 1, nodeFocus)
+		nodeChild.position.copy(nodeFocus.position)
+		nodeChild.position.x	+= (Math.random()-0.5)*400
+		nodeChild.position.y	+= (Math.random()-0.5)*400
+		for(var j = 0; j < nGrandChildren; j++){
+			var nodeGrandChild	= createNode('grandChild'+i+'_'+j, 2, nodeChild)
+			nodeGrandChild.position.copy(nodeChild.position)
+			nodeGrandChild.position.x	+= (Math.random()-0.5)*200
+			nodeGrandChild.position.y	+= (Math.random()-0.5)*200
+		}
+	}
+})()
 
 
-	// setInterval(function(){
-	// 	controls.forEach(function(controls){
-	// 		controls.computeForces(bodiesControls)
-	// 	})
+	//////////////////////////////////////////////////////////////////////////////////
+	//		to comment							//
+	//////////////////////////////////////////////////////////////////////////////////
 
-	// 	controls.forEach(function(controls){
-	// 		controls.applyForces()
-	// 	})
-	// }, 1000/60)
+	// update the nodes itself
+	onRenderFcts.push(function(delta, now){
+		nodes.forEach(function(node){
+			node.update(delta, now)
+		})
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		to comment							//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	function createNode(name, generation, parentNode){
+		var node	= new PepperNode(name, generation, scene)
+		node.object3d.userData.node	= node
+		node.setParent( parentNode )
+		nodes.push(node)
+		return node
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		to comment							//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	nodes.forEach(function(node){
+		var controls	= new THREEx.BasicPhysicsControls(node.object3d)
+		controls.damping.multiplyScalar(0.8)
+		nodesControls.push(controls)
+
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//		spring link							//
+		//////////////////////////////////////////////////////////////////////////////////
+		controls.onComputeForces.push(function(others){
+			// return
+			var current	= controls
+			var node	= current.object3d.userData.node
+
+			if( node.parent === null )	return;
+			var other	= node.parent
+
+			// compute the average
+			var delta	= new THREE.Vector3()
+			delta.subVectors( other.position, current.position ).normalize()
+			// set some variables
+			var distance	= other.position.distanceTo( current.position );
+
+			var targetDist	= 300/node.generation
+
+			if( delta.length() > 300/node.generation ){
+				var force	= delta.clone()
+				// honor weight for this force
+				force.multiplyScalar(0.005/node.generation)
+				// apply the force to acceleration
+				current.acceleration.add(force)
+			}
+		})
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//		separation							//
+		//////////////////////////////////////////////////////////////////////////////////
+		controls.onComputeForces.push(function(others){
+			var current	= controls
+			var node	= current.object3d.userData.node
+			var vectorSum	= new THREE.Vector3();
+			var vectorCount	= 0
+	
+			var vectorRepulse	= new THREE.Vector3();
+			others.forEach(function(other){
+				// dont apply on yourself
+				if( other === current )	return
+
+				// set some variables
+				var distance	= other.position.distanceTo( current.position );
+
+				var radius	= 200/node.generation
+				if( distance > 0 && distance <= radius ){
+					vectorRepulse.subVectors( current.position, other.position );
+					vectorRepulse.normalize();
+					vectorRepulse.divideScalar( distance/node.generation );
+					vectorSum.add( vectorRepulse );
+					vectorCount++;
+				}		
+			})
+
+			// do nothing if no neighbour
+			if( vectorCount === 0 )	return
+			// compute the average
+			vectorSum.divideScalar( vectorCount );
+			var force	= vectorSum
+			// honor weight for this force
+			force.multiplyScalar(8)
+			// apply the force to acceleration
+			current.acceleration.add(force)
+		})
+	})
+
+	setInterval(function(){
+		nodesControls.forEach(function(controls){
+			controls.computeForces(nodesControls)
+			controls.computeForces(nodesControls)
+			controls.computeForces(nodesControls)
+			controls.computeForces(nodesControls)
+		})
+
+		nodesControls.forEach(function(controls){
+			controls.applyForces()
+		})
+	}, 1000/60)
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////

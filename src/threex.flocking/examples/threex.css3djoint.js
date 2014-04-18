@@ -1,7 +1,9 @@
 var THREEx	= THREEx	|| {}
-THREEx.CSS3DJoint	= function(srcPosition, dstPosition, margin){
+THREEx.CSS3DJoint	= function(srcPosition, dstPosition){
 
 	this.object3d	= new THREE.Object3D()
+	this.srcMargin	= 55/2;
+	this.dstMargin	= 55/2;
 
 	var domElement	= document.createElement( 'div' );
 	domElement.className	= "bond";
@@ -25,7 +27,7 @@ THREEx.CSS3DJoint	= function(srcPosition, dstPosition, margin){
 		var bondLength		= tmpVec1.length();
 
 		var domElement		= objectCSS3d.element
-		domElement.style.height	= (bondLength-margin) + "px";
+		domElement.style.height	= (bondLength-(this.srcMargin+this.dstMargin)) + "px";
 
 		objectCSS3d.position.copy( srcPosition ).add( dstPosition ).multiplyScalar(0.5)
 

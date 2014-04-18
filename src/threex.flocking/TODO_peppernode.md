@@ -18,6 +18,10 @@
   - the links is displayed by the child to its parent
 
 ### Controls
+* note about smarter initial placement of node
+  - when placing a child, scan all your sibling angle from the parent center
+  - for each angle testes, measure the distance to the closest sibling angle
+  - the one the furthest from the others win. 
 * from generationDelta, you get the separation area of the node
   * if another node radius is within separation radius, we try to move away
   * similar to boids in flocking 

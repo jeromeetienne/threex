@@ -5,12 +5,14 @@ THREEx.BasicPhysicsControls	= function(object3d){
 	this.object3d	= object3d
 
 	// physics constant
+	var position	= object3d.position
+	this.position	= position
 	var velocity	= new THREE.Vector3()
 	this.velocity	= velocity
 	var acceleration= new THREE.Vector3()
 	this.acceleration=acceleration
-	var position	= object3d.position
-	this.position	= position
+	var damping	= new THREE.Vector3(1,1,1)
+	this.damping	= damping
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
@@ -18,16 +20,10 @@ THREEx.BasicPhysicsControls	= function(object3d){
 	
 	this.applyForces	= function(){
 		// handle physics
-		velocity.multiplyScalar(this.opts.damping)
+		velocity.multiply(this.damping)
 		velocity.add(acceleration)
-		// honor maxSpeed
-		if( velocity.length() > this.opts.maxSpeed ){
-			velocity.setLength(this.opts.maxSpeed)
-		}
 		// update object3d position
 		object3d.position.add(velocity)
-		// update debug
-		if( debug )	this.updateDebug()
 		// reset acceleration
 		acceleration.set(0,0,0)
 	}
