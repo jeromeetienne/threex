@@ -4,7 +4,7 @@ THREEx.PepperNode	= function(name, generation, scene){
 	// handle structure
 	this.name	= name
 	this.generation	= generation
-	this.radius	= 1/(generation+1)
+	this.radius	= 1/generation
 	this.parent	= null
 	this.children	= []
 
@@ -31,7 +31,10 @@ THREEx.PepperNode	= function(name, generation, scene){
 	var css3DJoint		= null
 	onRenderFcts.push(function(delta, now){
 		if( css3DJoint === null )	return
+		console.assert(this.parent);
 
+		css3DJoint.srcMargin	= (128 - 18)/2 * (1/generation)
+		css3DJoint.dstMargin	= (128 - 18)/2 * (1/this.parent.generation)
 		css3DJoint.update()
 	}.bind(this))
 

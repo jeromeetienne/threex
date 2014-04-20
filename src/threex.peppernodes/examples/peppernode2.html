@@ -32,41 +32,42 @@
 	var nodesControls	= []
 
 ;(function(){
-	return
+return
 	// build the tree
-	var nodeParent	= createNode('nodeParent',  1, null)
+	var nodeParent	= createNode('nodeParent',  2, null)
 	nodeParent.position.x	= -80
 
-	var nodeCurrent	= createNode('nodeCurrent', 0, nodeParent)
+	var nodeCurrent	= createNode('nodeCurrent', 1, nodeParent)
 	nodeCurrent.position.x	= +80
-	onRenderFcts.push(function(delta, now){
-		var angle	= now * Math.PI*2*0.3
-		nodeCurrent.position.y	= Math.sin(angle)*50
-	})
+	// onRenderFcts.push(function(delta, now){
+	// 	var angle	= now * Math.PI*2*0.3
+	// 	nodeCurrent.position.y	= Math.sin(angle)*50
+	// })
 
-	var nodeChild1	= createNode('child1', 1, nodeCurrent)
-	nodeChild1.position.x	= +150
-	nodeChild1.position.y	= +80
+	// var nodeChild1	= createNode('child1', 2, nodeCurrent)
+	// nodeChild1.position.x	= +150
+	// nodeChild1.position.y	= +80
 
-	var nodeChild2	= createNode('child2', 1, nodeCurrent)
-	nodeChild2.position.x	= +150
-	nodeChild2.position.y	= -80
+	// var nodeChild2	= createNode('child2', 2, nodeCurrent)
+	// nodeChild2.position.x	= +150
+	// nodeChild2.position.y	= -80
 })()
 
 
 ;(function(){
+// return;
 	// build the tree
-	var nodeFocus	= createNode('nodeFocus', 0, null)
+	var nodeFocus	= createNode('nodeFocus', 1, null)
 
-	var nChildren		= 1
-	var nGrandChildren	= 5
+	var nChildren		= 3
+	var nGrandChildren	= 3
 	for(var i = 0; i < nChildren; i++){
-		var nodeChild	= createNode('child'+i, 1, nodeFocus)
+		var nodeChild	= createNode('child'+i, 2, nodeFocus)
 		nodeChild.position.copy(nodeFocus.position)
 		nodeChild.position.x	+= (Math.random()-0.5)*400
 		nodeChild.position.y	+= (Math.random()-0.5)*400
 		for(var j = 0; j < nGrandChildren; j++){
-			var nodeGrandChild	= createNode('grandChild'+i+'_'+j, 2, nodeChild)
+			var nodeGrandChild	= createNode('grandChild'+i+'_'+j, 3, nodeChild)
 			nodeGrandChild.position.copy(nodeChild.position)
 			nodeGrandChild.position.x	+= (Math.random()-0.5)*200
 			nodeGrandChild.position.y	+= (Math.random()-0.5)*200
@@ -113,34 +114,40 @@
 		//		spring link							//
 		//////////////////////////////////////////////////////////////////////////////////
 		controls.onComputeForces.push(function(others){
-			// return
+// return
 			var current	= controls
 			var node	= current.object3d.userData.node
 
+			// this force is applied only on the child
 			if( node.parent === null )	return;
 			var other	= node.parent
 
-			// compute the average
-			var delta	= new THREE.Vector3()
-			delta.subVectors( other.position, current.position ).normalize()
 			// set some variables
-			var distance	= other.position.distanceTo( current.position );
 
 			var targetDist	= 300/node.generation
+			var actualDist	= other.position.distanceTo( current.position );
 
-			if( delta.length() > 300/node.generation ){
-				var force	= delta.clone()
-				// honor weight for this force
-				force.multiplyScalar(0.005/node.generation)
-				// apply the force to acceleration
-				current.acceleration.add(force)
-			}
+			var targetPos	= new THREE.Vector3()
+			targetPos.subVectors( other.position, current.position ).setLength(targetDist)
+
+			var distance	= targetPos.distanceTo( current.position );
+			var deltaDist	= actualDist - targetDist
+
+			// honor weight for this force
+			var force	= new THREE.Vector3()
+				.subVectors( targetPos, current.position )
+				.normalize()
+				.multiplyScalar( deltaDist  )
+				.multiplyScalar( 0.01 )
+			// apply the force to acceleration
+			current.acceleration.add(force)
 		})
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//		separation							//
 		//////////////////////////////////////////////////////////////////////////////////
 		controls.onComputeForces.push(function(others){
+// return
 			var current	= controls
 			var node	= current.object3d.userData.node
 			var vectorSum	= new THREE.Vector3();
@@ -170,7 +177,7 @@
 			vectorSum.divideScalar( vectorCount );
 			var force	= vectorSum
 			// honor weight for this force
-			force.multiplyScalar(8)
+			force.multiplyScalar(3)
 			// apply the force to acceleration
 			current.acceleration.add(force)
 		})
