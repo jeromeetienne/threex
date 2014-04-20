@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.js'></script>
 <script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
-<script src='peppernode.js'></script>
-<script src='threex.css3djoint.js'></script>
+<script src='../threex.peppernode.js'></script>
+<script src='../threex.css3djoint.js'></script>
 <script src='../threex.basicphysicscontrols.js'></script>
 <body style='margin: 0px; background-color: #333333; overflow: hidden;'>
 <style>
@@ -58,7 +58,7 @@
 	// build the tree
 	var nodeFocus	= createNode('nodeFocus', 0, null)
 
-	var nChildren		= 5
+	var nChildren		= 1
 	var nGrandChildren	= 5
 	for(var i = 0; i < nChildren; i++){
 		var nodeChild	= createNode('child'+i, 1, nodeFocus)
@@ -91,7 +91,7 @@
 	//////////////////////////////////////////////////////////////////////////////////
 
 	function createNode(name, generation, parentNode){
-		var node	= new PepperNode(name, generation, scene)
+		var node	= new THREEx.PepperNode(name, generation, scene)
 		node.object3d.userData.node	= node
 		node.setParent( parentNode )
 		nodes.push(node)

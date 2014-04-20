@@ -1,4 +1,6 @@
-function PepperNode(name, generation, scene){
+var THREEx	= THREEx	|| {}
+
+THREEx.PepperNode	= function(name, generation, scene){
 	// handle structure
 	this.name	= name
 	this.generation	= generation
@@ -58,7 +60,4 @@ function PepperNode(name, generation, scene){
 			scene.add(css3DJoint.object3d)
 		}
 	}
-}
-
-PepperNode.prototype.destroy	= function(){
 }
