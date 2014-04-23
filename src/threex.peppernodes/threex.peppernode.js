@@ -19,8 +19,8 @@ THREEx.PepperNode	= function(name, generation, scene){
 	// visualisation build object3d
 	var domElement	= document.createElement( 'img' );
 	domElement.src	= 'css3d_molecules/images/ball.png';
-	domElement.width	= 128*this.radius
-	domElement.height	= 128*this.radius
+	domElement.width	= (128+22 /* because sprite isnt full image */)*this.radius
+	domElement.height	= (128+22 /* because sprite isnt full image */)*this.radius
 	domElement.title= name
 	var object3d	= new THREE.CSS3DSprite( domElement );
 	this.object3d	= object3d
@@ -33,8 +33,8 @@ THREEx.PepperNode	= function(name, generation, scene){
 		if( css3DJoint === null )	return
 		console.assert(this.parent);
 
-		css3DJoint.srcMargin	= (128 - 18)/2 * (1/generation)
-		css3DJoint.dstMargin	= (128 - 18)/2 * (1/this.parent.generation)
+		css3DJoint.srcMargin	= 128/2 * (1/generation)
+		css3DJoint.dstMargin	= 128/2 * (1/this.parent.generation)
 		css3DJoint.update()
 	}.bind(this))
 
@@ -61,6 +61,23 @@ THREEx.PepperNode	= function(name, generation, scene){
 			console.assert(css3DJoint === null)
 			css3DJoint	= new THREEx.CSS3DJoint(this.position, this.parent.position)
 			scene.add(css3DJoint.object3d)
+		}
+	}
+
+	this.setGeneration	= function(newGeneration, originNode){
+		generation	= newGeneration
+		this.generation	= generation
+		this.radius	= 1/generation
+		domElement.width	= (128+22 /* because sprite isnt full image */)*this.radius
+		domElement.height	= (128+22 /* because sprite isnt full image */)*this.radius
+
+
+		if( this.parent && this.parent !== originNode ){
+			this.parent.setGeneration(newGeneration+1, this)
+		}
+		for(var i = 0; i < this.children.length; i++){
+			if( this.children[i] === originNode )	continue;
+			this.children[i].setGeneration(newGeneration+1, this)
 		}
 	}
 }

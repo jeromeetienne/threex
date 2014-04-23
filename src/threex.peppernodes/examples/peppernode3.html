@@ -4,13 +4,13 @@
 <script src='../threex.peppernode.js'></script>
 <script src='../threex.css3djoint.js'></script>
 <script src='../threex.basicphysicscontrols.js'></script>
+<script src='../threex.peppernodecontrols.js'></script>
 <body style='margin: 0px; background-color: #333333; overflow: hidden;'>
 <style>
 .bond {
 	width		: 5px;
 	height		: 10px;
 	background	: #eee;
-	display		: block;
 }
 </style><script>
 	// setup webgl renderer full page
@@ -32,30 +32,26 @@
 	var nodesControls	= []
 
 ;(function(){
-return
+// return
 	// build the tree
 	var nodeParent	= createNode('nodeParent',  2, null)
 	nodeParent.position.x	= -80
 
 	var nodeCurrent	= createNode('nodeCurrent', 1, nodeParent)
 	nodeCurrent.position.x	= +80
-	// onRenderFcts.push(function(delta, now){
-	// 	var angle	= now * Math.PI*2*0.3
-	// 	nodeCurrent.position.y	= Math.sin(angle)*50
-	// })
 
-	// var nodeChild1	= createNode('child1', 2, nodeCurrent)
-	// nodeChild1.position.x	= +150
-	// nodeChild1.position.y	= +80
+	var nodeChild1	= createNode('child1', 2, nodeCurrent)
+	nodeChild1.position.x	= +150
+	nodeChild1.position.y	= +80
 
-	// var nodeChild2	= createNode('child2', 2, nodeCurrent)
-	// nodeChild2.position.x	= +150
-	// nodeChild2.position.y	= -80
+	var nodeChild2	= createNode('child2', 2, nodeCurrent)
+	nodeChild2.position.x	= +150
+	nodeChild2.position.y	= -80
 })()
 
 
 ;(function(){
-// return;
+return;
 	// build the tree
 	var nodeFocus	= createNode('nodeFocus', 1, null)
 
@@ -95,7 +91,23 @@ return
 		var node	= new THREEx.PepperNode(name, generation, scene)
 		node.object3d.userData.node	= node
 		node.setParent( parentNode )
+
+
 		nodes.push(node)
+
+		var domElement	= node.object3d.element
+		// if it is clicked on, changet the focus by spreading the generation
+		domElement.addEventListener('click', function(){
+			node.setGeneration(1, null)
+		})
+		// change the mouse cursor to show it is clickable
+		domElement.addEventListener('mouseover', function(){
+			document.body.style.cursor	= 'pointer'
+		})
+		domElement.addEventListener('mouseout', function(){
+			document.body.style.cursor	= 'default'
+		})
+
 		return node
 	}
 
@@ -105,110 +117,17 @@ return
 	//////////////////////////////////////////////////////////////////////////////////
 
 	nodes.forEach(function(node){
-		var controls	= new THREEx.BasicPhysicsControls(node.object3d)
-		controls.damping.multiplyScalar(0.8)
+		var controls	= new THREEx.PepperNodeControls(node.object3d)
+		controls.damping.multiplyScalar(0.9)
 		nodesControls.push(controls)
-
-		//////////////////////////////////////////////////////////////////////////////////
-		//		focus node goto center						//
-		//////////////////////////////////////////////////////////////////////////////////
-		controls.onComputeForces.push(function(others){
-// return
-			var current	= controls
-			var node	= current.object3d.userData.node
-
-			// this force is applied generation === 1 aka focus node
-			if( node.generation !== 1 )	return;
-
-			// honor weight for this force
-			var force	= new THREE.Vector3()
-				.copy( current.position )
-				.normalize()
-				.multiplyScalar( 0.05 )
-			// apply the force to acceleration
-			current.acceleration.sub(force)
-		})
-
-
-		//////////////////////////////////////////////////////////////////////////////////
-		//		spring link							//
-		//////////////////////////////////////////////////////////////////////////////////
-		controls.onComputeForces.push(function(others){
-// return
-			var current	= controls
-			var node	= current.object3d.userData.node
-
-			// this force is applied only on the child
-			if( node.parent === null )	return;
-			var other	= node.parent
-
-			// set some variables
-
-			var targetDist	= 400/node.generation
-			var actualDist	= other.position.distanceTo( current.position );
-
-			var targetPos	= new THREE.Vector3()
-			targetPos.subVectors( other.position, current.position ).setLength(targetDist)
-
-			var distance	= targetPos.distanceTo( current.position );
-			var deltaDist	= actualDist - targetDist
-
-			// honor weight for this force
-			var force	= new THREE.Vector3()
-				.subVectors( targetPos, current.position )
-				.normalize()
-				.multiplyScalar( deltaDist  )
-				.multiplyScalar( 0.01 )
-			// apply the force to acceleration
-			current.acceleration.add(force)
-		})
-
-		//////////////////////////////////////////////////////////////////////////////////
-		//		separation							//
-		//////////////////////////////////////////////////////////////////////////////////
-		controls.onComputeForces.push(function(others){
-// return
-			var current	= controls
-			var node	= current.object3d.userData.node
-			var vectorSum	= new THREE.Vector3();
-			var vectorCount	= 0
-	
-			var vectorRepulse	= new THREE.Vector3();
-			others.forEach(function(other){
-				// dont apply on yourself
-				if( other === current )	return
-
-				// set some variables
-				var distance	= other.position.distanceTo( current.position );
-
-				var radius	= 300/node.generation
-				if( distance > 0 && distance <= radius ){
-					vectorRepulse.subVectors( current.position, other.position );
-					vectorRepulse.normalize();
-					vectorRepulse.divideScalar( distance/node.generation );
-					vectorSum.add( vectorRepulse );
-					vectorCount++;
-				}		
-			})
-
-			// do nothing if no neighbour
-			if( vectorCount === 0 )	return
-			// compute the average
-			vectorSum.divideScalar( vectorCount );
-			var force	= vectorSum
-			// honor weight for this force
-			force.multiplyScalar(3)
-			// apply the force to acceleration
-			current.acceleration.add(force)
-		})
 	})
 
 	setInterval(function(){
 		nodesControls.forEach(function(controls){
 			controls.computeForces(nodesControls)
-			controls.computeForces(nodesControls)
-			controls.computeForces(nodesControls)
-			controls.computeForces(nodesControls)
+			// controls.computeForces(nodesControls)
+			// controls.computeForces(nodesControls)
+			// controls.computeForces(nodesControls)
 		})
 
 		nodesControls.forEach(function(controls){
@@ -225,8 +144,8 @@ return
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
 	}, false)
 	onRenderFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*512 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*512 - camera.position.y) * (delta*3)
+		camera.position.x += (mouse.x*512*2 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*512*5 - camera.position.y) * (delta*3)
 		camera.lookAt( scene.position )
 	})
 	
