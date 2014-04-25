@@ -1,4 +1,6 @@
 var THREEx	= THREEx	|| {}
+
+// from three.js examples/css3d_molecules.html
 THREEx.CSS3DJoint	= function(srcPosition, dstPosition){
 
 	this.object3d	= new THREE.Object3D()
@@ -45,5 +47,6 @@ THREEx.CSS3DJoint	= function(srcPosition, dstPosition){
 		objectCSS3d.rotation.setFromRotationMatrix( objectCSS3d.matrix, objectCSS3d.rotation.order );
 
 		// objectCSS3d.matrixAutoUpdate = false;
+// TODO original had 2 sides, so better 3d representation
 	}
 }

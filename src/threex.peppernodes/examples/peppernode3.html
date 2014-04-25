@@ -112,7 +112,7 @@ return;
 
 		// init the controls
 		var controls	= new THREEx.PepperNodeControls(node.object3d)
-		controls.damping.multiplyScalar(0.5)
+		controls.damping.multiplyScalar(0.95)
 		nodesControls.push(controls)
 		node.object3d.userData.controls	= controls
 

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script src='../threex.md2character.js'></script>
+<script src='../threex.md2characterratmahatta.js'></script>
+<script src='../threex.md2charactercontrols.js'></script>
+<div style='position:absolute; top: 10px; left: 10px; font-size: 20px; color: gray; font-family: monospace;'>
+	<div>
+		skinNames:
+		<button onclick='switchSkinName(this.innerHTML);'>ratamahatta</button>
+		<button onclick='switchSkinName(this.innerHTML);'>ctf_b</button>
+		<button onclick='switchSkinName(this.innerHTML);'>ctf_r</button>
+		<button onclick='switchSkinName(this.innerHTML);'>dead</button>
+		<button onclick='switchSkinName(this.innerHTML);'>gearwhore</button>
+	</div>
+	<div>
+		weaponNames:
+		<button onclick='switchWeaponName(this.innerHTML);'>none</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>weapon</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_bfg</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_blaster</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_chaingun</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_glauncher</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_hyperblaster</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_machinegun</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_railgun</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_rlauncher</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_shotgun</button>
+		<button onclick='switchWeaponName(this.innerHTML);'>w_sshotgun</button>
+	</div>
+	<div>
+		animationNames:
+		<button onclick='switchAnimationName(this.innerHTML);'>stand</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>run</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>attack</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>pain</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>jump</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>flip</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>salute</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>taunt</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>wave</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>point</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>crstand</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>crwalk</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>crattack</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>crpain</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>crdeath</button>
+		<button onclick='switchAnimationName(this.innerHTML);'>death</button>
+	</div>
+</div>
+
+<!-- <script src='../threex.md2character.ratamahatta.js'></script> -->
+<body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
+
+["stand", "run", "attack", "pain", "jump", "flip", "salute", "taunt", "wave", "point", "crstand", "crwalk", "crattack", "crpain", "crdeath", "death"]
+
+	var renderer	= new THREE.WebGLRenderer({
+		antialias	: true
+	});
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 2;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		set 3 point lighting						//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	;(function(){
+		// add a ambient light
+		var light	= new THREE.AmbientLight( 0x020202 )
+		scene.add( light )
+		// add a light in front
+		var light	= new THREE.DirectionalLight('white', 1.5)
+		light.position.set(0.5, 0.5, 2)
+		scene.add( light )
+		// add a light behind
+		var light	= new THREE.DirectionalLight('white', 0.75*2)
+		light.position.set(-0.5, -0.5, -2)
+		scene.add( light )		
+	})()
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var ratamahatta	= new THREEx.MD2CharacterRatmahatta()
+	scene.add(ratamahatta.character.object3d)
+	onRenderFcts.push(function(delta){
+		ratamahatta.update(delta)
+	})
+window.ratamahatta	= ratamahatta
+
+	// ratamahatta.character.addEventListener('loaded', function(){
+	// 	ratamahatta.character.setSkin(1)
+	// 	ratamahatta.character.setWeapon(1)
+	// 	ratamahatta.character.animation('run')
+	// })
+// window.character	= ratamahatta.character
+
+	window.switchSkinName	= function(value){
+		ratamahatta.setSkinName(value)
+	}
+	window.switchWeaponName	= function(value){
+		ratamahatta.setWeaponName(value)
+	}
+	window.switchAnimationName	= function(value){
+		ratamahatta.setAnimationName(value)
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		// mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		// mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 +1 - camera.position.y) * (delta*3)
+
+		var target	= new THREE.Vector3(0,0,-3)
+		camera.lookAt( target )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

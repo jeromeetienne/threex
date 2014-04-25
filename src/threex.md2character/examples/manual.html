@@ -60,9 +60,9 @@
 	// character.object3d.position.y	= -10
 	scene.add(character.object3d)
 	character.addEventListener('loaded', function(){
-		character.setSkin(1)
-		character.setWeapon(1)
-		character.animation('run')
+		// character.setSkin(1)
+		// character.setWeapon(1)
+		// character.animation('run')
 	})
 	onRenderFcts.push(function(delta){
 		character.update(delta)

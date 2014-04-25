@@ -48,7 +48,8 @@ THREEx.PepperNodeControls	= function(object3d){
 		var node	= current.object3d.userData.node
 
 		// this force is applied generation === 1 aka focus node
-		if( node.generation !== 1 )	return;
+		var isFocusedNode	= node.generation === 1 ? true : false
+		if( isFocusedNode === false )	return;
 
 		// honor weight for this force
 		var force	= new THREE.Vector3()
@@ -68,13 +69,14 @@ THREEx.PepperNodeControls	= function(object3d){
 // return
 
 		// this force is applied only on the child
-		if( node.parent === null )	return;
-		var other		= node.parent
-		var otherControls	= node.parent.object3d.userData.controls
+		var hasParent	= node.parent ? true : false
+		if( hasParent === false )	return;
 
 		// set some variables
-		var targetDist	= 400/node.generation
-		var actualDist	= other.position.distanceTo( current.position );
+		var other		= node.parent
+		var otherControls	= node.parent.object3d.userData.controls
+		var targetDist		= 400/node.generation
+		var actualDist		= other.position.distanceTo( current.position );
 
 		var targetPos	= new THREE.Vector3()
 		targetPos.subVectors( other.position, current.position ).setLength(targetDist)
@@ -87,7 +89,7 @@ THREEx.PepperNodeControls	= function(object3d){
 			.subVectors( targetPos, current.position )
 			.normalize()
 			.multiplyScalar( deltaDist  )
-			.multiplyScalar( 0.01 )
+			.multiplyScalar( 0.005 )
 		// apply the force to acceleration
 		current.acceleration.add(force)
 		otherControls.acceleration.sub(force)
@@ -97,7 +99,7 @@ THREEx.PepperNodeControls	= function(object3d){
 	//		separation							//
 	//////////////////////////////////////////////////////////////////////////////////
 	onComputeForces.push(function(others){
-return
+// return
 
 		var node	= current.object3d.userData.node
 		var vectorSum	= new THREE.Vector3();
@@ -115,7 +117,7 @@ return
 			if( distance > 0 && distance <= radius ){
 				vectorRepulse.subVectors( current.position, other.position );
 				vectorRepulse.normalize();
-				vectorRepulse.divideScalar( distance/node.generation );
+				vectorRepulse.divideScalar( distance * node.generation );
 				vectorSum.add( vectorRepulse );
 				vectorCount++;
 			}		
@@ -127,7 +129,7 @@ return
 		vectorSum.divideScalar( vectorCount );
 		var force	= vectorSum
 		// honor weight for this force
-		force.multiplyScalar(3)
+		force.multiplyScalar(5)
 		// apply the force to acceleration
 		current.acceleration.add(force)
 	})

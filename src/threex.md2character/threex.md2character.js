@@ -170,15 +170,18 @@ THREEx.MD2Character.prototype.animation = function( animationName ){
 	if( animationName === this._curAnimation ){
 		return this;	// for chained API
 	}
-	// sanity check
-	console.assert( Object.keys(this.meshBody.geometry.animations).indexOf(animationName) !== -1 );
 	// setter on this.meshBody
 	if ( this.meshBody ) {
+		// sanity check
+		console.assert( Object.keys(this.meshBody.geometry.animations).indexOf(animationName) !== -1 );
+
 		this.meshBody.playAnimation( animationName, this.animationFPS );
 		this.meshBody.baseDuration	= this.meshBody.duration;
 	}
 	// setter on this.meshWeapon
 	if ( this.meshWeapon ) {
+		// sanity check
+		console.assert( Object.keys(this.meshWeapon.geometry.animations).indexOf(animationName) !== -1 );
 		this.meshWeapon.playAnimation( animationName, this.animationFPS );
 		this.meshWeapon.baseDuration	= this.meshWeapon.duration;
 		this.meshWeapon.time		= this.meshBody.time;
