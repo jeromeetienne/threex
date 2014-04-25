@@ -54,7 +54,7 @@ THREEx.PepperNodeControls	= function(object3d){
 		var force	= new THREE.Vector3()
 			.copy( current.position )
 			// .normalize()
-			.multiplyScalar( -0.1 )
+			.multiplyScalar( -0.2 )
 		// apply the force to acceleration
 		current.acceleration.add(force)
 	})
@@ -69,10 +69,10 @@ THREEx.PepperNodeControls	= function(object3d){
 
 		// this force is applied only on the child
 		if( node.parent === null )	return;
-		var other	= node.parent
+		var other		= node.parent
+		var otherControls	= node.parent.object3d.userData.controls
 
 		// set some variables
-
 		var targetDist	= 400/node.generation
 		var actualDist	= other.position.distanceTo( current.position );
 
@@ -87,16 +87,17 @@ THREEx.PepperNodeControls	= function(object3d){
 			.subVectors( targetPos, current.position )
 			.normalize()
 			.multiplyScalar( deltaDist  )
-			.multiplyScalar( 0.1 )
+			.multiplyScalar( 0.01 )
 		// apply the force to acceleration
 		current.acceleration.add(force)
+		otherControls.acceleration.sub(force)
 	})
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		separation							//
 	//////////////////////////////////////////////////////////////////////////////////
 	onComputeForces.push(function(others){
-// return
+return
 
 		var node	= current.object3d.userData.node
 		var vectorSum	= new THREE.Vector3();

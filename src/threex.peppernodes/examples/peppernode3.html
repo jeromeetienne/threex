@@ -91,10 +91,12 @@ return;
 		var node	= new THREEx.PepperNode(name, generation, scene)
 		node.object3d.userData.node	= node
 		node.setParent( parentNode )
-
-
 		nodes.push(node)
 
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//		bind dom events							//
+		//////////////////////////////////////////////////////////////////////////////////
 		var domElement	= node.object3d.element
 		// if it is clicked on, changet the focus by spreading the generation
 		domElement.addEventListener('click', function(){
@@ -108,6 +110,13 @@ return;
 			document.body.style.cursor	= 'default'
 		})
 
+		// init the controls
+		var controls	= new THREEx.PepperNodeControls(node.object3d)
+		controls.damping.multiplyScalar(0.5)
+		nodesControls.push(controls)
+		node.object3d.userData.controls	= controls
+
+
 		return node
 	}
 
@@ -116,18 +125,9 @@ return;
 	//		to comment							//
 	//////////////////////////////////////////////////////////////////////////////////
 
-	nodes.forEach(function(node){
-		var controls	= new THREEx.PepperNodeControls(node.object3d)
-		controls.damping.multiplyScalar(0.9)
-		nodesControls.push(controls)
-	})
-
 	setInterval(function(){
 		nodesControls.forEach(function(controls){
 			controls.computeForces(nodesControls)
-			// controls.computeForces(nodesControls)
-			// controls.computeForces(nodesControls)
-			// controls.computeForces(nodesControls)
 		})
 
 		nodesControls.forEach(function(controls){
@@ -144,6 +144,7 @@ return;
 		mouse.y	= (event.clientY / window.innerHeight) - 0.5
 	}, false)
 	onRenderFcts.push(function(delta, now){
+return
 		camera.position.x += (mouse.x*512*2 - camera.position.x) * (delta*3)
 		camera.position.y += (mouse.y*512*5 - camera.position.y) * (delta*3)
 		camera.lookAt( scene.position )
