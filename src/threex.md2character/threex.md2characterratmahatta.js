@@ -40,6 +40,7 @@ THREEx.MD2CharacterRatmahatta	= function(onLoad){
 	//////////////////////////////////////////////////////////////////////////
 	// load the data
 	// - TODO make all this data cachable, thus 2 instances load only once
+	// - take a microcache.js and put it in THREEx.MD2Character
 	character.load({
 		baseUrl	: THREEx.MD2CharacterRatmahatta.baseUrl+'models/ratamahatta/',
 		body	: "ratamahatta.js",
@@ -59,6 +60,9 @@ THREEx.MD2CharacterRatmahatta	= function(onLoad){
 			[ "w_sshotgun.js"	, "w_sshotgun.png" ],
 		]
 	})
+	character.addEventListener('loaded', function(){
+		onLoad && onLoad(this)
+	}.bind(this))
 
 	//////////////////////////////////////////////////////////////////////////
 	//									//

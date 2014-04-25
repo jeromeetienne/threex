@@ -50,9 +50,6 @@
 
 <!-- <script src='../threex.md2character.ratamahatta.js'></script> -->
 <body style='margin: 0px; background-color: #000000; overflow: hidden;'><script>
-
-["stand", "run", "attack", "pain", "jump", "flip", "salute", "taunt", "wave", "point", "crstand", "crwalk", "crattack", "crpain", "crdeath", "death"]
-
 	var renderer	= new THREE.WebGLRenderer({
 		antialias	: true
 	});
@@ -62,7 +59,10 @@
 	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
-	camera.position.z = 2;
+	camera.position.y	= 1
+	camera.position.z	= 2;
+	camera.lookAt(new THREE.Vector3(0,0,-3))
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		set 3 point lighting						//
@@ -93,12 +93,10 @@
 	})
 window.ratamahatta	= ratamahatta
 
-	// ratamahatta.character.addEventListener('loaded', function(){
-	// 	ratamahatta.character.setSkin(1)
-	// 	ratamahatta.character.setWeapon(1)
-	// 	ratamahatta.character.animation('run')
-	// })
-// window.character	= ratamahatta.character
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
 
 	window.switchSkinName	= function(value){
 		ratamahatta.setSkinName(value)
@@ -109,23 +107,6 @@ window.ratamahatta	= ratamahatta
 	window.switchAnimationName	= function(value){
 		ratamahatta.setAnimationName(value)
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////
-	//		Camera Controls							//
-	//////////////////////////////////////////////////////////////////////////////////
-	var mouse	= {x : 0, y : 0}
-	document.addEventListener('mousemove', function(event){
-		// mouse.x	= (event.clientX / window.innerWidth ) - 0.5
-		// mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	}, false)
-	onRenderFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 +1 - camera.position.y) * (delta*3)
-
-		var target	= new THREE.Vector3(0,0,-3)
-		camera.lookAt( target )
-	})
-
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
