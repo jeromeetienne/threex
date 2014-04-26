@@ -161,7 +161,7 @@ THREEx.MD2Character.prototype.setWeapon = function( index ){
  *
  * @param {string} animationName the animation name to set
 */
-THREEx.MD2Character.prototype.animation = function( animationName ){
+THREEx.MD2Character.prototype.setAnimation = function( animationName ){
 	// for getter
 	if( animationName === undefined ){
 		return this._curAnimation;

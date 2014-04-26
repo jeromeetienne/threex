@@ -114,7 +114,7 @@ THREEx.MD2CharacterRatmahatta	= function(onLoad){
 	this.animationNames	= animationNames
 	this.setAnimationName	= function(animationName){
 		console.assert(animationNames.indexOf(animationName) !== -1)
-		character.animation(animationName)
+		character.setAnimation(animationName)
 	}
 }
 
