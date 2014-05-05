@@ -1,4 +1,3 @@
-
 ### About controls strategy
 * i went for a dynamic physics
     - it seems hard to controls
@@ -76,3 +75,14 @@ node.children.forEach(function(nodeChild){
     angle += deltaAngle
 })
 ```
+
+
+
+
+
+
+
+
+
+
+

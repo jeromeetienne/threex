@@ -5,6 +5,7 @@
 <script src='../threex.css3djoint.js'></script>
 <script src='../threex.basicphysicscontrols.js'></script>
 <script src='../threex.peppernodedynamiccontrols.js'></script>
+<script src='../threex.peppernodestaticcontrols.js'></script>
 <body style='margin: 0px; background-color: #333333; overflow: hidden;'>
 <style>
 .bond {
@@ -32,31 +33,30 @@
 	var nodesControls	= []
 
 ;(function(){
-// return
+return
 	// build the tree
 	var nodeParent	= createNode('nodeParent',  2, null)
-	nodeParent.position.x	= -80
-
 	var nodeCurrent	= createNode('nodeCurrent', 1, nodeParent)
-	nodeCurrent.position.x	= +80
 
+	// var nodeCurrent	= createNode('nodeCurrent', 1, null)
 	var nodeChild1	= createNode('child1', 2, nodeCurrent)
-	nodeChild1.position.x	= +150
-	nodeChild1.position.y	= +80
 
 	var nodeChild2	= createNode('child2', 2, nodeCurrent)
-	nodeChild2.position.x	= +150
-	nodeChild2.position.y	= -80
+
+
+	var topFocusedNode	= nodeParent
+	topFocusedNode.setGeneration(1, null)
+	THREEx.PepperNodeStaticControls.computePosition(topFocusedNode)
 })()
 
 
 ;(function(){
-return;
+// return;
 	// build the tree
 	var nodeFocus	= createNode('nodeFocus', 1, null)
 
-	var nChildren		= 1
-	var nGrandChildren	= 3
+	var nChildren		= 5
+	var nGrandChildren	= 2
 	for(var i = 0; i < nChildren; i++){
 		var nodeChild	= createNode('child'+i, 2, nodeFocus)
 		nodeChild.position.copy(nodeFocus.position)
@@ -69,6 +69,10 @@ return;
 			nodeGrandChild.position.y	+= (Math.random()-0.5)*200
 		}
 	}
+
+	var topFocusedNode	= nodeFocus
+	topFocusedNode.setGeneration(1, null)
+	THREEx.PepperNodeStaticControls.computePosition(topFocusedNode)
 })()
 
 
@@ -101,6 +105,7 @@ return;
 		// if it is clicked on, changet the focus by spreading the generation
 		domElement.addEventListener('click', function(){
 			node.setGeneration(1, null)
+			THREEx.PepperNodeStaticControls.computePosition(node)
 		})
 		// change the mouse cursor to show it is clickable
 		domElement.addEventListener('mouseover', function(){
@@ -110,30 +115,8 @@ return;
 			document.body.style.cursor	= 'default'
 		})
 
-		// init the controls
-		var controls	= new THREEx.PepperNodeDynamicControls(node.object3d)
-		controls.damping.multiplyScalar(0.95)
-		nodesControls.push(controls)
-		node.object3d.userData.controls	= controls
-
-
 		return node
 	}
-
-
-	//////////////////////////////////////////////////////////////////////////////////
-	//		to comment							//
-	//////////////////////////////////////////////////////////////////////////////////
-
-	setInterval(function(){
-		nodesControls.forEach(function(controls){
-			controls.computeForces(nodesControls)
-		})
-
-		nodesControls.forEach(function(controls){
-			controls.applyForces()
-		})
-	}, 1000/60)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//

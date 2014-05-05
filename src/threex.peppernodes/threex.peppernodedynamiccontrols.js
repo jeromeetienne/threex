@@ -1,6 +1,6 @@
 var THREEx	= THREEx	|| {}
 
-THREEx.PepperNodeControls	= function(object3d){
+THREEx.PepperNodeDynamicControls	= function(object3d){
 	// export object3d
 	this.object3d	= object3d
 	var current	= this
