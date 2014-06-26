@@ -4,43 +4,49 @@ THREEx.RomeModels		= {}
 THREEx.RomeModels.baseUrl	= '../'
 
 THREEx.RomeModels.load	= function(url, callback){
+	var options	= {
+		smoothShading	: true,
+		morphColors	: true,
+	}
 	var loader	= new THREE.JSONLoader();
 	loader.load( url, function(geometry, material){
-
-		//////////////////////////////////////////////////////////////////////////////////
-		//		Comment								//
-		//////////////////////////////////////////////////////////////////////////////////
-		morphColorsToFaceColors(geometry)
-
-		function morphColorsToFaceColors( geometry ) {
-			if ( geometry.morphColors && geometry.morphColors.length ) {
-				var colorMap = geometry.morphColors[ 0 ];
-				for ( var i = 0; i < colorMap.colors.length; i ++ ) {
-					geometry.faces[ i ].color = colorMap.colors[ i ];
-				}
-			}
-		}
-
-		geometry.computeMorphNormals();
-
 		//////////////////////////////////////////////////////////////////////////////////
 		//		Comment								//
 		//////////////////////////////////////////////////////////////////////////////////
 		var material	= new THREE.MeshPhongMaterial({
-			morphTargets	: true,
-			// vertexColors	: THREE.FaceColors,
-			// shading		: THREE.SmoothShading,
-			// morphNormals	: true,
+			morphTargets	: true
 		})
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//		Comment								//
+		//////////////////////////////////////////////////////////////////////////////////
+		if( options.morphColors === true ){
+			morphColorsToFaceColors(geometry)
+			material.vertexColors	= THREE.FaceColors
+		}
+		if( options.smoothShading === true ){
+			geometry.computeMorphNormals();
+			material.shading	= THREE.SmoothShading
+			material.morphNormals	= true
+		}
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//		Comment								//
+		//////////////////////////////////////////////////////////////////////////////////
 		var mesh	= new THREE.MorphAnimMesh( geometry, material );
-		// mesh.position.z	= -300
-		// mesh.position.y	= -0.5
-		// mesh.scale.multiplyScalar(1/100)
-		// mesh.scale.multiplyScalar(1/1000)
-		// mesh.rotation.y	= Math.PI/2
 
 		callback(mesh)
 	} );
+
+	// utils funcitons
+	function morphColorsToFaceColors( geometry ) {
+		if ( geometry.morphColors && geometry.morphColors.length ) {
+			var colorMap = geometry.morphColors[ 0 ];
+			for ( var i = 0; i < colorMap.colors.length; i ++ ) {
+				geometry.faces[ i ].color = colorMap.colors[ i ];
+			}
+		}
+	}
 }
 
 THREEx.RomeModels.loadHorse	= function(callback){
