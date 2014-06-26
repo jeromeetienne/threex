@@ -6,7 +6,7 @@ THREEx.RomeModels.baseUrl	= '../'
 THREEx.RomeModels.load	= function(url, callback){
 	var options	= {
 		smoothShading	: true,
-		morphColors	: false,
+		morphColors	: true,
 	}
 	var loader	= new THREE.JSONLoader();
 	loader.load( url, function(geometry, material){
