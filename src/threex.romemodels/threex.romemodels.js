@@ -28,9 +28,9 @@ THREEx.RomeModels.load	= function(url, callback){
 		//////////////////////////////////////////////////////////////////////////////////
 		var material	= new THREE.MeshPhongMaterial({
 			morphTargets	: true,
-			vertexColors	: THREE.FaceColors,
-			shading		: THREE.SmoothShading,
-			morphNormals	: true,
+			// vertexColors	: THREE.FaceColors,
+			// shading		: THREE.SmoothShading,
+			// morphNormals	: true,
 		})
 		var mesh	= new THREE.MorphAnimMesh( geometry, material );
 		// mesh.position.z	= -300

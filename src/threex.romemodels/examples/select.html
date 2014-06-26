@@ -22,15 +22,15 @@
 	
 	var ambientLight= new THREE.AmbientLight( 0x606060 )
 	scene.add( ambientLight)
-	var frontLight	= new THREE.DirectionalLight('white', 2)
+	var frontLight	= new THREE.DirectionalLight('white', 1)
 	frontLight.position.set(0.5, 0.5, 2)
 	scene.add( frontLight )
-	var backLight	= new THREE.DirectionalLight('white', 0.75*2)
+	var backLight	= new THREE.DirectionalLight('white', 0.75)
 	backLight.position.set(-0.5, -0.5, -2)
 	scene.add( backLight )		
 
 	//////////////////////////////////////////////////////////////////////////////////
-	//		Comment								//
+	//		List All Models							//
 	//////////////////////////////////////////////////////////////////////////////////
 
 	var modelNames	= 
@@ -39,10 +39,8 @@
   'bearBrown',
   'bison',
   'black_widow',
-  'black_widow_scorpion',
   'centipede',
   'chowchow',
-  'chowchow_sealSwim',
   'cow',
   'crab',
   'deer',
@@ -50,7 +48,6 @@
   'eagle',
   'elk',
   'fish1',
-  'fish1_fish2',
   'fish2',
   'fish3',
   'fish4',
@@ -59,60 +56,51 @@
   'gator',
   'goat',
   'horse',
-  'horse_bearBlack',
   'hummingbird',
   'moose',
   'mountainlion',
   'owl',
-  'owl_parrot',
   'panther',
   'parrot',
   'rabbit',
   'raccoon',
   'raven',
-  'raven_eagle',
   'retreiver',
-  'retreiver_bearBlack',
   'scorpion',
   'sealRun',
-  'sealRun_bearBrown',
   'sealSwim',
   'shadow2',
   'stork',
-  'stork_flamingo',
   'tarbuffaloA',
-  'tarbuffaloA_tarbuffaloB',
   'tarbuffaloB',
   'toad',
-  'toad_treeFrog',
   'treefrog',
   'vulture',
-  'vulture_hummingbird',
-  'wolf',
-  'wolf_fox' ]
+  'wolf']
 
 
-  	switchValue(modelNames[4])
-
-  	var mesh	= null
+  	var mesh
 	onRenderFcts.push(function(delta, now){
-		if( mesh === null )	return
+		if( mesh === undefined )	return
 		mesh.updateAnimation( delta*1000 );
+
+		mesh.rotation.y	+= delta * Math.PI*2 * -0.1
 	})
+
   	function switchValue(modelName){
 		var url	= '../models/'+modelName+'.js'
 		THREEx.RomeModels.load(url, function(newMesh){
 	  		if( mesh && mesh.parent )	mesh.parent.remove(mesh)
 
 	  		mesh	= newMesh
-
-			scene.add(mesh)
-
 			mesh.scale.multiplyScalar(1/200)
 			mesh.rotation.y	= Math.PI/2
-		})
 
+			scene.add(mesh)
+		})
   	}
+
+  	switchValue(modelNames[4])
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -131,16 +119,16 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
-	var mouse	= {x : 0, y : 0}
-	document.addEventListener('mousemove', function(event){
-		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
-		mouse.y	= (event.clientY / window.innerHeight) - 0.5
-	}, false)
-	onRenderFcts.push(function(delta, now){
-		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
-		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
-		camera.lookAt( scene.position )
-	})
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// onRenderFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
