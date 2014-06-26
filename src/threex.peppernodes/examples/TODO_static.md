@@ -1,25 +1,29 @@
+## About threex.tweencontrols.js
 
-# Interesting Links
-* [Alternative BRowsing]http://en.wikipedia.org/wiki/Wikipedia:Tools/Alternative_browsing
-Looks at them. read to learn from them. They know more about wikipedia
-* http://threejs.org/examples/css3d_molecules.html css3d animtion of nodes
-* You need to know the structure of a page
-* Looks for [wikinodes on youtube](https://www.youtube.com/watch?v=fdiXXxMnqJQ)
-    - Kindof wonderwheels for wikipedia
-* the tech behind wikinodes: http://en.wikipedia.org/wiki/SpicyNodes
-    - official site http://www.spicynodes.org/
-    - good video showing principle http://www.spicynodes.org/blog/2011/01/22/sneak-peek-spicynodes-touch-jan-2011/
-    - apps on ipad and on flash. ipad seems fine but flash is flickering all over.
-* Wikiweb on youtube
-    - https://www.youtube.com/watch?v=pLk-3iima9s
-    - https://www.youtube.com/watch?v=ZkcfHIYwqPY
+* NOTES: is it position only ?
+* it gives the currentPosition
+* it gives the targetPosition
+* it gives a transitionDelay
+* targetPosition is dynamic
+    - everytime it changes, test if a tweening is in progress
+    - if current tweening, don't change the delay
+    - else put default delay
+* which function for the tweening ?
 
+## About size variations
 
---- ############################################################
+* if focus generation changes, the display size will change too
+* could that be handled at the css level
 
---- ############################################################
+## About dynamic generation based on wikipedia content
 
---- ############################################################
+* how to query it from wikipedia
+  * query some info from a page
+  * query related pages from a page - build from it
+  * cache all that 
+* how to build it dynamically
+
+## About threex.peppernodestaticcontrols.js
 
 ### About controls strategy
 * i went for a dynamic physics
@@ -98,15 +102,3 @@ node.children.forEach(function(nodeChild){
     angle += deltaAngle
 })
 ```
-
-
-
-
-
-
-
-
-
-
-
-

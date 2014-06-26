@@ -40,7 +40,7 @@ THREEx.PepperNodeStaticControls.computePosition	= function(node){
 	}
 
 	// compute the radius
-	var radiuses	= [0, 200, 100, 70, 50]
+	var radiuses	= [0, 200, 100, 70, 50, 30]
 	console.assert(node.generation >= 1 && node.generation < radiuses.length )
 	var radius	= radiuses[node.generation]
 

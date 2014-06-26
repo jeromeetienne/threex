@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<script src='vendor/three.js/three.js'></script>
+<script src='../threex.romemodels.js'></script>
+<body style='margin: 0px; overflow: hidden;'><script>
+	// setup webgl renderer full page
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer.setClearColor( 0xbbbbbb );
+	document.body.appendChild( renderer.domElement );
+	// setup a scene and camera
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 3;
+
+	// declare the rendering loop
+	var onRenderFcts= [];
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		default 3 points lightning					//
+	//////////////////////////////////////////////////////////////////////////////////
+	
+	var ambientLight= new THREE.AmbientLight( 0x606060 )
+	scene.add( ambientLight)
+	var frontLight	= new THREE.DirectionalLight('white', 2)
+	frontLight.position.set(0.5, 0.5, 2)
+	scene.add( frontLight )
+	var backLight	= new THREE.DirectionalLight('white', 0.75*2)
+	backLight.position.set(-0.5, -0.5, -2)
+	scene.add( backLight )		
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var models	= 
+[ 'armHand',
+  'bearBlack',
+  'bearBrown',
+  'bison',
+  'black_widow',
+  'black_widow_scorpion',
+  'centipede',
+  'chowchow',
+  'chowchow_sealSwim',
+  'cow',
+  'crab',
+  'deer',
+  'drownArm',
+  'eagle',
+  'elk',
+  'fish1',
+  'fish1_fish2',
+  'fish2',
+  'fish3',
+  'fish4',
+  'flamingo',
+  'fox',
+  'gator',
+  'goat',
+  'horse',
+  'horse_bearBlack',
+  'hummingbird',
+  'moose',
+  'mountainlion',
+  'owl',
+  'owl_parrot',
+  'panther',
+  'parrot',
+  'rabbit',
+  'raccoon',
+  'raven',
+  'raven_eagle',
+  'retreiver',
+  'retreiver_bearBlack',
+  'scorpion',
+  'sealRun',
+  'sealRun_bearBrown',
+  'sealSwim',
+  'shadow2',
+  'stork',
+  'stork_flamingo',
+  'tarbuffaloA',
+  'tarbuffaloA_tarbuffaloB',
+  'tarbuffaloB',
+  'toad',
+  'toad_treeFrog',
+  'treefrog',
+  'vulture',
+  'vulture_hummingbird',
+  'wolf',
+  'wolf_fox' ]
+
+	var romeUrl	= '../rome/deploy/asset_viewer/files/'
+
+	var url	= '../models/horse.js'
+
+	var url	= romeUrl + 'models/animals/armHand.js'
+	var url	= romeUrl + 'models/animals/deer.js'
+	var url	= romeUrl + 'models/animals/bison.js'
+	var url	= romeUrl + 'models/animals/centipede.js'
+	var url	= romeUrl + 'models/animals/hummingbird.js'
+	var url	= romeUrl + 'models/animals/eagle.js'
+	var url	= romeUrl + 'models/animals/mountainlion.js'
+	var url	= romeUrl + 'models/animals/rabbit.js'
+	var url	= romeUrl + 'models/animals/panther.js'
+	var url	= romeUrl + 'models/animals/raven.js'
+	var url	= '../output/cow.js'
+	THREEx.RomeModels.load(url, function(mesh){
+		scene.add(mesh)
+		onRenderFcts.push(function(delta, now){
+			mesh.updateAnimation( delta*1000 );
+		})
+
+		mesh.scale.multiplyScalar(1/200)
+		// mesh.position.x	= +1
+		// mesh.position.y	= 0.5
+		mesh.rotation.y	= Math.PI/2
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Rendering Loop runner						//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

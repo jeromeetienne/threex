@@ -5,7 +5,8 @@ THREEx.MinecraftControls	= function(object3d, input){
 	input		= input	|| {}
 
 	// handle arguments default values
-	this.speed	= 2;
+	this.speed		= 2;
+	this.angularSpeed	= 0.2 * Math.PI * 2;
 	this.input	= input;
 	this.object3d	= object3d;
 	
@@ -13,8 +14,8 @@ THREEx.MinecraftControls	= function(object3d, input){
 	this.update	= function(delta, now){
 		var prevPosition	= object3d.position.clone();
 		// rotation
-		if( input.left )	object3d.rotation.y += 0.1 * delta * Math.PI * 2;
-		if( input.right )	object3d.rotation.y -= 0.1 * delta * Math.PI * 2;			
+		if( input.left )	object3d.rotation.y += this.angularSpeed*delta
+		if( input.right )	object3d.rotation.y -= this.angularSpeed*delta
 
 		// strafe
 		var distance	= 0;

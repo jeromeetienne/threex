@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <script src='../../../vendor/three.js/build/three.js'></script>
 <script src='../../../vendor/three.js/examples/js/renderers/CSS3DRenderer.js'></script>
-<script src='../threex.peppernode.js'></script>
+<script src='../threex.peppernode2.js'></script>
 <script src='../threex.css3djoint.js'></script>
-<script src='../threex.basicphysicscontrols.js'></script>
-<script src='../threex.peppernodedynamiccontrols.js'></script>
 <script src='../threex.peppernodestaticcontrols.js'></script>
+
+<script src="vendor/mustache/mustache.js"></script>
+<script src="vendor/jquery/jquery.js"></script>
+
 <body style='margin: 0px; background-color: #333333; overflow: hidden;'>
 <style>
 .bond {
@@ -13,7 +15,23 @@
 	height		: 10px;
 	background	: #eee;
 }
-</style><script>
+</style>
+<style>
+.pepperNode {
+	text-align	: center;
+}
+.pepperNode label {
+	color		: grey;
+	font-size	: 80%;
+}
+</style>
+<template id='pepperNodeTemplate'>
+	<div class='pepperNode'>
+		<img src='css3d_molecules/images/ball.png' width='100%'/>
+		<label>{{name}}</label>
+	</div>
+</template>
+<script>
 	// setup webgl renderer full page
 	var renderer	= new THREE.CSS3DRenderer();
 	// var renderer	= new THREE.WebGLRenderer();
@@ -33,16 +51,12 @@
 	var nodesControls	= []
 
 ;(function(){
-return
+// return
 	// build the tree
 	var nodeParent	= createNode('nodeParent',  2, null)
 	var nodeCurrent	= createNode('nodeCurrent', 1, nodeParent)
-
-	// var nodeCurrent	= createNode('nodeCurrent', 1, null)
 	var nodeChild1	= createNode('child1', 2, nodeCurrent)
-
 	var nodeChild2	= createNode('child2', 2, nodeCurrent)
-
 
 	var topFocusedNode	= nodeParent
 	topFocusedNode.setGeneration(1, null)
@@ -51,7 +65,7 @@ return
 
 
 ;(function(){
-// return;
+return;
 	// build the tree
 	var nodeFocus	= createNode('nodeFocus', 1, null)
 
@@ -92,7 +106,7 @@ return
 	//////////////////////////////////////////////////////////////////////////////////
 
 	function createNode(name, generation, parentNode){
-		var node	= new THREEx.PepperNode(name, generation, scene)
+		var node	= new THREEx.PepperNode2(name, generation, scene)
 		node.object3d.userData.node	= node
 		node.setParent( parentNode )
 		nodes.push(node)
@@ -104,8 +118,10 @@ return
 		var domElement	= node.object3d.element
 		// if it is clicked on, changet the focus by spreading the generation
 		domElement.addEventListener('click', function(){
-			node.setGeneration(1, null)
-			THREEx.PepperNodeStaticControls.computePosition(node)
+console.log('click on node', node.name)
+			var topFocusedNode	= node
+			topFocusedNode.setGeneration(1, null)
+			THREEx.PepperNodeStaticControls.computePosition(topFocusedNode)
 		})
 		// change the mouse cursor to show it is clickable
 		domElement.addEventListener('mouseover', function(){
