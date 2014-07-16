@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three-r67.js/build/three.js'></script>
+<script src="../../../vendor/three-r67.js/examples/js/Mirror.js"></script>
+<script src="../../../vendor/three-r67.js/examples/js/WaterShader.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer({
+		antialias	: true
+	});
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 3000000);
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var directionalLight = new THREE.DirectionalLight( 0xffff55, 1 );
+	directionalLight.position.set( - 1, 0.4, - 1 );
+	scene.add( directionalLight );
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.BoxGeometry( 1, 100, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+
+	mesh.scale.multiplyScalar(20)
+	mesh.position.x	= +20
+	mesh.rotation.z	= Math.PI/4
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.BoxGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+
+	mesh.scale.multiplyScalar(20)
+	mesh.position.y	= +20
+	
+	onRenderFcts.push(function(delta, now){
+		mesh.rotation.x += 1 * delta;
+		mesh.rotation.y += 2 * delta;		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// load skybox
+	var cubeMap = new THREE.Texture( [] );
+	cubeMap.format = THREE.RGBFormat;
+	cubeMap.flipY = false;
+
+	var loader = new THREE.ImageLoader();
+	loader.load( 'images/skyboxsun25degtest.png', function ( image ) {
+		// convert the 
+		var getSide = function ( x, y ) {
+
+			var size = 1024;
+
+			var canvas = document.createElement( 'canvas' );
+			canvas.width = size;
+			canvas.height = size;
+
+			var context = canvas.getContext( '2d' );
+			context.drawImage( image, - x * size, - y * size );
+
+			return canvas;
+
+		};
+
+		cubeMap.image[ 0 ] = getSide( 2, 1 ); // px
+		cubeMap.image[ 1 ] = getSide( 0, 1 ); // nx
+		cubeMap.image[ 2 ] = getSide( 1, 0 ); // py
+		cubeMap.image[ 3 ] = getSide( 1, 2 ); // ny
+		cubeMap.image[ 4 ] = getSide( 1, 1 ); // pz
+		cubeMap.image[ 5 ] = getSide( 3, 1 ); // nz
+		cubeMap.needsUpdate = true;
+
+	} );
+
+	var cubeShader = THREE.ShaderLib['cube'];
+	cubeShader.uniforms['tCube'].value = cubeMap;
+
+	var skyBoxMaterial = new THREE.ShaderMaterial( {
+		fragmentShader: cubeShader.fragmentShader,
+		vertexShader: cubeShader.vertexShader,
+		uniforms: cubeShader.uniforms,
+		depthWrite: false,
+		side: THREE.BackSide
+	});
+
+	var skyBox = new THREE.Mesh(
+		new THREE.BoxGeometry( 1000000, 1000000, 1000000 ),
+		skyBoxMaterial
+	);
+	
+	scene.add( skyBox );
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+	var waterNormals = new THREE.ImageUtils.loadTexture( 'images/waternormals.jpg' );
+	waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
+
+	var water = new THREE.Water( renderer, camera, scene, {
+		textureWidth: 1024, 
+		textureHeight: 1024,
+		waterNormals: waterNormals,
+		alpha: 	0.7,
+		// sunDirection: directionalLight.position.normalize(),
+		// sunColor: 0xffffff,
+		// waterColor: 0x001e0f,
+		// distortionScale: 50.0/1,
+	} );
+
+
+	camera.position.set( 0, 20, 100 ).setLength(100/1);
+	camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+	var mirrorMesh = new THREE.Mesh(
+		new THREE.PlaneGeometry( 1, 1, 50,50 ), 
+		water.material
+	);
+
+	mirrorMesh.add( water );
+	mirrorMesh.rotation.x = - Math.PI/2;
+	mirrorMesh.scale.multiplyScalar(2000)
+	scene.add( mirrorMesh );
+	
+
+	onRenderFcts.push(function(delta){
+		water.material.uniforms.time.value += 1.0 / 60.0;
+		water.render();		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	// var mouse	= {x : 0, y : 0}
+	// document.addEventListener('mousemove', function(event){
+	// 	mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+	// 	mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	// }, false)
+	// onRenderFcts.push(function(delta, now){
+	// 	camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+	// 	camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+	// 	camera.lookAt( scene.position )
+	// })
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

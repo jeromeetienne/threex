@@ -1,84 +1,60 @@
 <!DOCTYPE html>
-<script src='vendor/three.js/three.js'></script>
-<script src='../threex.romemodels.js'></script>
-<body style='margin: 0px; overflow: hidden;'><script>
-	// setup webgl renderer full page
+<script src='../../../vendor/three-r67.js/build/three.js'></script>
+<script src="../../../vendor/three-r67.js/examples/js/Mirror.js"></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer({
 		antialias	: true
 	});
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setClearColor( 0xbbbbbb );
 	document.body.appendChild( renderer.domElement );
-	// setup a scene and camera
+
+	var onRenderFcts= [];
 	var scene	= new THREE.Scene();
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
 	camera.position.z = 3;
 
-	// declare the rendering loop
-	var onRenderFcts= [];
-
 	//////////////////////////////////////////////////////////////////////////////////
-	//		default 3 points lightning					//
-	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.BoxGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
 	
-	var ambientLight= new THREE.AmbientLight( 0x020202 )
-	scene.add( ambientLight)
-	var frontLight	= new THREE.DirectionalLight('white', 1)
-	frontLight.position.set(0.5, 0.5, 2)
-	scene.add( frontLight )
-	var backLight	= new THREE.DirectionalLight('white', 0.75)
-	backLight.position.set(-0.5, -0.5, -2)
-	scene.add( backLight )		
+	onRenderFcts.push(function(delta, now){
+		mesh.rotation.x += 1 * delta;
+		mesh.rotation.y += 2 * delta;		
+	})
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Comment								//
 	//////////////////////////////////////////////////////////////////////////////////
+	var wallMesh	= new THREE.Mesh( new THREE.PlaneGeometry( 10, 10 ), new THREE.MeshNormalMaterial() );
+	wallMesh.position.z	= -2
+	scene.add( wallMesh );
 
-	THREEx.RomeModels.loadHorse(function(mesh){
-		scene.add(mesh)
-		onRenderFcts.push(function(delta, now){
-			mesh.updateAnimation( delta*1000 );
-		})
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Mirror								//
+	//////////////////////////////////////////////////////////////////////////////////
 
-		mesh.position.y	= -1
-		mesh.rotation.y	= Math.PI/2
+	var mirror	= new THREE.Mirror(renderer, camera, {
+		// clipBias	: 0.003, 
+		color		: 0x889999,
+		textureWidth	: 1024,
+		textureHeight	: 1024,
+	});
+	onRenderFcts.push(function(delta){
+		mirror.render();
 	})
 
-	THREEx.RomeModels.loadParrot(function(mesh){
-		scene.add(mesh)
-		onRenderFcts.push(function(delta, now){
-			mesh.updateAnimation( delta*1000 );
-		})
+	var mirrorMesh	= new THREE.Mesh( new THREE.CircleGeometry( 1,32), mirror.material );
+	mirrorMesh.add( mirror );
+	mirrorMesh.scale.set(1,2,1)
+	mirrorMesh.position.z	= +0.001	// bias to avoid z-fighting
+	wallMesh.add( mirrorMesh );
 
-		// remove smoothness if needed
-		// mesh.material.morphNormals	= false
-
-		mesh.position.x	= -1
-		mesh.position.y	= 0.5
-		mesh.rotation.y	= Math.PI/2
-	})
-
-	THREEx.RomeModels.loadFlamingo(function(mesh){
-		scene.add(mesh)
-		onRenderFcts.push(function(delta, now){
-			mesh.updateAnimation( delta*1000 );
-		})
-
-		mesh.position.y	= 0.5
-		mesh.rotation.y	= Math.PI/2
-	})
-
-	THREEx.RomeModels.loadStork(function(mesh){
-		scene.add(mesh)
-		onRenderFcts.push(function(delta, now){
-			mesh.updateAnimation( delta*1000 );
-		})
-
-		mesh.position.x	= +1
-		mesh.position.y	= 0.5
-		mesh.rotation.y	= Math.PI/2
-	})
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Camera Controls							//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -93,6 +69,7 @@
 		camera.lookAt( scene.position )
 	})
 
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		render the scene						//
 	//////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +78,7 @@
 	})
 	
 	//////////////////////////////////////////////////////////////////////////////////
-	//		Rendering Loop runner						//
+	//		loop runner							//
 	//////////////////////////////////////////////////////////////////////////////////
 	var lastTimeMsec= null
 	requestAnimationFrame(function animate(nowMsec){
