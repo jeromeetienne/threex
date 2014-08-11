@@ -1,7 +1,7 @@
 var THREEx	= THREEx	|| {}
 
 
-THREEx.Outline	= function(object3d, renderer, camera, thickness){
+THREEx.OutlineHelper	= function(object3d, renderer, camera, thickness){
 	thickness	= thickness !== undefined ? thickness : 8
 	// compute the object height
 	var boundingBox	= new THREE.Box3().setFromObject(object3d)
