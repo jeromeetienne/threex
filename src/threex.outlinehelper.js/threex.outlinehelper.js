@@ -12,31 +12,35 @@ THREEx.OutlineHelper	= function(object3d, renderer, camera, thickness){
 		color	: new THREE.Color(0x0088cc),
 		side	: THREE.BackSide,
 	})
-	var outline	= new THREE.Mesh(object3d.geometry, material)
-	this.object3d	= outline
-	// add it to the object3d
-	object3d.add(outline)
-/**
- * * it should not be attached to object3d but to world
- * * this is a helper
- * * recompute the world position and copy them
- */
+	THREE.Mesh.call( this, object3d.geometry, material)
+
 	// update function
 	this.update	= function(){
+		// update worldMatrix
+		object3d.updateMatrixWorld();
+
+		// decompose object3d.matrixWorld
+		var position	= new THREE.Vector3()
+		var scale	= new THREE.Vector3()
+		var quaternion	= new THREE.Quaternion()
+		object3d.matrixWorld.decompose(position, quaternion, scale)
+
 		// from https://developer.valvesoftware.com/wiki/Field_of_View#FOV_calculations
-		var objectDistance	= object3d.position.distanceTo(camera.position)
+		var objectDistance	= position.distanceTo(camera.position)
 		var screenHeight	= renderer.domElement.height
 		var yFovInRadians	= camera.fov / 180 * Math.PI
 		var objectScreenHeight	= screenHeight * objectHeight/(objectDistance * (2*Math.tan(yFovInRadians/2)))
-		// console.log(objectScreenHeight)
-/**
- * if height === 250, scale = 1.01
- * if height === 25, scale = 1.1
- */
 
- 		// compute the scale 
- 		var scaleFactor	= 0.0025 * (250/objectScreenHeight)
- 		var scale	= 1 + scaleFactor*thickness
- 		outline.scale.set(1,1,1).multiplyScalar(scale)		
+		// compute the scale 
+ 		var scaleRatio	= 0.0025 * (250/objectScreenHeight)
+ 		var scaleFactor	= 1 + scaleRatio*thickness
+ 		scale.multiplyScalar(scaleFactor)
+
+ 		// now compose the helper matrixWorld
+		this.matrixWorld.compose(position, quaternion, scale)
+		this.matrixAutoUpdate = false;
 	}
 }
+
+
+THREEx.OutlineHelper.prototype = Object.create( THREE.Mesh.prototype );
