@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script id="fragmentShaderMinimal" type="x-shader/x-fragment">
+void main( void ) {
+	gl_FragColor = vec4( 0, 1, 1, 1 );
+}
+</script>
+<script id="fragmentShader" type="x-shader/x-fragment">
+// test
+uniform float time;
+varying vec2 vUv;
+void main( void ) {
+	vec2 position = -1.0 + 2.0 * vUv;
+	float red   = abs( sin( position.x * position.y + time / 5.0 ) );
+	float green = abs( sin( position.x * position.y + time / 4.0 ) );
+	float blue  = abs( sin( position.x * position.y + time / 3.0 ) );
+	gl_FragColor = vec4( red, green, blue, 1.0 );
+}
+</script>
+<script id="vertexShader" type="x-shader/x-vertex">
+	varying vec2 vUv;
+	void main(){
+		vUv = uv;
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+	}
+</script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.Camera()
+	camera.position.z = 1;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	// define the material
+var uniforms	= {
+	time	: { type: "f", value: 1.0 },
+}
+var vertexShader	= document.getElementById('vertexShader')
+var fragmentShader	= document.getElementById('fragmentShader')
+var material = new THREE.ShaderMaterial( {
+	uniforms	: uniforms,
+	vertexShader	: vertexShader.textContent,
+	fragmentShader	: fragmentShader.textContent
+});
+
+	// update the time
+	var clock	= new THREE.Clock();
+	onRenderFcts.push(function(){
+		var delta	= clock.getDelta();
+		material.uniforms.time.value += delta * 5;
+	})
+
+	// build a object3d with it and add it the scene
+	// - note the PlaneGeometry 2,2
+	// - this is in relation with our camera
+	var geometry	= new THREE.PlaneGeometry(2,2);
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

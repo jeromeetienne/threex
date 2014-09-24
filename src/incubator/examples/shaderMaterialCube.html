@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<script src='../../../vendor/three.js/build/three.min.js'></script>
+<script id="fragmentShader" type="x-shader/x-fragment">
+
+	uniform float time;
+	uniform vec2 resolution;
+
+	varying vec2 vUv;
+
+	void main( void ) {
+
+		vec2 position = -1.0 + 2.0 * vUv;
+
+		float red = abs( sin( position.x * position.y + time / 5.0 ) );
+		float green = abs( sin( position.x * position.y + time / 4.0 ) );
+		float blue = abs( sin( position.x * position.y + time / 3.0 ) );
+		gl_FragColor = vec4( red, green, blue, 1.0 );
+
+	}
+
+</script>
+<script id="vertexShader" type="x-shader/x-vertex">
+
+	varying vec2 vUv;
+
+	void main()
+	{
+		vUv = uv;
+		vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		gl_Position = projectionMatrix * mvPosition;
+	}
+
+</script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	// define the material
+	var material = new THREE.ShaderMaterial( {
+		uniforms	: {
+			time		: { type: "f", value: 1.0 },
+		},
+		vertexShader	: document.getElementById( 'vertexShader'  ).textContent,
+		fragmentShader	: document.getElementById( 'fragmentShader').textContent
+
+	} );
+
+	// update the time	
+	var clock	= new THREE.Clock();
+	onRenderFcts.push(function(){
+		var delta	= clock.getDelta();
+		material.uniforms.time.value += delta * 5;
+	})
+
+	// build a object3d
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	
+	onRenderFcts.push(function(delta, now){
+		mesh.rotation.x += 1 * delta;
+		mesh.rotation.y += 2 * delta;		
+	})
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>

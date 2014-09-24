@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<script src='vendor/three.js/build/three.min.js'></script>
+<script src='../threex.spritelensflare.js'></script>
+<body style='margin: 0px; background-color: #bbbbbb; overflow: hidden;'><script>
+	var renderer	= new THREE.WebGLRenderer({ antialias: true, alpha: true });
+	renderer.setClearColor( new THREE.Color('black'), 1 );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+	var onRenderFcts= [];
+	var scene	= new THREE.Scene();
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+	camera.position.z = 3;
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////	
+	var geometry	= new THREE.CubeGeometry( 1, 1, 1);
+	var material	= new THREE.MeshNormalMaterial();
+	var mesh	= new THREE.Mesh( geometry, material );
+	scene.add( mesh );
+	
+	onRenderFcts.push(function(delta, now){
+		mesh.rotation.x += 1 * delta;
+		mesh.rotation.y += 2 * delta;		
+	})
+	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+
+	var flareColor = new THREE.Color( 0xffffff );
+	flareColor.setHSL( 0.55, 0.9, 0.5 + 0.5 );
+	flareColor.set('white')
+
+	var lensFlare	= new THREEx.SpriteLensFlare(flareColor)
+	lensFlare.position.set(0, 0, -512);
+
+	scene.add( lensFlare );
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var mouse	= {x : 0, y : 0}
+	document.addEventListener('mousemove', function(event){
+		mouse.x	= (event.clientX / window.innerWidth ) - 0.5
+		mouse.y	= (event.clientY / window.innerHeight) - 0.5
+	}, false)
+	onRenderFcts.push(function(delta, now){
+		camera.position.x += (mouse.x*5 - camera.position.x) * (delta*3)
+		camera.position.y += (mouse.y*5 - camera.position.y) * (delta*3)
+		camera.lookAt( scene.position )
+	})
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	onRenderFcts.push(function(){
+		renderer.render( scene, camera );		
+	})
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+		// call each update function
+		onRenderFcts.forEach(function(onRenderFct){
+			onRenderFct(deltaMsec/1000, nowMsec/1000)
+		})
+	})
+</script></body>
