@@ -25,7 +25,7 @@ var THREEx	= THREEx 		|| {};
 */
 THREEx.BoilerPlate	= function(renderer, camera){
 
-	this.windowResize	= THREEx.WindowResize(renderer, camera).trigger()
+	// this.windowResize	= THREEx.WindowResize(renderer, camera).trigger()
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	
