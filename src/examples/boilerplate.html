@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!-- for ios and maybe other mobiles -->
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-<script src='../../../vendor/three-r67.js/build/three.min.js'></script>
-<script src='../../../vendor/three-r67.js/examples/js/controls/OrbitControls.js'></script>
+<script src='../../vendor/three-r67.js/build/three.min.js'></script>
+<script src='../../vendor/three-r67.js/examples/js/controls/OrbitControls.js'></script>
 <body style='margin: 0px; overflow: hidden;'><script>
 	var renderer	= new THREE.WebGLRenderer({
 		antialias	: true,
@@ -22,7 +22,7 @@
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////	
 	var geometry	= new THREE.TorusKnotGeometry(0.5-0.12, 0.12);
-	var material	= new THREE.MeshNormalMaterial();
+	var material	= new THREE.MeshNormalMaterial(); 
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 	
