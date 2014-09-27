@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-<script src='../../vendor/three-r67.js/build/three.min.js'></script>
-<script src='../../vendor/three-r67.js/examples/js/controls/OrbitControls.js'></script>
+<script src='../../../vendor/three-r67.js/build/three.min.js'></script>
+<script src='../../../vendor/three-r67.js/examples/js/controls/OrbitControls.js'></script>
 <div style='position: absolute; top: 0px; width: 100%;font-family:arial; font-weight: bolder; padding-top: 5px;'>
-	Boilerplate for <a href="http://threejs.org" target="_blank">three.js</a>
+	<a href="https://github.com/jeromeetienne/threejsboilerplate" target="_blank">Boilerplate</a>
+	for
+	<a href="http://threejs.org" target="_blank">three.js</a>
 	- works on desktop and mobile
 </div><body style='margin: 0px; overflow: hidden; text-align:center;'><script>
 	//////////////////////////////////////////////////////////////////////////////////
@@ -12,7 +14,7 @@
 
 	// init renderer
 	var renderer	= new THREE.WebGLRenderer({
-		antialias	: true,
+		antialias	: true
 	});
 	renderer.setClearColor(new THREE.Color('lightgrey'), 1)
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -31,9 +33,15 @@
 	//		add an object in the scene
 	//////////////////////////////////////////////////////////////////////////////////
 
+	var texture	= THREE.ImageUtils.loadTexture( "images/water.jpg" );
+	texture.repeat.set( 1,22 );
+	texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
 	// add a torus	
-	var geometry	= new THREE.TorusKnotGeometry(0.5-0.12, 0.12);
-	var material	= new THREE.MeshNormalMaterial(); 
+	var geometry	= new THREE.BoxGeometry(1,1,1);
+	var material	= new THREE.MeshBasicMaterial({
+		map	: texture
+	}); 
 	var mesh	= new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 	

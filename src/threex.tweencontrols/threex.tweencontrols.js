@@ -38,7 +38,9 @@ THREEx.TweenControls	= function(object3d){
 		startScale.copy(object3d.scale)
 		finalScale.copy(newScale)
 	}
-
+	this.isRunning	= function(){
+		return startTime !== null ? true : false
+	}
 	this.update	= function(){
 		// return now if no tweening is in progress
 		if( startTime === null )	return

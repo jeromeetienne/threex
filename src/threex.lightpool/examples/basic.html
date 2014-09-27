@@ -4,7 +4,8 @@
 <script src='../../vendor/three-r67.js/examples/js/controls/OrbitControls.js'></script>
 <div style='position: absolute; top: 0px; width: 100%;font-family:arial; font-weight: bolder; padding-top: 5px;'>
 	Boilerplate for <a href="http://threejs.org" target="_blank">three.js</a>
-	- works on desktop and mobile
+	-
+	works on desktop and mobile
 </div><body style='margin: 0px; overflow: hidden; text-align:center;'><script>
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Init
@@ -26,6 +27,29 @@
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
 	camera.position.z = 2;
 	var controls	= new THREE.OrbitControls(camera)
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Init light pool
+	//////////////////////////////////////////////////////////////////////////////////
+
+	// init the light pool BEFORE the first rendering
+	var lightPool	= {
+		directional	: new THREEx.LightPool(THREE.DirectionalLight, 3),
+		pointLight	: new THREEx.LightPool(THREE.PointLight, 20),
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var light	= lightPool.pointLight.pop()
+	light.color.set('white')
+	scene.add(light)
+
+	setTimeout(function(){
+		scene.remove(light)
+		lightPool.pointLight.push(light)
+	}, 1000)
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//		add an object in the scene

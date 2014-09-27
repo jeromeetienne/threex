@@ -312,15 +312,15 @@ function FlameThrowerWebAudio(){
 		sourceNode.buffer	= buffer;
 		sourceNode.loop	= true;
 
-		var gainNode	= audioCtx.createGainNode()
+		var gainNode	= audioCtx.createGain()
 		sourceNode.connect(gainNode);
 		gainNode.connect(audioCtx.destination);
 
 		sourceNode.start(0);
 		updateFcts.push(function(delta, now){
 			var intensity	= trigger.intensity()
-			sourceNode.playbackRate.value	= 0.5 + intensity*1.5;
-			gainNode.gain.value		= intensity*30;
+			sourceNode.playbackRate.value	= 0.2 + intensity*2.5;
+			gainNode.gain.value		= intensity*15;
 		});
 	})	
 	this.update	= function(delta, now){

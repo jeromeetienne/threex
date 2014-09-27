@@ -20,7 +20,7 @@ WebAudiox.FlameThrower	= function(context, destination){
 	var url		= WebAudiox.FlameThrower.baseUrl + 'sounds/flamethrower-freesoundloop.wav';
 	loadSoundWebAudio(url, function(buffer){
 		// GainNode
-		var gainNode	= context.createGainNode()
+		var gainNode	= context.createGain()
 		gainNode.connect(destination);
 		destination	= gainNode
 		// BufferSource
@@ -35,7 +35,6 @@ WebAudiox.FlameThrower	= function(context, destination){
 		updateFcts.push(function(delta, now){
 			var intensity	= trigger.intensity()
 			bufferSource.playbackRate.value	= 0.5 + intensity*1.5;
-			// gainNode.gain.value		= intensity*0;
 			gainNode.gain.value		= intensity*30;
 		});
 	})	
